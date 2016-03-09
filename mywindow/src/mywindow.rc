@@ -1,1 +1,26 @@
+#include <windows.h>
+#include "resource.h"
+
 1 ICON "ringtones.ico"
+
+MYMENU1 MENU PRELOAD DISCARDABLE
+BEGIN
+  POPUP "&File"
+  BEGIN
+    MENUITEM "&New",    IDM_New, CHECKED
+    MENUITEM "&Open"   ,IDM_Open
+    MENUITEM "&Save"   ,IDM_Save
+    MENUITEM SEPARATOR
+    MENUITEM "E&xit"   ,IDM_Exit
+  END
+  POPUP "&Edit"
+  BEGIN
+    MENUITEM "Cu&t"    ,IDM_Cut
+    MENUITEM "&Copy"   ,IDM_Copy
+    MENUITEM "&Paste"  ,IDM_Paste
+  END
+  POPUP "&Help"
+  BEGIN
+    MENUITEM "&About"  ,IDM_About
+  END
+END

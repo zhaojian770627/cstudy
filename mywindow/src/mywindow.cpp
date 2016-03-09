@@ -1,4 +1,5 @@
 #include <windows.h>
+#include "resource.h"
 
 /*  Declare Windows procedure  */
 LRESULT CALLBACK WindowProcedure (HWND, UINT, WPARAM, LPARAM);
@@ -27,7 +28,8 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
     wincl.hIcon = LoadIcon (NULL, IDI_APPLICATION);
     wincl.hIconSm = LoadIcon (NULL, IDI_APPLICATION);
     wincl.hCursor = LoadCursor (NULL, IDC_ARROW);
-    wincl.lpszMenuName = NULL;                 /* No menu */
+    wincl.lpszMenuName =  MAKEINTRESOURCE(MYMENU1);	;                 /* No menu */
+
     wincl.cbClsExtra = 0;                      /* No extra bytes after the window class */
     wincl.cbWndExtra = 0;                      /* structure or the window instance */
     /* Use Windows's default color as the background of the window */
