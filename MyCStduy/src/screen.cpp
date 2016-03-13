@@ -7,6 +7,8 @@
 
 #include "screen.h"
 
+int Screen::si=0;
+
 char Screen::get(index r, index c) const {
 	index row = r * width;
 	return contents[row + c];

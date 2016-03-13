@@ -52,6 +52,8 @@ private:
 	std::string contents;
 	index cursor;
 	index height, width;
+	static int si;
+	const static int ssi=11;
 };
 
 #endif /* SCREEN_H_ */
