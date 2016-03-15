@@ -5,7 +5,7 @@
  *      Author: zhaojian
  */
 
-#include "screen.h"
+#include "Screen.h"
 
 int Screen::si=0;
 
