@@ -7,16 +7,15 @@
 
 #ifndef FOLDER_H_
 #define FOLDER_H_
-
+#include <iostream>
 #include <vector>
 #include <set>
-
 #include "Message.h"
 
 class Folder {
 	friend class Message;
 public:
-	Folder() { } // defaults ok
+	Folder() { std::cerr<<"Folder()"<<std::endl; } // defaults ok
     Folder(const Folder&); // add new folder to each Message| in msgs
     Folder& operator=(const Folder&); // delete Folder from lhs messages
 
@@ -31,7 +30,7 @@ private:
     typedef std::set<Message*>::const_iterator Msg_iter;
     std::set<Message*> msgs;  // messages in this folder
 
-    void copy_msgs(const std::set<Message*>&);// add this Folder to each Message
+    void copy_msgs(const std::set<Message*>&); // add this Folder to each Message
     void empty_msgs();           // remove this Folder from each Message
     void addMsg(Message *m) { msgs.insert(m); }
     void remMsg(Message *m) { msgs.erase(m); }
