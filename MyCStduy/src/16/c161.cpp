@@ -8,8 +8,10 @@
 
 #include <iostream>
 #include "compare.h"
+#include "Queue.h"
 
-#include "compare.cpp";
+#include "compare.cpp"
+#include "Queue.cc"
 
 using namespace std;
 
@@ -20,5 +22,10 @@ int main() {
 
 	int r2 = compare(33.6, 4.5);
 	cout << r2 << endl;
+	Queue<int> queue;
+	queue.push(1);
+	queue.push(2);
+	queue.pop();
+	cout<<queue.front()<<endl;
 	return 0;
 }
