@@ -27,7 +27,20 @@ struct Footer{		// ÄÚ´æ¿éÎ²²¿
 
 const int MaxHeap=16384;	//16KB
 const int MinWordSize=sizeof(int);
+const int MinEpsilon=sizeof(Header)+sizeof(Footer)+4;
+
 class DynMem {
+protected:
+	enum Status {		// ¿é×´Ì¬
+		vacant,used
+	};
+	char heap[MaxHeap];	// ¶Ñ
+	int WordSize;		// ×Ö³ß´ç
+	int epsilon;
+	Header *FreeList;
+	Header *HeadOf(void *block){
+		return (Header*)block-1;
+	}
 public:
 	DynMem();
 	virtual ~DynMem();
