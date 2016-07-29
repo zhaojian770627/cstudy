@@ -20,29 +20,51 @@ struct Header {		// ÄÚ´æ¿éÍ·²¿
 	Status tag;		// ¿é×´Ì¬
 };
 
-struct Footer{		// ÄÚ´æ¿éÎ²²¿
+struct Footer {		// ÄÚ´æ¿éÎ²²¿
 	Header *uLink;	// ÉÏÖ¸Õë
 	Status tag;		// ¿é×´Ì¬
 };
 
-const int MaxHeap=16384;	//16KB
-const int MinWordSize=sizeof(int);
-const int MinEpsilon=sizeof(Header)+sizeof(Footer)+4;
+const int MaxHeap = 16384;	//16KB
+const int MinWordSize = sizeof(int);
+const int MinEpsilon = sizeof(Header) + sizeof(Footer) + 4;
 
 class DynMem {
 protected:
 	enum Status {		// ¿é×´Ì¬
-		vacant,used
+		vacant, used
 	};
 	char heap[MaxHeap];	// ¶Ñ
 	int WordSize;		// ×Ö³ß´ç
 	int epsilon;
 	Header *FreeList;
-	Header *HeadOf(void *block){
-		return (Header*)block-1;
+	Header *HeadOf(void *block) {
+		return (Header*) block - 1;
 	}
+	Footer * FootOf(Header *h) {
+		return (Footer*) ((char*) h + h->size) - 1;
+	}
+	void * BlockOf(Header *h) {
+		return (void*) (h + 1);
+	}
+
+	Header * PrevHead(Header *h) {
+		return (Header*)((char*)h+h->size);
+	}
+
+	Header *NextHead(Header* h);
+	void InsertBlock(Header *h);
+	void RemoveBlock(Header *h);
+
 public:
-	DynMem();
+	DynMem(int eps=MinEpsilon,int wSize=MinWordSize);
+	void * NewPtr(int bytes);
+	void FreePtr(void *ptr);
+	int PtrSize(void *ptr)
+	{
+		return HeadOf(ptr)->size-sizeof(Header)-sizeof(Footer);
+	}
+	void *ResizePtr(void *ptr,int NewSize);
 	virtual ~DynMem();
 };
 
