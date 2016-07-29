@@ -18,6 +18,12 @@ inline void DynMem::InsertBlock(Header *head){
 	head->rLink->lLink=head->lLink->rLink=head;
 
 }
+
+inline void DynMem::RemoveBlock(Header *head){
+	FreeList=head->lLink;
+	head->rLink->lLink=head->lLink;
+	head->lLink->rLink=head->rLink;
+}
 DynMem::DynMem(int eps,int wSize) {
 	std::cout<<eps<<std::endl;
 	std::cout<<wSize<<std::endl;
