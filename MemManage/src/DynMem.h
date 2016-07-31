@@ -31,9 +31,6 @@ const int MinEpsilon = sizeof(Header) + sizeof(Footer) + 4;
 
 class DynMem {
 protected:
-	enum Status {		// ¿é×´Ì¬
-		vacant, used
-	};
 	char heap[MaxHeap];	// ¶Ñ
 	int WordSize;		// ×Ö³ß´ç
 	int epsilon;
