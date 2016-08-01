@@ -12,5 +12,8 @@ using namespace std;
 int main() {
 	DynMem dynMem;
 	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
+	void *p=dynMem.NewPtr(16);
+	cout << p << endl; // prints !!!Hello World!!!
+	cout << sizeof(Header) << endl;
 	return 0;
 }
