@@ -46,10 +46,12 @@ protected:
 	}
 
 	Header * PrevHead(Header *h) {
-		return (Header*)((char*)h+h->size);
+		return (Header*)((char*)h-h->size);
 	}
 
-	Header *NextHead(Header* h);
+	Header *NextHead(Header* h){
+		return (Header*)((char*)h+h->size);
+	}
 	void InsertBlock(Header *h);
 	void RemoveBlock(Header *h);
 

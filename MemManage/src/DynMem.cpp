@@ -94,6 +94,38 @@ void *DynMem::NewPtr(int bytes) {
 	return 0;
 }
 
+/**
+ * 释放内存块
+ */
+void DynMem::FreePtr(void *ptr) {
+	Header *head = HeadOf(ptr);	// 被释放的块
+	Footer *foot = FootOf(head);
+	Header *prev = PrevHead(head);	// 前邻接块
+	Header *next = NextHead(head);	// 后邻接块
+	int size = head->size;
+
+	if ((prev->tag & used) && (next->tag & used)) {
+		// 两邻接块皆使用
+		InsertBlock(head);
+	} else if (!(prev->tag & used) && (next->tag & used)) {
+		// 仅前邻接块空闲
+		prev->size += size;
+		foot->tag = vacant;
+		foot->uLink = prev;
+	} else if ((prev->tag & used) && !(next->tag & used)) {
+		// 仅后邻接块空闲
+		head->size += next->size;
+		foot->uLink = head;
+		RemoveBlock(next);
+		InsertBlock(head);
+	} else {
+		// 两邻接块空闲
+		prev->size += size + next->size;
+		FootOf(prev)->uLink = prev;
+		RemoveBlock(next);
+	}
+}
+
 DynMem::~DynMem() {
 	// TODO Auto-generated destructor stub
 }
