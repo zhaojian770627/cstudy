@@ -46,7 +46,7 @@ protected:
 	}
 
 	Header * PrevHead(Header *h) {
-		return (Header*)((char*)h-h->size);
+		return ((Footer*)h-1)->uLink;
 	}
 
 	Header *NextHead(Header* h){

@@ -11,9 +11,14 @@ using namespace std;
 
 int main() {
 	DynMem dynMem;
-	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
-	void *p=dynMem.NewPtr(16);
-	cout << p << endl; // prints !!!Hello World!!!
-	cout << sizeof(Header) << endl;
+	void *p1=dynMem.NewPtr(16);
+	cout <<"p1:"<< p1 << endl;
+	void *p2=dynMem.NewPtr(16);
+	cout <<"p2:"<< p2 << endl;
+	void *p3=dynMem.NewPtr(16);
+	cout <<"p3:"<< p3 << endl;
+	dynMem.FreePtr(p1);
+	dynMem.FreePtr(p3);
+	dynMem.FreePtr(p2);
 	return 0;
 }
