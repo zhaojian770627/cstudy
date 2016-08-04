@@ -126,6 +126,52 @@ void DynMem::FreePtr(void *ptr) {
 	}
 }
 
+/**
+ * 调整尺寸
+ */
+void * DynMem::ResizePtr(void *ptr, int NewSize) {
+	int size = PtrSize(ptr);
+	int diff;
+	Header *head = HeadOf(ptr);
+	Footer *foot;
+
+	if (NewSize<0 || NewSize == size>)
+		return ptr;
+
+	if (NewSize<size>) {	// 缩小尺寸
+		diff = size - NewSize;
+		if (diff > MinEpsilon) {	// 分为两块
+			head->size -= diff;
+			(foot = FootOf(head))->uLink = head;
+			foot->tag = head->tag;
+			(head = NextHead(head))->size = diff;
+			FootOf(head)->uLink = head;
+			InsertBlock(head);
+		}
+		return ptr;
+	} else {
+		diff = NewSize - size;
+		Header *prev = PrevHead(head);
+		Header *next = NextHead(head);
+		int PrevSize = ((prev->tag & used) ? 0 : prev->size);
+		int NextSize = ((next->tag & used) ? 0 : next->size);
+		Status tag = head->tag;
+		size = head->size;
+		if (diff > PrevSize + NextSize)
+			return ptr;
+		if (PrevSize > 0) {
+			head = prev;
+			RemoveBlock(prev);
+		}
+		if (NextSize > 0)
+			RemoveBlock(next);
+		head->size = size + PrevSize + NextSize;
+		(foot = FootOf(head))->uLink = head;
+		head->tag = foot->tag = tag;
+		return ResizePtr(BlockOf(head), NewSize);	// 太大时
+	}
+}
+
 DynMem::~DynMem() {
 	// TODO Auto-generated destructor stub
 }
