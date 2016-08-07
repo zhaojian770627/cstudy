@@ -9,7 +9,7 @@
 #define DYNMEM_H_
 
 enum Status {
-	vacant, used
+	vacant, used, relocatable
 };
 
 struct Header {		// ÄÚ´æ¿éÍ·²¿
@@ -46,24 +46,23 @@ protected:
 	}
 
 	Header * PrevHead(Header *h) {
-		return ((Footer*)h-1)->uLink;
+		return ((Footer*) h - 1)->uLink;
 	}
 
-	Header *NextHead(Header* h){
-		return (Header*)((char*)h+h->size);
+	Header *NextHead(Header* h) {
+		return (Header*) ((char*) h + h->size);
 	}
 	void InsertBlock(Header *h);
 	void RemoveBlock(Header *h);
 
 public:
-	DynMem(int eps=MinEpsilon,int wSize=MinWordSize);
+	DynMem(int eps = MinEpsilon, int wSize = MinWordSize);
 	void * NewPtr(int bytes);
 	void FreePtr(void *ptr);
-	int PtrSize(void *ptr)
-	{
-		return HeadOf(ptr)->size-sizeof(Header)-sizeof(Footer);
+	int PtrSize(void *ptr) {
+		return HeadOf(ptr)->size - sizeof(Header) - sizeof(Footer);
 	}
-	void *ResizePtr(void *ptr,int NewSize);
+	void *ResizePtr(void *ptr, int NewSize);
 	virtual ~DynMem();
 };
 

@@ -135,10 +135,10 @@ void * DynMem::ResizePtr(void *ptr, int NewSize) {
 	Header *head = HeadOf(ptr);
 	Footer *foot;
 
-	if (NewSize<0 || NewSize == size>)
+	if (NewSize<0 || NewSize == size)
 		return ptr;
 
-	if (NewSize<size>) {	// 缩小尺寸
+	if (NewSize<size) {	// 缩小尺寸
 		diff = size - NewSize;
 		if (diff > MinEpsilon) {	// 分为两块
 			head->size -= diff;
