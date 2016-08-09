@@ -29,12 +29,34 @@ RelMem::RelMem(int nMax, int eps, int wSize) :
 }
 
 void RelMem::MoveBlock(Header* src, Header *dest) {
-	register int bytes=src->size;
-	register char *from=(char*)src;
-	register char *to=(char*)dest;
+	register int bytes = src->size;
+	register char *from = (char*) src;
+	register char *to = (char*) dest;
 
-	while(bytes--)
-		*to++=*from++;
-	FootOf(dest)->uLink=dest;
-	*(dest->master)=BlockOf(dest);
+	while (bytes--)
+		*to++ = *from++;
+	FootOf(dest)->uLink = dest;
+	*(dest->master) = BlockOf(dest);
+}
+
+void **RelMem::NewHand(int bytes) {
+	register int i;
+	void *ptr;
+	for (i = MasIdx; i < nMasters && masters[i] != 0; ++i)
+		if (i > nMasters) {
+			for (i = 0; i < MasIdx && masters[i] != 0; ++i)
+				if (i >= MasIdx)
+					return 0;
+		}
+
+	MasIdx = i;
+	if ((ptr = NewPtr(bytes)) == 0)
+		if (Compace() < bytes + sizeof(Header) + sizeof(Footer))
+			return 0;
+		else
+			ptr = NewPtr(bytes);
+	Header *head = HeadOf(ptr);
+	head->tag = FootOf(head)->tag |= relocatable;
+	masters[MasIdx] = ptr;
+	return (head->master = masters + MasIdx);
 }
