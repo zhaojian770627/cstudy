@@ -27,5 +27,6 @@ int main() {
 	 */
 	// 测试可重定位的内存管理类
 	RelMem relMem;
+	relMem.NewHand(30);
 	return 0;
 }

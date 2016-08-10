@@ -56,7 +56,47 @@ void **RelMem::NewHand(int bytes) {
 		else
 			ptr = NewPtr(bytes);
 	Header *head = HeadOf(ptr);
-	head->tag = FootOf(head)->tag |= relocatable;
+	head->tag = FootOf(head)->tag = relocatable;
 	masters[MasIdx] = ptr;
 	return (head->master = masters + MasIdx);
 }
+
+int RelMem::Compace() {
+	FreeList = (Header*) heap;
+	FreeList->lLink = FreeList->rLink = FreeList;
+
+	Header *src = NextHead(FreeList);
+	Header *dest = src;
+	Header *LastHead = (Header*) masters - 1;
+	Footer *foot;
+	int largest = 0;
+
+	for (;;) {
+		if (!(src->tag & used))	// 空闲块
+			src = NextHead(src);
+		else if (src->tag & relocatable) {	// 可重定位的已用块
+			if (src != dest) {
+				Header *tmp = NextHead(src);
+				MoveBlock(src, dest);
+				src = tmp;
+				dest = NextHead(dest);
+			} else
+				src = dest = NextHead(src);
+		} else if (src != dest) {	// 无可重定位块
+			dest->size = (char*) src - (char*) dest;
+			(foot = FootOf(dest))->uLink = dest;
+			dest->tag = foot->tag = vacant;
+			InsertBlock(dest);
+			if (dest->size > largest)
+				largest = dest->size;
+			src = dest = NextHead(src);
+		} else
+			src = dest = NextHead(src);
+
+		if (src > LastHead)
+			break;
+
+	}
+	return largest;
+}
+
