@@ -73,8 +73,11 @@ int RelMem::Compace() {
 
 	for (;;) {
 		if (!(src->tag & used))	// 空闲块
+		{
+			// zhaojian add the low line
+			dest = src;
 			src = NextHead(src);
-		else if (src->tag & relocatable) {	// 可重定位的已用块
+		} else if (src->tag & relocatable) {	// 可重定位的已用块
 			if (src != dest) {
 				Header *tmp = NextHead(src);
 				MoveBlock(src, dest);
