@@ -56,10 +56,36 @@ void **RelMem::NewHand(int bytes) {
 		else
 			ptr = NewPtr(bytes);
 	Header *head = HeadOf(ptr);
-	head->tag = FootOf(head)->tag = relocatable;
+	head->tag = FootOf(head)->tag |= relocatable;
 	masters[MasIdx] = ptr;
 	return (head->master = masters + MasIdx);
 }
+
+void RelMem::ResizeHand(void **hand, int NewSize) {
+	*hand = ResizePtr(*hand, NewSize);
+	if (PtrSize(*hand) >= NewSize)		// 尝试调整指针大小
+		HeadOf(*hand)->master = hand;
+	else if (HeadOf(*hand)->tag & relocatable) {
+		void **newHand = newHand(NewSize);
+		if (newHand == 0)				// 失败
+			return;
+		FreeHand(hand);
+		*hand = *newHand;
+		*newHand = 0;
+		HeadOf(*hand)->master = hand;
+	}
+
+}
+
+void RelMem::LockHand(void **hand) {
+	Header *head = HeadOf(*hand);
+	head->tag = FootOf(head)->tag &= ~relocatable;
+} /* LockHand */
+
+void RelMem::UnlockHand(void **hand) {
+	Header *head = HeadOf(*hand);
+	head->tag = FootOf(head)->tag |= relocatable;
+} /* UnlockHand */
 
 int RelMem::Compace() {
 	FreeList = (Header*) heap;

@@ -17,12 +17,12 @@ struct Header {		// 内存块头部
 	Header * rLink;	// 右指针
 	void ** master;	// 本块的控制指针
 	int size;		// 以字节记得块大小
-	Status tag;		// 块状态
+	int tag;		// 块状态
 };
 
 struct Footer {		// 内存块尾部
 	Header *uLink;	// 上指针
-	Status tag;		// 块状态
+	int tag;		// 块状态
 };
 
 const int MaxHeap = 16384;	//16KB

@@ -155,7 +155,7 @@ void * DynMem::ResizePtr(void *ptr, int NewSize) {
 		Header *next = NextHead(head);
 		int PrevSize = ((prev->tag & used) ? 0 : prev->size);
 		int NextSize = ((next->tag & used) ? 0 : next->size);
-		Status tag = head->tag;
+		int tag = head->tag;
 		size = head->size;
 		if (diff > PrevSize + NextSize)
 			return ptr;
