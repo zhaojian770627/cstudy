@@ -66,7 +66,7 @@ void RelMem::ResizeHand(void **hand, int NewSize) {
 	if (PtrSize(*hand) >= NewSize)		// 尝试调整指针大小
 		HeadOf(*hand)->master = hand;
 	else if (HeadOf(*hand)->tag & relocatable) {
-		void **newHand = newHand(NewSize);
+		void **newHand = NewHand(NewSize);
 		if (newHand == 0)				// 失败
 			return;
 		FreeHand(hand);
