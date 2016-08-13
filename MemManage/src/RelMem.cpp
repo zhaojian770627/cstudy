@@ -50,11 +50,12 @@ void **RelMem::NewHand(int bytes) {
 		}
 
 	MasIdx = i;
-	if ((ptr = NewPtr(bytes)) == 0)
+	if ((ptr = NewPtr(bytes)) == 0){
 		if (Compace() < bytes + sizeof(Header) + sizeof(Footer))
 			return 0;
 		else
 			ptr = NewPtr(bytes);
+	}
 	Header *head = HeadOf(ptr);
 	head->tag = FootOf(head)->tag |= relocatable;
 	masters[MasIdx] = ptr;
