@@ -7,9 +7,15 @@
 //============================================================================
 
 #include <iostream>
+#include "Line.h"
 using namespace std;
 
 int main() {
 	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
+	Line line("abc efgh");
+	char s[30];
+	line.GetWord(s);
+	cout<<line<<endl;
+	cout<<s<<endl;
 	return 0;
 }
