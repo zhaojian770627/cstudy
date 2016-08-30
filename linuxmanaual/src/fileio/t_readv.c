@@ -36,8 +36,8 @@ int main(int argc, char *argv[]) {
 	iov[1].iov_len = sizeof(x);
 	totRequired += iov[1].iov_len;
 
-	iov[2].iov_base = &x;
-	iov[2].iov_len = sizeof(x);
+	iov[2].iov_base = str;
+	iov[2].iov_len = sizeof(STR_SIZE);
 	totRequired += iov[2].iov_len;
 
 	numRead = readv(fd, iov, 3);
