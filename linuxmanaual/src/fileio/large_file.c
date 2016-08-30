@@ -13,7 +13,7 @@
 
 int main(int argc, char *argv[]) {
 	int fd;
-	off64_t off;
+	off_t off;
 	if (argc != 3 || strcmp(argv[1], "--help") == 0)
 		usageErr("%s pathname offset\n", argv[0]);
 
