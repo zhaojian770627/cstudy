@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 #include <ctype.h>
 #include <fcntl.h>
-#include "../lib/tlpi_hdr.h"
+#include "../../lib/tlpi_hdr.h"
 
 #ifndef BUF_SIZE	/* Allow "cc -D" to override definition */
 #define BUF_SIZE 1024

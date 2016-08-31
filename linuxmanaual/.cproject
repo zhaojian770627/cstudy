@@ -43,7 +43,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="fileio/large_file.c|fileio/t_readv.c|study/dtee.c|fileio/seek_io.c|fileio/copy.c|fileio/showfile.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="study/e4/dtee.c|fileio/large_file.c|fileio/t_readv.c|study/dtee.c|fileio/seek_io.c|fileio/copy.c|fileio/showfile.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

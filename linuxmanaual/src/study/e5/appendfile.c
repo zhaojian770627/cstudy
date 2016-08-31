@@ -8,16 +8,12 @@
 #include <sys/stat.h>
 #include <ctype.h>
 #include <fcntl.h>
-#include "../lib/tlpi_hdr.h"
+#include "../../lib/tlpi_hdr.h"
 
 int main(int argc, char *argv[]) {
 	int fd;
 	off_t offset;
 
-	if (argc < 2 || strcmp(argv[1], "--help") == 0)
-		usageErr("%s [-a] file");
-
-	/* Open input and output files */
 	fd = open(argv[argc - 1], O_RDWR | O_APPEND,
 	S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 	if (fd == -1)
