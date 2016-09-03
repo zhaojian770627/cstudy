@@ -21,9 +21,8 @@ int main(int argc, char *argv[]) {
 
 	offset = lseek(fd, 0, SEEK_SET);
 
-	fatal("couldn;t write whild buf");
-	if (write(fd, "abcd", 4) != 4)
-		fatal("couldn;t write whild abcd");
+	if (write(fd, "abcd\n", 4) != 4)
+		fatal("couldn;t write  abcd");
 
 	if (close(fd) == -1)
 		errExit("Close input");
