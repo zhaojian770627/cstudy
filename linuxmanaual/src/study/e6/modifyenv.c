@@ -13,18 +13,33 @@
 
 extern char **environ;
 char env[1000];
+char *pos = env;
 
 int M_setenv(const char *name, const char *value, int overwrite) {
-	strcpy(env, name);
-	strcat(env, "=");
-	strcat(env, value);
+	char tmp[100];
+
+	strcpy(tmp, name);
+	strcat(tmp, "=");
+	strcat(tmp, value);
+
+	size_t length = strlen(tmp);
+
+	strcpy(pos, tmp);
 
 	if (getenv(name) != NULL && overwrite == 0)
 		return 0;
-	if (putenv(env) == 0)
+	if (putenv(pos) == 0) {
+		pos += length + 1;
 		return 0;
-	else
+	} else
 		return -1;
+}
+
+int M_unsetenv(const char *name) {
+	if (putenv((char*) name) == 0)
+		return 0;
+	return -1;
+
 }
 
 int main(int argc, char *argv[]) {
@@ -33,10 +48,14 @@ int main(int argc, char *argv[]) {
 
 	clearenv(); /** Erase entire environment */
 
-	M_setenv("TEST1", "123456890A", 0);
-	M_setenv("TEST2", "123456890B", 0);
+	for (j = 1; j < argc; j++)
+		if (putenv(argv[j]) != 0)
+			errExit("putenv:%s", argv[j]);
 
-	//env[9] = 'A';
+	if (M_setenv("GREET", "Hello world", 0) == -1)
+		errExit("M_setenv");
+
+	M_unsetenv("BYE");
 	for (ep = environ; *ep != NULL; ep++)
 		puts(*ep);
 
