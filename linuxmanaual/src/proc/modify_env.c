@@ -5,6 +5,7 @@
  *      Author: root
  */
 
+#define _GNU_SOURCE		/* To get various declarations from <stdlib.h> */
 #include "../lib/tlpi_hdr.h"
 
 extern char **environ;
