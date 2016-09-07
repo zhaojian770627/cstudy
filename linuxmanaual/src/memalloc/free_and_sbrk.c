@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 	printf("program break is now:       %10p\n", sbrk(0));
 	printf("Freeing blocks from %d to %d in steps of %d\n", freeMin, freeMax,
 			freeStep);
-	for (j = freeMax - 1; j < freeMax; j += freeStep)
+	for (j = freeMin - 1; j < freeMax; j += freeStep)
 		free(ptr[j]);
 
 	printf("After free(),program break is: %10p\n",sbrk(0));
