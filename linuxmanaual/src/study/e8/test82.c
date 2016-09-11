@@ -23,16 +23,18 @@ struct passwd * M_getpwnam(const char *name) {
 }
 
 int main(int argc, char *argv[]) {
+	int i;
 	struct passwd *pwd;
-	if (argc != 2 || strcmp(argv[1], "--help") == 0)
+	if (argc < 2 || strcmp(argv[1], "--help") == 0)
 		usageErr("%s <username> \n", argv[0]);
 
-	pwd = M_getpwnam(argv[1]);
-	if (pwd != NULL)
-		printf("%s find uid, is %d \n", argv[1], pwd->pw_uid);
-	else
-		printf("%s not find uid \n", argv[1]);
-
+	for (i = 1; i < argc; ++i) {
+		pwd = M_getpwnam(argv[i]);
+		if (pwd != NULL)
+			printf("%s find, uid is %d \n", argv[i], pwd->pw_uid);
+		else
+			printf("%s not find uid \n", argv[i]);
+	}
 	exit(EXIT_SUCCESS);
 }
 
