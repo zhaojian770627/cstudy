@@ -46,7 +46,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="time/calendar_time.c|proccred/idshow.c|study/e9/testgetuid.c|users_groups/check_password.c|study/e8/test82.c|study/e8/test81.c|study/e8/testug.c|study/e7/sbrk.c|memalloc/free_and_sbrk.c|study/e6/modifyenv.c|proc/mem_segments.c|proc/longjmp.c|proc/modify_env.c|proc/display_env.c|study/e5/tmp.c|study/e5/lseek.c|study/e5/cdup.c|study/e5/atomic_append.c|study/e5/appendfile.c|study/e4/dtee.c|fileio/large_file.c|fileio/t_readv.c|study/dtee.c|fileio/seek_io.c|fileio/copy.c|fileio/showfile.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="time/strtime.c|time/calendar_time.c|proccred/idshow.c|study/e9/testgetuid.c|users_groups/check_password.c|study/e8/test82.c|study/e8/test81.c|study/e8/testug.c|study/e7/sbrk.c|memalloc/free_and_sbrk.c|study/e6/modifyenv.c|proc/mem_segments.c|proc/longjmp.c|proc/modify_env.c|proc/display_env.c|study/e5/tmp.c|study/e5/lseek.c|study/e5/cdup.c|study/e5/atomic_append.c|study/e5/appendfile.c|study/e4/dtee.c|fileio/large_file.c|fileio/t_readv.c|study/dtee.c|fileio/seek_io.c|fileio/copy.c|fileio/showfile.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
