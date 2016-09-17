@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
 		errExit("setlocale");	// Use locale settings in conversions
 
 	memset(&tm, 0, sizeof(struct tm));	// Initialize 'tm'
-	if (strptime(argv[1], argv[2], &tm))
+	if (strptime(argv[1], argv[2], &tm)==NULL)
 		fatal("strptime");
 	tm.tm_isdst = -1; 	// Not set by strptime();tells mktime()
 						// to determine if DST is in effect
