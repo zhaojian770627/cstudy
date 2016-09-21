@@ -26,8 +26,7 @@ int main(int argc, char *argv[]) {
 
 		if (strcmp(dp->d_name, ".") == 0 || strcmp(dp->d_name, "..") == 0)
 			continue;
-		printf("%s/", dirpath);
-		printf("%s/", dp->d_name);
+		printf("%s\n", dp->d_name);
 	}
 
 	if (errno != 0)
