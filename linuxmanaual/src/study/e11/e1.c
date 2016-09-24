@@ -18,8 +18,12 @@ int main(int argc, char *argv[]) {
 	struct dirent *dp;
 	char dirpath[] = "/proc";
 	char pathName[CHARMAX];
-	char buffer[CHARMAX];
+	char readbuffer[CHARMAX];
+	char namebuffer[CHARMAX];
+	char uidbuffer[CHARMAX];
 	FILE *input;
+
+	int uid = userIdFromName(argv[1]);
 
 	dirp = opendir(dirpath);
 	if (dirp == NULL) {
@@ -41,18 +45,22 @@ int main(int argc, char *argv[]) {
 
 			input = fopen(pathName, "r");
 			if (input == NULL) {
-				printf("open %s error", pathName);
 				continue;
 			}
 
-			while (fgets(buffer, CHARMAX, input) != NULL) {
-				if (strncmp(buffer, "Name:", 5) == 0){
-					printf("%s", buffer);
-					break;
+			while (fgets(readbuffer, CHARMAX, input) != NULL) {
+				if (strncmp(readbuffer, "Name:", 5) == 0) {
+					strcpy(namebuffer, readbuffer);
+					continue;
+				} else if (strncmp(readbuffer, "Uid:", 4) == 0) {
+					//strcpy(namebuffer, readbuffer);
+					if (strtol(readbuffer + 4, NULL, 10) == uid) {
+						printf("%s", namebuffer);
+						break;
+					}
 				}
 			}
 
-			printf("open %s \n", pathName);
 
 			if (fclose(input) != 0)
 				printf("close %s error", pathName);
