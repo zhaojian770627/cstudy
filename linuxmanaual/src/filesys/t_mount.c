@@ -37,5 +37,64 @@ static void usageError(const char *progName, const char *msg) {
 }
 
 int main(int argc, char *argv[]) {
-	usageError("a", "b");
+	unsigned long flags;
+	char *data, *fstype;
+	int j, opt;
+
+	flags = 0;
+	data = NULL;
+	fstype = NULL;
+
+	while ((opt = getopt(argc, argv, "o:t:f:")) != -1)
+		switch (opt) {
+		case 'o':
+			data = optarg;
+			break;
+		case 't':
+			fstype = optarg;
+			break;
+		case 'f':
+			for (j = 0; j < strlen(optarg); j++) {
+				switch (optarg[j]) {
+				case 'b':
+					flags |= MS_BIND;
+				case 'd':
+					flags |= MS_DIRSYNC;
+				case 'l':
+					flags |= MS_MANDLOCK;
+				case 'm':
+					flags |= MS_MOVE;
+				case 'A':
+					flags |= MS_NOATIME;
+				case 'V':
+					flags |= MS_NODEV;
+				case 'D':
+					flags |= MS_NODIRATIME;
+				case 'E':
+					flags |= MS_NOEXEC;
+				case 'S':
+					flags |= MS_NOSUID;
+				case 'r':
+					flags |= MS_RDONLY;
+				case 'C':
+					flags |= MS_REC;
+				case 'R':
+					flags |= MS_REMOUNT;
+				case 's':
+					flags |= MS_SYNCHRONOUS;
+					break;
+				default:
+					usageError(argv[0], NULL);
+				}
+			}
+			break;
+		default:
+			usageError(argv[0], NULL);
+		}
+	if (argc != optind + 2)
+		usageError(argv[0], "Wrong number of arguments\n");
+
+	if (mount(argv[optind], argv[optind + 1], fstype, flags, data) == -1)
+		errExit("mount");
+	exit(EXIT_SUCCESS);
 }
