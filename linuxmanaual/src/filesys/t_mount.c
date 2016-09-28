@@ -58,28 +58,40 @@ int main(int argc, char *argv[]) {
 				switch (optarg[j]) {
 				case 'b':
 					flags |= MS_BIND;
+					break;
 				case 'd':
 					flags |= MS_DIRSYNC;
+					break;
 				case 'l':
 					flags |= MS_MANDLOCK;
+					break;
 				case 'm':
 					flags |= MS_MOVE;
+					break;
 				case 'A':
 					flags |= MS_NOATIME;
+					break;
 				case 'V':
 					flags |= MS_NODEV;
+					break;
 				case 'D':
 					flags |= MS_NODIRATIME;
+					break;
 				case 'E':
 					flags |= MS_NOEXEC;
+					break;
 				case 'S':
 					flags |= MS_NOSUID;
+					break;
 				case 'r':
 					flags |= MS_RDONLY;
+					break;
 				case 'C':
 					flags |= MS_REC;
+					break;
 				case 'R':
 					flags |= MS_REMOUNT;
+					break;
 				case 's':
 					flags |= MS_SYNCHRONOUS;
 					break;
