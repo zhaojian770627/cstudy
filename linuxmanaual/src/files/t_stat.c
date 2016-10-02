@@ -48,7 +48,7 @@ static void displayStatInfo(const struct stat *sb) {
 				(sb->st_mode & S_ISGID) ? "set-GID " : "",
 				(sb->st_mode & S_ISVTX) ? "set-sticky " : "");
 	printf("Number of (hard) links: %ld\n", (long) sb->st_nlink);
-	printf("Ownership:         UID=%ld\n GID=%ld\n", (long) sb->st_uid,
+	printf("Ownership:         UID=%ld GID=%ld\n", (long) sb->st_uid,
 			(long) sb->st_gid);
 	if (S_ISCHR(sb->st_mode) || S_ISBLK(sb->st_mode))
 		printf("Device number (st_rdev):major=%ld;minor=%ld\n",
