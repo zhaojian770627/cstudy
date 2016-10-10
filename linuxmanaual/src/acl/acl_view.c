@@ -5,7 +5,7 @@
  *      Author: root
  */
 #include <acl/libacl.h>
-
+#include "../users_groups/ugid_functions.h"
 #include "../lib/tlpi_hdr.h"
 
 static void usageError(char *progName) {
@@ -35,6 +35,84 @@ int main(int argc, char *argv[]) {
 			usageError(argv[0]);
 		}
 	}
+
+	if (optind + 1 != argc)
+		usageError(argv[0]);
+
+	acl = acl_get_file(argv[optind], type);
+	if (acl == NULL)
+		errExit("acl_get_file");
+
+	// Walk throuth each entry in this ACL
+	for (entryId = ACL_FIRST_ENTRY;; entryId = ACL_NEXT_ENTRY)
+	{
+		if (acl_get_entry(acl, entryId, &entry) != 1)
+			break;	// Exit on error or no more entries
+
+		// Retrieve and display tag type
+		if (acl_get_tag_type(entry, &tag) == -1)
+			errExit("acl_get_tag_type");
+
+		printf("%-12s",
+				(tag == ACL_USER_OBJ) ? "user_obj" :
+				(tag == ACL_USER) ? "user" :
+				(tag == ACL_GROUP_OBJ) ? "group_obj" :
+				(tag == ACL_GROUP) ? "group" : (tag == ACL_MASK) ? "mask" :
+				(tag == ACL_OTHER) ? "other" : "???");
+
+		// Retrieve and dispaly optional tag qualifier
+		if (tag == ACL_USER) {
+			uidp = acl_get_qualifier(entry);
+			if (uidp == NULL)
+				errExit("acl_get_qualifier");
+
+			name = groupNameFromId(*uidp);
+			if (name == NULL)
+				printf("%-8d ", *uidp);
+			else
+				printf("%-8s ", name);
+
+			if (acl_free(uidp) == -1)
+				errExit("acl_free");
+		} else if (tag == ACL_GROUP) {
+			gidp = acl_get_qualifier(entry);
+			if (gidp == NULL)
+				errExit("acl_get_qualifier");
+			name = groupNameFromId(*gidp);
+			if (name == NULL)
+				printf("%-8d ", *gidp);
+			else
+				printf("%-8s ", name);
+
+			if (acl_free(gidp) == -1)
+				errExit("acl_free");
+		} else
+			printf("              ");
+
+		// Retrieve and display permission
+		if (acl_get_permset(entry, &permset) == -1)
+			errExit("acl_get_permset");
+
+		permVal = acl_get_perm(permset, ACL_READ);
+		if (permVal == -1)
+			errExit("acl_get_perm - ACL_READ");
+		printf("%c", (permVal == 1) ? 'r' : '-');
+
+		permVal = acl_get_perm(permset, ACL_WRITE);
+		if (permVal == -1)
+			errExit("acl_get_perm - ACL_WRITE");
+		printf("%c", (permVal == 1) ? 'w' : '-');
+
+		permVal = acl_get_perm(permset, ACL_EXECUTE);
+		if (permVal == -1)
+			errExit("acl_get_perm - ACL_EXECUTE");
+		printf("%c", (permVal == 1) ? 'x' : '-');
+
+		printf("\n");
+	}
+
+	if (acl_free(acl) == -1)
+		errExit("acl_free");
 
 	exit(EXIT_SUCCESS);
 }
