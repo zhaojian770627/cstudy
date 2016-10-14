@@ -39,7 +39,6 @@ int main(int argc, char *argv[]) {
 	if (close(fd) == -1)
 		errExit("close");
 	printf("********** Closed file descriptor\n");
-	sleep(1);
 	system(shellCmd);
 	exit(EXIT_SUCCESS);
 }
