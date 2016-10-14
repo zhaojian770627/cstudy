@@ -35,9 +35,11 @@ int main(int argc, char *argv[]) {
 
 	snprintf(shellCmd, CMD_SIZE, "df -k `dirname %s`", argv[1]);
 	system(shellCmd);
+	fflush(stdout);
 	if (close(fd) == -1)
 		errExit("close");
 	printf("********** Closed file descriptor\n");
+	sleep(1);
 	system(shellCmd);
 	exit(EXIT_SUCCESS);
 }
