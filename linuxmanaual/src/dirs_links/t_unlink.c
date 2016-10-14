@@ -34,7 +34,10 @@ int main(int argc, char *argv[]) {
 			fatal("partial/failed write");
 
 	snprintf(shellCmd, CMD_SIZE, "df -k `dirname %s`", argv[1]);
-	printf(shellCmd);
+	system(shellCmd);
+	if (close(fd) == -1)
+		errExit("close");
+	printf("********** Closed file descriptor\n");
 	system(shellCmd);
 	exit(EXIT_SUCCESS);
 }
