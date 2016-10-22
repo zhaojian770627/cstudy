@@ -1,0 +1,19 @@
+#define _GNU_SOURCE
+#include <signal.h>
+#include "signal_functions.h"
+#include "../lib/tlpi_hdr.h"
+
+static int sigCnt[NSIG];// Counts deliveries of each signal
+static volatile sig_atomic_t gotSigint=0;// Set nonzero if SIGINT is delivered
+
+static void
+handler(int sig)
+{
+  if(sig==SIGINT)
+    gotSigint=1;
+  else
+    sigCnt[sig]++;
+}
+
+
+
