@@ -1,0 +1,9 @@
+#
+OBJECTS=t_sigaltstack.o ../lib/get_num.o ../lib/error_functions.o 
+t_sigaltstack:$(OBJECTS)
+	cc -o t_sigaltstack $(OBJECTS)
+t_sigaltstack.o:t_sigaltstack.c ../lib/tlpi_hdr.h
+../lib/get_num.o:../lib/get_num.c ../lib/tlpi_hdr.h
+../lib/error_functions.o:../lib/error_functions.c ../lib/error_functions.h ../lib/ename.c.inc ../lib/tlpi_hdr.h
+clean:
+	rm t_sigaltstack $(OBJECTS)
