@@ -1,8 +1,8 @@
 #
 GPATH=../lib ../signals
 VPATH=../lib ../signals
-OBJECTS=t_sigwaitinfo.o get_num.o error_functions.o signal_functions.o
-t_sigwaitinfo:$(OBJECT)
+OBJECTS= t_sigwaitinfo.o get_num.o error_functions.o signal_functions.o
+t_sigwaitinfo: $(OBJECTS)
 	cc -o t_sigwaitinfo $(OBJECTS)
 t_sigwaitinfo.o:t_sigwaitinfo.c tlpi_hdr.h signal_functions.h
 #t_sigqueue:$(OBJECTS)
