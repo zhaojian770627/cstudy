@@ -14,12 +14,12 @@ static void handler(int sig)
 int main(int argc,char *argv[])
 {
   struct sigaction sa;
-  int sig;
+  int sig,count;
   sigset_t prevMask,blockMask;
-  if(argc>1 && strcmp(argv[1],"--help")==0)
-    usageErr("%s:PID is %ld\n",argv[0],(long)getpid());
+  if(argc<2 || strcmp(argv[1],"--help")==0)
+    usageErr("%s:times",argv[0],(long)getpid());
   printf("%s:PID is %ld\n",argv[0],(long)getpid());
-  handlerSleepTime=(argc>2)?getInt(argv[2],GN_NONNEG,"handler-sleep_time"):1;
+  handlerSleepTime=(argc>1)?getInt(argv[1],GN_NONNEG,"handler-sleep_time"):1;
 
   /* Establish handler for most signals.During execution of the handler,
      mask all other signals to prevent handlers recursively interrupting
@@ -39,7 +39,12 @@ int main(int argc,char *argv[])
   if(sigprocmask(SIG_SETMASK,&blockMask,&prevMask)==-1)
     errExit("sigprocmask");
   printf("%s:signal blocked-sleeping %s seconds\n",argv[0],argv[1]);
-  sleep(getInt(argv[1],GN_GT_0,"block-time"));
+  for(count=0;count<handlerSleepTime;count++)
+    {
+      printf("%d times\r",count);
+      fflush(stdout);
+      sleep(1);
+    }
   printf("%s:sleep complete\n",argv[0]);
   if(sigprocmask(SIG_SETMASK,&prevMask,NULL)==-1)
     errExit("sigprocmask");
