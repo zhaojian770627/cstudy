@@ -1,10 +1,13 @@
 #
 GPATH=../lib ../time
 VPATH=../lib ../time
-OBJECTS= ptmr_sigev_thread.o get_num.o error_functions.o itimerspec_from_str.o curr_time.o
-ptmr_sigev_thread: $(OBJECTS)
-	cc -o ptmr_sigev_thread $(OBJECTS) -lrt
-ptmr_sigev_thread.o:ptmr_sigev_thread.c tlpi_hdr.h 
+OBJECTS= demo_timerfd.o get_num.o error_functions.o itimerspec_from_str.o curr_time.o
+demo_timerfd: $(OBJECTS)
+	cc -o demo_timerfd $(OBJECTS) -lrt
+demo_timerfd.o:demo_timerfd.c tlpi_hdr.h 
+#ptmr_sigev_thread: $(OBJECTS)
+#	cc -o ptmr_sigev_thread $(OBJECTS) -lrt
+#ptmr_sigev_thread.o:ptmr_sigev_thread.c tlpi_hdr.h 
 #ptmr_sigev_signal: $(OBJECTS)
 #	cc -o ptmr_sigev_signal $(OBJECTS) -lrt
 #ptmr_sigev_signal.o:ptmr_sigev_signal.c tlpi_hdr.h 
