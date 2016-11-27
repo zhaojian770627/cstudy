@@ -14,7 +14,7 @@ int main(int argc,char *argv[])
     idata*=3;
     istack*=3;
     break;
-  defalt:
+  default:
     sleep(30);			/* Give child a change to execute */
     break;
   }
