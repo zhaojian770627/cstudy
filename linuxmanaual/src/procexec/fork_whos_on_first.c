@@ -14,6 +14,8 @@ int main(int argc,char *argv[])
 
   setbuf(stdout,NULL);		/* Make stdout unbuffered */
 
+  printf("%d\n",numChildren);
+
   for(j=0;j<numChildren;j++){
     switch(childPid=fork()){
     case -1:
@@ -22,7 +24,7 @@ int main(int argc,char *argv[])
       printf("%d child\n",j);
       _exit(EXIT_SUCCESS);
     default:
-      printf("%d parentd\n",j);
+      printf("%d parent\n",j);
       wait(NULL);		
       break;
     }

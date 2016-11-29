@@ -21,7 +21,7 @@ demo_timerfd.o:demo_timerfd.c tlpi_hdr.h
 #	cc -o real_timer $(OBJECTS)
 #real_timer.o:real_timer.c tlpi_hdr.h 
 itimerspec_from_str:itimerspec_from_str.c
-curr_time:curr_time.c
+curr_time.o:curr_time.c
 get_num.o:get_num.c tlpi_hdr.h
 error_functions.o:error_functions.c error_functions.h ename.c.inc tlpi_hdr.h
 clean:
