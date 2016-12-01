@@ -28,4 +28,5 @@ int main(int argc,char *argv[])
   if(on_exit(onexitFunc,(void*)20)!=0)
     fatal("on_exit 2");
   exit(2);
+
 }
