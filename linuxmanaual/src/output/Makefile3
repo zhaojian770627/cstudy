@@ -7,3 +7,4 @@ t_sigaltstack.o:t_sigaltstack.c ../lib/tlpi_hdr.h
 ../lib/error_functions.o:../lib/error_functions.c ../lib/error_functions.h ../lib/ename.c.inc ../lib/tlpi_hdr.h
 clean:
 	rm t_sigaltstack $(OBJECTS)
+	
