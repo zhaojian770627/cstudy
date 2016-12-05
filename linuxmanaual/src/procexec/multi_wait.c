@@ -1,6 +1,6 @@
 #include <sys/wait.h>
 #include <time.h>
-#include "../lib/curr_time.h"
+#include "../time/curr_time.h"
 #include "../lib/tlpi_hdr.h"
 
 int main(int argc,char *argv[])
@@ -11,7 +11,7 @@ int main(int argc,char *argv[])
 
   if(argc<2||strcmp(argv[1],"--help")==0)
     usageErr("%s sleep-time...\n",argv[0]);
-
+  
   setbuf(stdout,NULL);		/* Disable buffering of stdout */
   for(j=1;j<argc;j++){		/* Create one chid for each argument */
     switch(fork()){
