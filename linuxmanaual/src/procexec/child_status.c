@@ -9,7 +9,7 @@ int main(int argc,char *argv[])
   if(argc>1 && strcmp(argv[1],"--help")==0)
     usageErr("%s [exit-status]\n",argv[0]);
   switch(fork()){
-  case -1:exitExit("fork");
+  case -1:errExit("fork");
   case 0:			/* Child:either exits immediately with
 				   given status or loops waiting for signals*/
     printf("Child started with PID=%ld\n",(long)getpid());

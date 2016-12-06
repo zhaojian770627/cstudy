@@ -1,10 +1,10 @@
 #define _GNU_SOURCE
 #include <string.h>
-#include <sys/wait>
+#include <sys/wait.h>
 #include "print_wait_status.h"
 #include "../lib/tlpi_hdr.h"
 
-void printWaitStatus(cont char *msg,int status)
+void printWaitStatus(const char *msg,int status)
 {
   if(msg!=NULL)
     printf("%s",msg);
