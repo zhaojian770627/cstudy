@@ -23,7 +23,7 @@
 #endif
 #endif
 #include <ftw.h>
-#include "tlpi_hdr.h"
+#include "../lib/tlpi_hdr.h"
 
 static int numReg = 0, numDir = 0, numSymLk = 0, numSocket = 0,
            numFifo = 0, numChar = 0, numBlock = 0,
