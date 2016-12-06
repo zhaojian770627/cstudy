@@ -11,7 +11,7 @@ int main(int argc,char *argv[])
   switch(fork()){
   case -1:exitExit("fork");
   case 0:			/* Child:either exits immediately with
-				 given status or loops waiting for signals*/
+				   given status or loops waiting for signals*/
     printf("Child started with PID=%ld\n",(long)getpid());
     if(argc>1)			/* Status supplied on command line? */
       exit(getInt(argv[1],0,"exit-status"));
@@ -22,3 +22,17 @@ int main(int argc,char *argv[])
   default:
     for(;;){
       childPid=waitpid(-1,&status,WUNTRACED
+#ifdef WCONTINUED		/* Not present on older versions of Linux */
+		       |WCONTINUED
+#endif
+		       );
+      if(childPid==-1)
+	errExit("waitpid");
+      /* Print status in hex,and as separate decimal bytes */
+      printf("waitpid() returned:PID=%ld;status=0x%04x(%d,%d)\n",(long)childPid,(unsigned int)status,status>>8,status&0xff);
+      printWaitStatus(NULL,status);
+      if(WIFEXITED(status)||WIFSIGNALED(status))
+	exit(EXIT_SUCCESS);
+    }
+  }
+}
