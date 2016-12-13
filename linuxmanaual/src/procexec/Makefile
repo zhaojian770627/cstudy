@@ -2,7 +2,8 @@
 GPATH=../lib ../time
 VPATH=../lib ../time 
 OBJECTS=get_num.o error_functions.o curr_time.o
-all:t_execve envargs t_execlp t_execl
+all:t_execve envargs t_execlp t_execl closeonexec
+closeonexec:closeonexec.o $(OBJECTS)
 t_execve:t_execve.o $(OBJECTS)
 envargs:envargs.o $(OBJECTS)
 t_execlp:t_execlp.o $(OBJECTS)
