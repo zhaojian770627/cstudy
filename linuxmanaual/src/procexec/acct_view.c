@@ -1,6 +1,7 @@
 #include <fcntl.h>
 #include <time.h>
 #include <sys/stat.h>
+#include <sys/acct.h>
 #include <limits.h>
 #include "../users_groups/ugid_functions.h" /* Declaration of 
 					       userAmeFromId() */
@@ -29,7 +30,7 @@ int main(int argc,char *argv[])
   char *s;
   char timeBuf[TIME_BUF_SIZE];
   struct tm *loc;
-
+  time_t t;
   if(argc!=2||strcmp(argv[1],"--help")==0)
     usageErr("%s file\n",argv[0]);
 
@@ -41,7 +42,7 @@ int main(int argc,char *argv[])
   printf("             status            "
 	 "                       time      time\n");
   while((numRead=read(acctFile,&ac,sizeof(struct acct)))>0){
-    if(numRead!=sizeof(strcut acct))
+    if(numRead!=sizeof(struct acct))
       fatal("partial read");
 
     printf("%-8.8s  ",ac.ac_comm);

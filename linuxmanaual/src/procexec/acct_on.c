@@ -10,6 +10,6 @@ int main(int argc,char *argv[])
     errExit("acct");
 
   printf("Process accounting %s\n",
-	 (argv[1]==NULL)?"disabled","enabled");
+	 (argv[1]==NULL)?"disabled":"enabled");
   exit(EXIT_SUCCESS);
 }
