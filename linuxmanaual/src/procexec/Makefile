@@ -2,7 +2,8 @@
 GPATH=../lib ../time ../users_groups
 VPATH=../lib ../time ../users_groups
 OBJECTS=get_num.o error_functions.o curr_time.o
-all:t_execve envargs t_execlp t_execl closeonexec t_system simple_system system acct_on acct_view
+all:t_execve envargs t_execlp t_execl closeonexec t_system simple_system system acct_on acct_view t_clone
+t_clone:t_clone.c $(OBJECTS)
 acct_on:acct_on.c $(OBJECTS)
 acct_view:acct_view.o $(OBJECTS) ugid_functions.o
 t_system:t_system.o $(OBJECTS) print_wait_status.o 
