@@ -1,0 +1,14 @@
+#
+GPATH=../lib ../time ../users_groups
+VPATH=../lib ../time ../users_groups
+OBJECTS=get_num.o error_functions.o curr_time.o
+all:simple_thread thread_incr
+simple_thread:simple_thread.o $(OBJECTS) -lpthread
+thread_incr:thread_incr.o $(OBJECTS) -lpthread
+get_num.o:get_num.c tlpi_hdr.h
+error_functions.o:error_functions.c error_functions.h ename.c.inc tlpi_hdr.h
+curr_time.o:curr_time.c
+print_wait_status.o:print_wait_status.c
+ugid_functions.o:ugid_functions.c
+clean:
+	rm  $(OBJECTS)
