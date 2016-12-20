@@ -2,7 +2,8 @@
 GPATH=../lib ../time ../users_groups
 VPATH=../lib ../time ../users_groups
 OBJECTS=get_num.o error_functions.o curr_time.o
-all:simple_thread thread_incr
+all:simple_thread thread_incr thread_incr_mutex
+thread_incr_mutex:thread_incr_mutex.o $(OBJECTS) -lpthread
 simple_thread:simple_thread.o $(OBJECTS) -lpthread
 thread_incr:thread_incr.o $(OBJECTS) -lpthread
 get_num.o:get_num.c tlpi_hdr.h
