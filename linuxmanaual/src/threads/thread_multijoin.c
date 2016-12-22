@@ -27,12 +27,15 @@ static void* threadFunc(void *arg) /* Start function for thread */
 {
   int idx=*((int*)arg);
   int s;
+  printf("idx :%d\n",idx);
   sleep(thread[idx].sleepTime);	/* Simulate doing some work */
   printf("Thread %d terminating\n",idx);
 
   s=pthread_mutex_lock(&threadMutex);
   if(s!=0)
     errExitEN(s,"pthread_mutex_lock");
+
+  printf("Thread %d add lock",idx);
 
   numUnjoined++;
   thread[idx].state=TS_TERMINATED;
@@ -57,4 +60,42 @@ int main(int argc,char *argv[])
     errExit("calloc");
 
   /* Create all threads */
+  for(idx=0;idx<argc-1;idx++){
+    thread[idx].sleepTime=getInt(argv[idx+1],GN_NONNEG,NULL);
+    thread[idx].state=TS_ALIVE;
+    s=pthread_create(&thread[idx].tid,NULL,threadFunc,&idx);
+    if(s!=0)
+      errExitEN(s,"pthread_create");
+  }
+  totThreads=argc-1;
+  numLive=totThreads;
+
+  /* Join with terminated threads */
+  while(numLive>0){
+    s=pthread_mutex_lock(&threadMutex);
+    if(s!=0)
+      errExitEN(s,"pthread_mutex_lock");
+    while(numUnjoined==0){
+      s=pthread_cond_wait(&threadDied,&threadMutex);
+      if(s!=0)
+	errExitEN(s,"pthread_cond_wait");
+    }
+    for(idx=0;idx<totThreads;idx++){
+      if(thread[idx].state==TS_TERMINATED){
+	s=pthread_join(thread[idx].tid,NULL);
+	if(s!=0)
+	  errExitEN(s,"pthread_join");
+
+	thread[idx].state=TS_JOINED;
+	numLive--;
+	numUnjoined--;
+
+	printf("Reaped thread %d (numLive=%d)\n",idx,numLive);
+      }
+    }
+    s=pthread_mutex_unlock(&threadMutex);
+    if(s!=0)
+      errExitEN(s,"pthread_mutex_unlock");
+  }
+  exit(EXIT_SUCCESS);
 }

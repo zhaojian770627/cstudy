@@ -2,7 +2,9 @@
 GPATH=../lib ../time ../users_groups
 VPATH=../lib ../time ../users_groups
 OBJECTS=get_num.o error_functions.o curr_time.o
-all:simple_thread thread_incr thread_incr_mutex
+EXEF:=simple_thread thread_incr thread_incr_mutex thread_multijoin
+all:$(EXEF)
+thread_multijoin:thread_multijoin.o $(OBJECTS) -lpthread
 thread_incr_mutex:thread_incr_mutex.o $(OBJECTS) -lpthread
 simple_thread:simple_thread.o $(OBJECTS) -lpthread
 thread_incr:thread_incr.o $(OBJECTS) -lpthread
@@ -12,4 +14,4 @@ curr_time.o:curr_time.c
 print_wait_status.o:print_wait_status.c
 ugid_functions.o:ugid_functions.c
 clean:
-	rm  $(OBJECTS)
+	$(RM) *.o *.d $(EXEF)
