@@ -1,6 +1,7 @@
 #
 GPATH=../lib ../time ../users_groups
 VPATH=../lib ../time ../users_groups
+CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o curr_time.o
 EXEF:=simple_thread thread_incr thread_incr_mutex thread_multijoin
 all:$(EXEF)
