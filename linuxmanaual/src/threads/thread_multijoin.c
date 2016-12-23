@@ -18,6 +18,7 @@ enum tstate{			/* Thread states */
 };
 
 static struct{                  /* Info about each thread */
+  int idx;			/* Thread num */
   pthread_t tid;		/* ID of this thread */
   enum tstate state;		/* Thread state (TS_* constants above */
   int sleepTime;		/* Number seconds to live before terminating */
@@ -27,7 +28,6 @@ static void* threadFunc(void *arg) /* Start function for thread */
 {
   int idx=*((int*)arg);
   int s;
-  printf("idx :%d\n",idx);
   sleep(thread[idx].sleepTime);	/* Simulate doing some work */
   printf("Thread %d terminating\n",idx);
 
@@ -61,9 +61,10 @@ int main(int argc,char *argv[])
 
   /* Create all threads */
   for(idx=0;idx<argc-1;idx++){
+    thread[idx].idx=idx;    
     thread[idx].sleepTime=getInt(argv[idx+1],GN_NONNEG,NULL);
     thread[idx].state=TS_ALIVE;
-    s=pthread_create(&thread[idx].tid,NULL,threadFunc,&idx);
+    s=pthread_create(&thread[idx].tid,NULL,threadFunc,&thread[idx].idx);
     if(s!=0)
       errExitEN(s,"pthread_create");
   }
