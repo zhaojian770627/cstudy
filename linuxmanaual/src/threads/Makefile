@@ -3,8 +3,10 @@ GPATH=../lib ../time ../users_groups
 VPATH=../lib ../time ../users_groups
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o
-EXEF:=simple_thread thread_incr thread_incr_mutex thread_multijoin strerror_test
+EXEF:=simple_thread thread_incr thread_incr_mutex thread_multijoin strerror_test thread_cancel thread_cleanup
 all:$(EXEF)
+thread_cleanup:thread_cleanup.o $(OBJECTS) -lpthread
+thread_cancel:thread_cancel.o $(OBJECTS) -lpthread
 strerror_test:strerror_test.o $(OBJECTS) -lpthread
 thread_multijoin:thread_multijoin.o $(OBJECTS) -lpthread
 thread_incr_mutex:thread_incr_mutex.o $(OBJECTS) -lpthread

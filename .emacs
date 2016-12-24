@@ -13,6 +13,8 @@
 ;;(require 'semantic/bovine/semantic-gcc.el)
 ;;(require 'semantic/bovine/semantic-c.el)
 
+(global-linum-mode 'linum-mode)
+
 ;;bind key
 (global-set-key [f12] 'semantic-ia-fast-jump)
 
