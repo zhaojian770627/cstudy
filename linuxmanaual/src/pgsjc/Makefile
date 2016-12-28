@@ -3,8 +3,9 @@ GPATH=../lib ../time ../users_groups
 VPATH=../lib ../time ../users_groups
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o
-EXEF:=t_setsid
+EXEF:=t_setsid catch_SIGHUP
 all:$(EXEF)
+catch_SIGHUP:catch_SIGHUP.o $(OBJECTS)
 t_setsid:t_setsid.o $(OBJECTS)
 get_num.o:get_num.c tlpi_hdr.h
 error_functions.o:error_functions.c error_functions.h ename.c.inc tlpi_hdr.h
