@@ -16,7 +16,7 @@ static void handler(int sig)	/* Handler for various signals */
   /* If we catch SIGTSTR,it won't actually stop us.Therefore we
    raise SIGSTOP so we actually get stopped.*/
 
-  if(sig==SIGTSTR)
+  if(sig==SIGTSTP)
     raise(SIGSTOP);
 }
 
