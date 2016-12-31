@@ -3,9 +3,10 @@ GPATH=../lib ../time ../users_groups
 VPATH=../lib ../time ../users_groups
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o
-EXEF:=t_setsid catch_SIGHUP disc_SIGHUP job_mon
+EXEF:=t_setsid catch_SIGHUP disc_SIGHUP job_mon handling_SIGTSTP
 all:$(EXEF)
 job_mon:job_mon.o $(OBJECTS)
+handling_SIGTSTP:handling_SIGTSTP.o $(OBJECTS)
 disc_SIGHUP:disc_SIGHUP.o $(OBJECTS)
 catch_SIGHUP:catch_SIGHUP.o $(OBJECTS)
 t_setsid:t_setsid.o $(OBJECTS)
