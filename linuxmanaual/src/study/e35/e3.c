@@ -13,6 +13,7 @@ int main(int argc,char *argv[])
   struct tms t;
   struct sched_param sp;
   long clktck=0;
+  int count=0;
   clktck=(int)sysconf(_SC_CLK_TCK);
 
   sp.sched_priority=36;
@@ -39,9 +40,31 @@ int main(int argc,char *argv[])
   }
 
   clock_t begin=times(&t);
-  sleep(2);
   clock_t end=times(&t);
-  printf("%lf\n",(double)(end-begin));
+  double diff=0;  
 
+  int total=0;
+  alarm(10);
+
+  for(;;)
+    {
+      end=times(&t);
+      diff=(double)(end-begin);
+      count=count+diff;
+      
+      if(count>=2500000)
+	{
+	  printf("Flag:%d PID:%d CPU:%d\n",childPid,getpid(),total);
+	  total=total+count;
+	  count=0;
+	  begin=times(&t);
+	}
+
+      if(total>=10000000)
+	{
+	  sched_yield();
+	  total=0;
+	}
+    }  
   exit(EXIT_SUCCESS);
 }
