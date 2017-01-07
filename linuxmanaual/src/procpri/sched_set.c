@@ -1,5 +1,5 @@
 #include <sched.h>
-#include "../lib/tlpi_h"
+#include "../lib/tlpi_hdr.h"
 
 
 int main(int argc,char *argv[])
@@ -28,7 +28,7 @@ int main(int argc,char *argv[])
     SCHED_OTHER;
   sp.sched_priority=getInt(argv[2],0,"priority");
   for(j=3;j<argc;j++)
-    if(sched_setschduler(getLong(argv[j],0,"pid"),pol,&sp)==-1)
+    if(sched_setscheduler(getLong(argv[j],0,"pid"),pol,&sp)==-1)
       errExit("sched_setscheduler");
   exit(EXIT_SUCCESS);
 }
