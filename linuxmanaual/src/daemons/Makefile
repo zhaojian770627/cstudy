@@ -3,9 +3,9 @@ GPATH=../lib ../time ../users_groups
 VPATH=../lib ../time ../users_groups
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=rlimit_nproc
+EXEF:=test_become_daemon
 all:$(EXEF)
-rlimit_nproc:rlimit_nproc.o $(OBJECTS) print_rlimit.o
+test_become_daemon:test_become_daemon.o $(OBJECTS) become_daemon.o
 get_num.o:get_num.c tlpi_hdr.h
 error_functions.o:error_functions.c error_functions.h ename.c.inc tlpi_hdr.h
 #curr_time.o:curr_time.c
