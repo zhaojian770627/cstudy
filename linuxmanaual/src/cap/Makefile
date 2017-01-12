@@ -5,7 +5,7 @@ CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
 EXEF:=check_password_caps
 all:$(EXEF)
-check_password_caps:check_password_caps.o $(OBJECTS)
+check_password_caps:check_password_caps.o $(OBJECTS) -lcap
 get_num.o:get_num.c tlpi_hdr.h
 error_functions.o:error_functions.c error_functions.h ename.c.inc tlpi_hdr.h
 #curr_time.o:curr_time.c
