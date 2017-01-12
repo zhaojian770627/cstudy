@@ -3,8 +3,9 @@ GPATH=../lib ../time ../users_groups
 VPATH=../lib ../time ../users_groups
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=dump_utmpx
+EXEF:=dump_utmpx utmpx_login
 all:$(EXEF)
+utmpx_login:utmpx_login.o $(OBJECTS)
 dump_utmpx:dump_utmpx.o $(OBJECTS)
 get_num.o:get_num.c tlpi_hdr.h
 error_functions.o:error_functions.c error_functions.h ename.c.inc tlpi_hdr.h
