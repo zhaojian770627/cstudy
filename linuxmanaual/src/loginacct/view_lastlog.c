@@ -32,6 +32,7 @@ int main(int argc,char *argv[])
       printf("read failed for %s\n",argv[j]); /* EOF or error */
       continue;
     }
+
     printf("%-8.8s %-6.6s %-20.20s %s",argv[j],llog.ll_line,
 	   llog.ll_host,ctime((time_t*)&llog.ll_time));
   }
