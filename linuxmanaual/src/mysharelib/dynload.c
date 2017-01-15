@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <dlfcn.h>
 #include "../lib/tlpi_hdr.h"
 
@@ -7,6 +8,7 @@ main(int argc, char *argv[])
   void *libHandle;            /* Handle for shared library */
   int (*funcp)(const char*,int,const char*);        /* Pointer to function with no arguments */
   const char *err;
+  Dl_info info;
 
   if (argc != 3 || strcmp(argv[1], "--help") == 0)
     usageErr("%s lib-path func-name\n", argv[0]);
@@ -28,6 +30,10 @@ main(int argc, char *argv[])
      that takes no arguments */
 
   int i=(*funcp)("1000",GN_GT_0,"libcall");
+  if(dladdr(funcp,&info)==-1)
+    errExit("dladdr");
+
+  printf("%s\n",info.dli_fname);
   printf("%d\n",i);
   dlclose(libHandle);                         /* Close the library */
 
