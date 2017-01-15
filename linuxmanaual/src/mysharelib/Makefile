@@ -3,10 +3,11 @@ GPATH=../lib ../time ../users_groups
 VPATH=../lib ../time ../users_groups
 CFLAGS+=-g -Wall
 OBJECTS=get_num.o error_functions.o 
-EXEF:=t_calllib
+EXEF:=t_calllib dynload
 all:$(EXEF)
 t_calllib:t_calllib.o libtlpi.so  -ltlpi
 #	cc -g -Wall -o t_calllib t_calllib.o -L. -ltlpi
+dynload:dynload.o $(OBJECTS) -ldl
 libtlpi.so:$(OBJECTS)
 	cc -g -shared -Wl,-soname,libtlpi.so.1 -o libtlpi.so.1.0.1 $(OBJECTS)
 	ln -s libtlpi.so.1.0.1 libtlpi.so.1
