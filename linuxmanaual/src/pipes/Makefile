@@ -3,8 +3,9 @@ GPATH=../lib ../time ../users_groups
 VPATH=../lib ../time ../users_groups
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=simple_pipe pipe_sync
+EXEF:=simple_pipe pipe_sync pipe_ls_wc
 all:$(EXEF)
+pipe_ls_wc:pipe_ls_wc.o $(OBJECTS)
 pipe_sync:pipe_sync.o $(OBJECTS) curr_time.o
 simple_pipe:simple_pipe.o $(OBJECTS)
 get_num.o:get_num.c tlpi_hdr.h
