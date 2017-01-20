@@ -3,12 +3,13 @@ GPATH=../lib ../time ../users_groups
 VPATH=../lib ../time ../users_groups
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=simple_pipe
+EXEF:=simple_pipe pipe_sync
 all:$(EXEF)
+pipe_sync:pipe_sync.o $(OBJECTS) curr_time.o
 simple_pipe:simple_pipe.o $(OBJECTS)
 get_num.o:get_num.c tlpi_hdr.h
 error_functions.o:error_functions.c error_functions.h ename.c.inc tlpi_hdr.h
-#curr_time.o:curr_time.c
+curr_time.o:curr_time.c
 #print_wait_status.o:print_wait_status.c
 #ugid_functions.o:ugid_functions.c
 clean:

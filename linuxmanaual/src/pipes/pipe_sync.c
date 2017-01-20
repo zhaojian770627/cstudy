@@ -41,8 +41,8 @@ int main(int argc,char *argv[])
     errExit("close");
 
   /* Parent may do other work,then synchronizes with children */
-  if(read[pfd[0],&dummy,1)!=0)
-    ratal("parent didn't get EOF");
+  if(read(pfd[0],&dummy,1)!=0)
+    fatal("parent didn't get EOF");
   printf("%s Parent ready to go\n",currTime("%T"));
 
   /* Parent can now carry on to do other things... */
