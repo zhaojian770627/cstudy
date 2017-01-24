@@ -3,8 +3,10 @@ GPATH=../lib ../time ../users_groups ../procexec
 VPATH=../lib ../time ../users_groups ../procexec
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=simple_pipe pipe_sync pipe_ls_wc popen_glob
+EXEF:=simple_pipe pipe_sync pipe_ls_wc popen_glob fifo_seqnum_server fifo_seqnum_client
 all:$(EXEF)
+fifo_seqnum_server:fifo_seqnum_server.o $(OBJECTS)
+fifo_seqnum_client:fifo_seqnum_client.o $(OBJECTS)
 popen_glob:popen_glob.o $(OBJECTS) print_wait_status.o
 pipe_ls_wc:pipe_ls_wc.o $(OBJECTS)
 pipe_sync:pipe_sync.o $(OBJECTS) curr_time.o
