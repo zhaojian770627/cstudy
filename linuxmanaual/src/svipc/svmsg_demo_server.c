@@ -22,7 +22,7 @@ int main(int argc,char *argv[])
     errExit("ftok");
 
   /* While msgget() fails,try creating the queue exclusively */
-  while((msgid=msgget(key,IPC_CREAT|IPC_EXCL|MQ_PERMS))==-1){
+  while((msqid=msgget(key,IPC_CREAT|IPC_EXCL|MQ_PERMS))==-1){
     if(errno==EEXIST){		/* MQ with the same key already
 				   exists - remove it and try again*/
       msqid=msgget(key,0);
@@ -34,7 +34,8 @@ int main(int argc,char *argv[])
     }else{			/* Some other error-->give up */
       errExit("msgget() failed");
     }
-    /* Upon loop exit,we've successfully created the message queue,
-       and we can then carry on to do other work...*/
-    exit(EXIT_SUCCESS);
   }
+  /* Upon loop exit,we've successfully created the message queue,
+     and we can then carry on to do other work...*/
+  exit(EXIT_SUCCESS);
+}
