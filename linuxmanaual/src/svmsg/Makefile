@@ -3,8 +3,10 @@ GPATH=../lib ../time ../users_groups ../procexec
 VPATH=../lib ../time ../users_groups ../procexec
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=svmsg_create svmsg_send svmsg_receive svmsg_rm svmsg_ls
+EXEF:=svmsg_create svmsg_send svmsg_receive svmsg_rm svmsg_ls svmsg_file_server svmsg_file_client
 all:$(EXEF)
+svmsg_file_server:svmsg_file_server.o $(OBJECTS)
+svmsg_file_client:svmsg_file_client.o $(OBJECTS)
 svmsg_ls:svmsg_ls.o $(OBJECTS)
 svmsg_rm:svmsg_rm.o $(OBJECTS)
 svmsg_receive:svmsg_receive.o $(OBJECTS)
