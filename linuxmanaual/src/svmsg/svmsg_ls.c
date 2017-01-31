@@ -5,7 +5,7 @@
 
 int main(int argc,char *argv[])
 {
-  int maxind,ind,msgid;
+  int maxind,ind,msqid;
   struct msqid_ds ds;
   struct msginfo msginfo;
 
