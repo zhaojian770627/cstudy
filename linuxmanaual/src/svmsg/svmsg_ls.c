@@ -15,7 +15,7 @@ int main(int argc,char *argv[])
     errExit("msgctl-MSG_INFO");
 
   printf("maxind:%d\n\n",maxind);
-  printf("index    id    key    message\n");
+  printf("index      id key             message\n");
 
   /* Retrieve and display information from each element of 
    'entries' array*/
