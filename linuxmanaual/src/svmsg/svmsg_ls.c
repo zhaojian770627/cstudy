@@ -18,7 +18,7 @@ int main(int argc,char *argv[])
   printf("index      id key             message\n");
 
   /* Retrieve and display information from each element of 
-   'entries' array*/
+     'entries' array*/
 
   for(ind=0;ind<=maxind;ind++){
     msqid=msgctl(ind,MSG_STAT,&ds);
