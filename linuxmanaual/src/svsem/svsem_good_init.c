@@ -19,7 +19,7 @@
 #include <sys/sem.h>
 #include <sys/stat.h>
 #include "semun.h"                      /* Definition of semun union */
-#include "tlpi_hdr.h"
+#include "../lib/tlpi_hdr.h"
 
 int
 main(int argc, char *argv[])
