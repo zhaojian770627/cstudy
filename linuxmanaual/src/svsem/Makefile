@@ -3,8 +3,10 @@ GPATH=../lib ../time
 VPATH=../lib ../time 
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=svsem_demo svsem_mon svsem_setall
+EXEF:=svsem_demo svsem_mon svsem_setall svsem_create svsem_op
 all:$(EXEF)
+svsem_op:svsem_op.o $(OBJECTS) curr_time.o
+svsem_create:svsem_create.o $(OBJECTS)
 svsem_setall:svsem_setall.o $(OBJECTS)
 svsem_demo:svsem_demo.o $(OBJECTS) curr_time.o
 svsem_mon:svsem_mon.o $(OBJECTS)
