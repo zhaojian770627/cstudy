@@ -3,8 +3,9 @@ GPATH=../lib ../time ../svsem
 VPATH=../lib ../time ../svsem
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=svshm_xfr_writer
+EXEF:=svshm_xfr_writer svshm_xfr_reader
 all:$(EXEF)
+svshm_xfr_reader:svshm_xfr_reader.o $(OBJECTS) binary_sems.o
 svshm_xfr_writer:svshm_xfr_writer.o $(OBJECTS) binary_sems.o
 get_num.o:get_num.c tlpi_hdr.h
 binary_sems.o:binary_sems.c tlpi_hdr.h

@@ -42,4 +42,18 @@ int main(int argc,char *argv[])
     if(shmp->cnt==0)
       break;
   }
+  /* Wait until reader has let us have one more turn.We then know
+   reader has finished,and so we can delete the IPC objects.*/
+  if(reserveSem(semid,WRITE_SEM)==-1)
+    errExit("reserveSem");
+
+  if(semctl(semid,0,IPC_RMID,dummy)==-1)
+    errExit("semctl");
+  if(shmdt(shmp)==-1)
+    errExit("shmdt");
+  if(shmctl(shmid,IPC_RMID,0)==-1)
+    errExit("shmctl");
+
+  fprintf(stderr,"Sent %d bytes (%d xfrs)\n",bytes,xfrs);
+  exit(EXIT_SUCCESS);
 }
