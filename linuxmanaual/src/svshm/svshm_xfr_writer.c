@@ -26,5 +26,20 @@ int main(int argc,char *argv[])
     errExit("shmat");
 
   /* Transfer blocks of data from stdin to shared memory */
+  for(xfrs=0,bytes=0;;xfrs++,bytes+=shmp->cnt){
+    if(reserveSem(semid,WRITE_SEM)==-1) /* Wait for our turn */
+      errExit("reserveSem");
 
+    shmp->cnt=read(STDIN_FILENO,shmp->buf,BUF_SIZE);
+    if(shmp->cnt==-1)
+      errExit("read");
+
+    if(releaseSem(semid,READ_SEM)==-1) /* Give reader a turn */
+      errExit("releaseSem");
+
+    /* Have we reached EOF? We test this after giving the reader 
+     a turn so that it can see the 0 value in shmp-.cnt.*/
+    if(shmp->cnt==0)
+      break;
+  }
 }
