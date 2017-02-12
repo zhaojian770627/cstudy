@@ -3,8 +3,9 @@ GPATH=../lib ../time ../svsem
 VPATH=../lib ../time ../svsem
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=mmcat t_mmap
+EXEF:=mmcat t_mmap anon_mmap
 all:$(EXEF)
+anon_mmap:anon_mmap.o $(OBJECTS) 
 t_mmap:t_mmap.o $(OBJECTS) 
 mmcat:mmcat.o $(OBJECTS) 
 get_num.o:get_num.c tlpi_hdr.h

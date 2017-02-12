@@ -32,7 +32,7 @@ int main(int argc,char *argv[])
   case -1:
     errExit("fork");
   case 0:			/* Child:increment shared integer and exit */
-    pintf("Child started,value=%d\n",*addr);
+    printf("Child started,value=%d\n",*addr);
     (*addr)++;
     if(munmap(addr,sizeof(int))==-1)
       errExit("munmap");
