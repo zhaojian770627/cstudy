@@ -3,8 +3,9 @@ GPATH=../lib ../time ../svsem
 VPATH=../lib ../time ../svsem
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=t_mprotect
+EXEF:=t_mprotect memlock
 all:$(EXEF)
+memlock:memlock.o $(OBJECTS) 
 t_mprotect:t_mprotect.o $(OBJECTS) 
 get_num.o:get_num.c tlpi_hdr.h
 binary_sems.o:binary_sems.c tlpi_hdr.h
