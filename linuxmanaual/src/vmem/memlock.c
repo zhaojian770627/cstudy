@@ -4,7 +4,7 @@
 #include "../lib/tlpi_hdr.h"
 
 /* Display residency of pages in range [addr .. (addr+length-1)] */
-static void displayMincore(char,size_t length)
+static void displayMincore(char* addr,size_t length)
 {
   unsigned char *vec;
   long pageSize,numPages,j;
@@ -36,7 +36,7 @@ int main(int argc,char *argv[])
   if(argc!=4||strcmp(argv[1],"--help")==0)
     usageErr("%s num-pages lock-page-step lock-page-len\n",argv[0]);
 
-  pageSize=sysConf(_SC_PAGESIZE);
+  pageSize=sysconf(_SC_PAGESIZE);
   if(pageSize==-1)
     errExit("sysconf(_SC_PAGESIZE)");
 
