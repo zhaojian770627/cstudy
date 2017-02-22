@@ -3,8 +3,10 @@ GPATH=../lib ../time ../svsem
 VPATH=../lib ../time ../svsem
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=pmsg_create pmsg_getattr pmsg_unlink pmsg_receive pmsg_send
+EXEF:=pmsg_create pmsg_getattr pmsg_unlink pmsg_receive pmsg_send mq_notify_sig mq_notify_thread
 all:$(EXEF)
+mq_notify_sig:mq_notify_sig.o $(OBJECTS) -lrt 
+mq_notify_thread:mq_notify_thread.o $(OBJECTS) -lrt 
 pmsg_send:pmsg_send.o $(OBJECTS) -lrt 
 pmsg_receive:pmsg_receive.o $(OBJECTS) -lrt 
 pmsg_getattr:pmsg_getattr.o $(OBJECTS) -lrt 

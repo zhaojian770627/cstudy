@@ -36,10 +36,10 @@ static void threadFunc(union sigval sv)
 
 static void notifySetup(mqd_t *mqdp)
 {
-  strcut sigevent sev;
+  struct sigevent sev;
   sev.sigev_notify=SIGEV_THREAD; /* Notify via thread */
   sev.sigev_notify_function=threadFunc;
-  sev_sigev_notify_attributes=NULL;
+  sev.sigev_notify_attributes=NULL;
 
   /* Could be pointer to pthread_attr_t structure */
   sev.sigev_value.sival_ptr=mqdp; /* Argument to threadFunc */

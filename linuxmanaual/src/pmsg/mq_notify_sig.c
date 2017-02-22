@@ -61,7 +61,7 @@ int main(int argc,char *argv[])
     while((numRead=mq_receive(mqd,buffer,attr.mq_msgsize,NULL))>=0)
       printf("Read %ld bytes\n",(long)numRead);
 
-    if(error!=EAGAIN)		/* Unexpected error */
+    if(errno!=EAGAIN)		/* Unexpected error */
       errExit("mq_receive");
   }
 }
