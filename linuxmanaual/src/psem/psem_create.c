@@ -31,8 +31,8 @@ int main(int argc,char *argv[])
     usageError(argv[0]);
 
   /* Default permissions are rw-------;default semaphore initialization
-   value is 0*/
-  perms=(argc<=optind+1)?(S_IRUSR|S_IWURS):
+     value is 0*/
+  perms=(argc<=optind+1)?(S_IRUSR|S_IWUSR):
     getInt(argv[optind+1],GN_BASE_8,"octal-perms");
   value=(argc<=optind+2)?0:getInt(argv[optind+2],0,"value");
   sem=sem_open(argv[optind],flags,perms,value);
