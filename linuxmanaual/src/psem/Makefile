@@ -3,8 +3,10 @@ GPATH=../lib ../time ../svsem
 VPATH=../lib ../time ../svsem
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=psem_unlink psem_create psem_wait
+EXEF:=psem_unlink psem_create psem_wait psem_getvalue psem_post
 all:$(EXEF)
+psem_getvalue:psem_getvalue.o $(OBJECTS) -lrt
+psem_post:psem_post.o $(OBJECTS) -lrt
 psem_wait:psem_wait.o $(OBJECTS) -lrt 
 psem_unlink:psem_unlink.o $(OBJECTS) -lrt 
 psem_create:psem_create.o $(OBJECTS) -lrt 
