@@ -20,8 +20,8 @@ return 1;
   yylval.double_value=temp;
   return DOUBLE_LITERAL;
 }
-[\t];
-.{
+[ \t];
+. {
   fprintf(stderr,"lexical error.\n");
   exit(1);
 }
