@@ -3,8 +3,9 @@ GPATH=../lib ../time ../svsem
 VPATH=../lib ../time ../svsem
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=pshm_create pshm_write 
+EXEF:=pshm_create pshm_write pshm_read
 all:$(EXEF)
+pshm_read:pshm_read.o $(OBJECTS) -lrt 
 pshm_write:pshm_write.o $(OBJECTS) -lrt 
 pshm_create:pshm_create.o $(OBJECTS) -lrt 
 get_num.o:get_num.c tlpi_hdr.h
