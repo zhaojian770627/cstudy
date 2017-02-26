@@ -20,6 +20,7 @@ line
 {
   printf(">>%1f\n",$1);
 }
+;
 expression
 :term
 |expression ADD term

@@ -14,7 +14,7 @@ return 1;
 "*" return MUL;
 "/" return DIV;
 "\n" return CR;
-([1-9][0-9]*)|0|([0-9]+\.[0-9]*){
+([1-9][0-9]*)|0|([0-9]+\.[0-9]*) {
   double temp;
   sscanf(yytext,"%lf",&temp);
   yylval.double_value=temp;
