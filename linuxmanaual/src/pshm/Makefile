@@ -3,8 +3,9 @@ GPATH=../lib ../time ../svsem
 VPATH=../lib ../time ../svsem
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=pshm_create pshm_write pshm_read
+EXEF:=pshm_create pshm_write pshm_read pshm_unlink
 all:$(EXEF)
+pshm_unlink:pshm_unlink.o $(OBJECTS) -lrt 
 pshm_read:pshm_read.o $(OBJECTS) -lrt 
 pshm_write:pshm_write.o $(OBJECTS) -lrt 
 pshm_create:pshm_create.o $(OBJECTS) -lrt 
