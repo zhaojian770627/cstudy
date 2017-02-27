@@ -23,6 +23,6 @@ return 1;
 [ \t];
 . {
   fprintf(stderr,"lexical error.\n");
-  exit(1);
+  //exit(1);
 }
 %%
