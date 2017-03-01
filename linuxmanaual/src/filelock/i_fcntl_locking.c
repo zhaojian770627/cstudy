@@ -80,7 +80,7 @@ int main(int argc,char *argv[])
     }else{			/* F_SETLK,F_SETLKW */
       if(status==0)
 	printf("[PID=%ld] %s\n",(long)getpid(),(lock=='u')?
-	       "unlocked":"get lock");
+	       "unlocked":"got lock");
       else if(errno==EAGAIN||errno==EACCES) /* F_SETLK */
 	printf("[PID=%ld] failed (incompatible lock)\n",
 	       (long)getpid());
