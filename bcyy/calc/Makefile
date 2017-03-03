@@ -1,11 +1,13 @@
 #
-#GPATH=../lib ../time ../svsem 
-#VPATH=../lib ../time ../svsem
+#GPATH=
+#VPATH=
 CFLAGS+=-g
 OBJECTS=
-EXEF:=mycalc lexicalanalyzer
+EXEF:=mycalc lexicalanalyzer parser
 all:$(EXEF)
+parser:parser.o gettoken.o
 lexicalanalyzer:lexicalanalyzer.o
+#gettoken.o:gettoken.c
 mycalc:y.tab.c lex.yy.c
 	cc -o mycalc y.tab.c lex.yy.c
 y.tab.c:
