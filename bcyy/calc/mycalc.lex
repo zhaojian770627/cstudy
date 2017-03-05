@@ -13,6 +13,8 @@ return 1;
 "-" return SUB;
 "*" return MUL;
 "/" return DIV;
+"(" return LP;
+")" return RP;
 "\n" return CR;
 ([1-9][0-9]*)|0|([0-9]+\.[0-9]*) {
   double temp;
