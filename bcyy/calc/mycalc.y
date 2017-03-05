@@ -54,6 +54,10 @@ primary_expression
 {
   $$=$2;
 }
+|SUB primary_expression
+{
+  $$=-$2;
+}
 ;
 %%
 int yyerror(char const *str)
