@@ -21,7 +21,7 @@ int main(int argc,char *argv[])
 
   memset(&addr,0,sizeof(struct sockaddr_un));
   addr.sun_family=AF_UNIX;
-  strncpy(addr.sun_path,SV_SOCK_PATH,sizeof(addr.sun_path-1));
+  strncpy(addr.sun_path,SV_SOCK_PATH,sizeof(addr.sun_path)-1);
 
   if(bind(sfd,(struct sockaddr*)&addr,sizeof(struct sockaddr_un))==-1)
     errExit("bind");
