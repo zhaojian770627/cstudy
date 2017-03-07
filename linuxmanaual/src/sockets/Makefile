@@ -3,8 +3,10 @@ GPATH=../lib ../time ../svsem
 VPATH=../lib ../time ../svsem
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=us_xfr_sv us_xfr_cl
+EXEF:=us_xfr_sv us_xfr_cl ud_ucase_sv ud_ucase_cl
 all:$(EXEF)
+ud_ucase_cl:ud_ucase_cl.o $(OBJECTS) 
+ud_ucase_sv:ud_ucase_sv.o $(OBJECTS) 
 us_xfr_sv:us_xfr_sv.o $(OBJECTS) 
 us_xfr_cl:us_xfr_cl.o $(OBJECTS) 
 get_num.o:get_num.c tlpi_hdr.h

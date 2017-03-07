@@ -38,8 +38,7 @@ int main(int argc,char *argv[])
 	      sizeof(struct sockaddr_un))!=msgLen)
       fatal("sendto");
 
-    numBytes=recvfrom(sfd,buf,BUF_SIZE,0,
-		      (struct sockaddr*)&claddr,&len);
+    numBytes=recvfrom(sfd,resp,BUF_SIZE,0,NULL,NULL);
 
     if(numBytes==-1)
       errExit("recvfrom");
