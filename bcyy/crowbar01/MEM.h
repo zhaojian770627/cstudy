@@ -83,3 +83,26 @@ void MEM_check_all_blocks_func(MEM_Controller controller,
 
 #define MEM_free(ptr)\
   (MEM_free_func(MEM_CURRENT_CONTROLLER,ptr))
+
+#define MEM_dispose_storage(storage)\
+  (MEM_dispose_storage_func(MEM_CURRENT_CONTROLLER,storage))
+
+#ifdef DEBUG
+#define MEM_dump_blocks(fp)\
+  (MEM_dump_blocks_func(MEM_CURRENT_CONTROLLER,fp))
+
+#define MEM_check_block(p)\
+  (MEM_check_block_func(MEM_CURRENT_CONTROLLER,\
+			__FILE__,__LINE__,p))
+
+#define MEM_check_all_blocks()\
+  (MEM_check_all_blocks_func(MEM_CURRENT_CONTROLLER,\
+			     __FILE__,__LINE__))
+
+#else  /* DEBUG */
+#define MEM_dump_blocks(fp) ((void)0)
+#define MEM_check_block(p) ((void)0)
+#define MEM_check_all_blocks() ((void)0)
+#endif	/* DEBUG */
+
+#endif	/* PUBLIC_MEM_H */
