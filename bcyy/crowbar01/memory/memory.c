@@ -48,3 +48,63 @@ static void default_error_handler(MEM_Controller controller,
   fprintf(controller->error_fp,
 	  "MEM:%s failed in %s at %d\n",msg,filename,line);
 }
+
+static void
+ error_handler(MEM_Controller controller,char *filename,int line,char *msg)
+{
+  if(controller->error_fp==NULL){
+    controller->error_fp=stderr;
+  }
+  controller->error_handler(controller,finename,line,msg);
+  if(controller->fail_mode==MEM_FAIL_AND_EXIT)
+    exit(1);
+}
+
+MEM_Controller MEM_create_controller(void)
+{
+  MEM_Controller p;
+  p=MEM_malloc_func(&st_default_controller,__FILE__,__LINE__,
+		    sizeof(struct MEM_Controller_tag));
+  *p=st_default_controller;
+  return p;
+}
+
+#ifdef DEBUG
+static void 
+chain_block(MEM_Controller controller,Header *new_header)
+{
+  if(controller->block_header){
+    controller->block_header->s.prev=new_header;
+  }
+  new_header->s.prev=NULL;
+  new_header->s.next=controller->header;
+  controller->block_header=new_header;
+}
+
+static void 
+rechain_block(MEM_Controller controller,Header *header)
+{
+  if(header->s.prev){
+    header->s.prev->s.next=header;
+  }else{
+    controller->block_header=header;
+  }
+  if(header->s.next){
+    header->s.next->s.prev=header;
+  }
+}
+
+static void
+unchain_block(MEM_Controller controller,Header *header)
+{
+  if(header->s.prev){
+    header->s.prev->s.next=header->s.next;
+  }else{
+    controller->block_header=header->s.next;
+  }
+  if(header->s.next){
+    header->s.next->s.prev=header->s.prev;
+  }
+}
+
+
