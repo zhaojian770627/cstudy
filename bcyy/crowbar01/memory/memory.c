@@ -35,3 +35,16 @@ typedef struct{
 #define ALIGN_SIZE (sizeof(Align))
 #define revalue_up_align(val) ((val)?((val)-1)/ALIGN_SIZE+1):0)
 #define HEADER_ALIGN_SIZE (revalue_up_align(sizeof(HeaderStruct)))
+#define MARK (0xCD)
+
+union Header_tag{
+  HeaderStruct s;
+  Align u[HEADER_ALIGN_SIZE];
+};
+
+static void default_error_handler(MEM_Controller controller,
+				  char *filename,int line,char *msg)
+{
+  fprintf(controller->error_fp,
+	  "MEM:%s failed in %s at %d\n",msg,filename,line);
+}
