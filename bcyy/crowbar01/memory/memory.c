@@ -39,7 +39,8 @@ typedef struct{
 
 union Header_tag{
   HeaderStruct s;
-  Align u[HEADER_ALIGN_SIZE];
+  Align u[HEADER_ALIGN_SIZE];	/* HEADER_ALIGN_SIZE shows s 
+				   has how many Align */
 };
 
 static void default_error_handler(MEM_Controller controller,
@@ -108,3 +109,20 @@ unchain_block(MEM_Controller controller,Header *header)
 }
 
 
+void
+set_header(Header *header,int size,char *filename,int line)
+{
+  header->s.size=size;
+  header->s.filename=filename;
+  header->s.line=line;
+  memset(header->s.mark,MARK,
+	 (char*)&header[1]-(char*)header->s.mark);
+}
+
+void 
+set_tail(void *ptr,int alloc_size)
+{
+  char *tail;
+  tail=((char*)ptr)+alloc_size-MARK_SIZE;
+  memset(tail,MARK,MARK_SIZE);
+}
