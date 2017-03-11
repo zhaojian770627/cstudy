@@ -78,7 +78,7 @@ chain_block(MEM_Controller controller,Header *new_header)
     controller->block_header->s.prev=new_header;
   }
   new_header->s.prev=NULL;
-  new_header->s.next=controller->header;
+  new_header->s.next=controller->block_header;
   controller->block_header=new_header;
 }
 
@@ -146,13 +146,13 @@ check_mark(Header *header)
   unsigned char *tail;
   check_mark_sub(header->s.mark,
 		 (char*)&header[1]-(char*)header->s.mark);
-  tail=((unsigned *char)header)+header->s.size+sizeof(Header);
+  tail=((unsigned char*)header)+header->s.size+sizeof(Header);
   check_mark_sub(tail,MARK_SIZE);
 }
 #endif	/* DEBUG */
 
 void*
-MEM_malloc_func(MEM_Controller controller,char *int line,
+MEM_malloc_func(MEM_Controller controller,char *filename,int line,
 		size_t size)
 {
   void *ptr;
@@ -168,7 +168,7 @@ MEM_malloc_func(MEM_Controller controller,char *int line,
     error_handler(controller,filename,line,"malloc");
   }
 #ifdef DEBUG
-  memset(ptr,oxCC,alloc_size);
+  memset(ptr,0xCC,alloc_size);
   set_header(ptr,size,filename,line);
   set_tail(ptr,alloc_size);
   chain_block(controller,(Header*)ptr);
@@ -251,7 +251,7 @@ MEM_strdup_func(MEM_Controller controller,char *filename,int line,
   }
 
 #ifdef DEBUG
-  memeset(ptr,0xCC,alloc_size);
+  memset(ptr,0xCC,alloc_size);
   set_header((Header*)ptr,size,filename,line);
   set_tail(ptr,alloc_size);
   chain_block(controller,(Header*)ptr);
