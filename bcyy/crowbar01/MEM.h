@@ -105,4 +105,6 @@ void MEM_check_all_blocks_func(MEM_Controller controller,
 #define MEM_check_all_blocks() ((void)0)
 #endif	/* DEBUG */
 
+/* zhaojianc Add  */
+void MEM_zjtest();
 #endif	/* PUBLIC_MEM_H */

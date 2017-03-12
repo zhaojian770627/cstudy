@@ -1,7 +1,8 @@
 TARGET=mem.o
 CC=gcc
 CFLAGS=-c -g -DDEBUG -Wall -ansi -pedantic
-OBJS=memory.o storage.o
+OBJS=memory.o
+# storage.o
 
 $(TARGET):$(OBJS)
 	ld -r -o $@ $(OBJS)
@@ -12,3 +13,5 @@ testp:$(OBJS) main.o
 main.o:main.c ../MEM.h
 memory.o:memory.c memory.h ../MEM.h
 storage.o:storage.c memory.h ../MEM.h
+clean:
+	$(RM) *.o *.d $(EXEF)

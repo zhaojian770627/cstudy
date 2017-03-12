@@ -336,3 +336,8 @@ void MEM_check_all_blocks_func(MEM_Controller controller,
   }
 #endif	/* DEBUG */
 }
+
+void MEM_zjtest()
+{
+
+}
