@@ -14,4 +14,4 @@ main.o:main.c ../MEM.h
 memory.o:memory.c memory.h ../MEM.h
 storage.o:storage.c memory.h ../MEM.h
 clean:
-	$(RM) *.o *.d $(EXEF)
+	$(RM) *.o *.d $(EXEF) testp

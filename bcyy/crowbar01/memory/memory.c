@@ -339,5 +339,14 @@ void MEM_check_all_blocks_func(MEM_Controller controller,
 
 void MEM_zjtest()
 {
+  void *p;
+  /* print ALIGN */
+  printf("long:%d\n",sizeof(long));
+  printf("double:%d\n",sizeof(double));
+  printf("point:%d\n",sizeof(p));
 
+  printf("ALIGN:%d\n",ALIGN_SIZE);
+
+  printf("HeaderStruct:%d\n",sizeof(HeaderStruct));
+  printf("HEADER_ALIGN_SIZE:%d\n",HEADER_ALIGN_SIZE);
 }
