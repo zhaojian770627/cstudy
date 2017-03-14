@@ -1,8 +1,7 @@
 TARGET=mem.o
 CC=gcc
 CFLAGS=-c -g -DDEBUG -Wall -ansi -pedantic
-OBJS=memory.o
-# storage.o
+OBJS=memory.o storage.o
 
 $(TARGET):$(OBJS)
 	ld -r -o $@ $(OBJS)

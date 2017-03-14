@@ -27,10 +27,10 @@ struct MEM_Storage_tag{
   int current_page_size;
 };
 
-#define large(a,b) (((a)>(b))?(a):(b))
+#define larger(a,b) (((a)>(b))?(a):(b))
 
 MEM_Storage
-MEM_open_storage_func(MEM_Controller,char *filename,int line,
+MEM_open_storage_func(MEM_Controller controller,char *filename,int line,
 		      int page_size)
 {
   MEM_Storage storage;
