@@ -28,7 +28,7 @@ main(int argc,char *argv[])
   for(;;){
     len=sizeof(struct sockaddr_in6);
     numBytes=recvfrom(sfd,buf,BUF_SIZE,0,
-		      (struct sockaddr*)&claddrStr,&len);
+		      (struct sockaddr*)&claddr,&len);
     if(numBytes==-1)
       errExit("recvfrom");
 

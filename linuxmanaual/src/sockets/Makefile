@@ -3,8 +3,9 @@ GPATH=../lib ../time ../svsem
 VPATH=../lib ../time ../svsem
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=us_xfr_sv us_xfr_cl ud_ucase_sv ud_ucase_cl i6d_ucase_sv
+EXEF:=us_xfr_sv us_xfr_cl ud_ucase_sv ud_ucase_cl i6d_ucase_sv i6d_ucase_cl
 all:$(EXEF)
+i6d_ucase_cl:i6d_ucase_cl.o $(OBJECTS)
 i6d_ucase_sv:i6d_ucase_sv.o $(OBJECTS)
 ud_ucase_cl:ud_ucase_cl.o $(OBJECTS) 
 ud_ucase_sv:ud_ucase_sv.o $(OBJECTS) 
