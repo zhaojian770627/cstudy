@@ -3,8 +3,10 @@ GPATH=../lib ../time ../svsem
 VPATH=../lib ../time ../svsem
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=us_xfr_sv us_xfr_cl ud_ucase_sv ud_ucase_cl i6d_ucase_sv i6d_ucase_cl
+EXEF:=us_xfr_sv us_xfr_cl ud_ucase_sv ud_ucase_cl i6d_ucase_sv i6d_ucase_cl \
+is_seqnum_sv
 all:$(EXEF)
+is_seqnum_sv:is_seqnum_sv.o $(OBJECTS) read_line.o
 i6d_ucase_cl:i6d_ucase_cl.o $(OBJECTS)
 i6d_ucase_sv:i6d_ucase_sv.o $(OBJECTS)
 ud_ucase_cl:ud_ucase_cl.o $(OBJECTS) 

@@ -45,7 +45,7 @@ fin:
 
 msg:
 	db	0x0a,0x0a
-	db	"hello,world"
+	db	"hello,zj,I has run"
 	db	0x0a
 	db	0
 
