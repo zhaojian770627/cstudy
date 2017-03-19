@@ -3,8 +3,9 @@ all:boot.img
 boot.img:blank.img helloos.bin
 	cp helloos.bin boot.img
 	dd if=blank.img of=boot.img skip=1 seek=1 bs=512 count=2879
+	cp boot.img /mnt/share/os/boot.img
 blank.img:
-	dd if=/dev/zero of=blank.img bs=1k count=1024
+	dd if=/dev/zero of=blank.img bs=512 count=2880
 helloos.bin:
 	nasm -f bin helloos.s -o helloos.bin
 clean:
