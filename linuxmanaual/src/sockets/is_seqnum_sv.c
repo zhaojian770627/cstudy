@@ -30,7 +30,7 @@ main(int argc,char *argv[])
     errExit("signal");
 
   /* Call getaddrinfo() to obtain a list of addresses that
-   we can try binding to */
+     we can try binding to */
 
   memset(&hints,0,sizeof(struct addrinfo));
   hints.ai_canonname=NULL;
@@ -44,7 +44,16 @@ main(int argc,char *argv[])
   if(getaddrinfo(NULL,PORT_NUM,&hints,&result)!=0)
     errExit("getaddrinfo");
 
+  /* Walk through returned list until we find an address structure
+     that can be used to sucessfully create and bind a socket*/
 
+  optval=1;
+
+  for(rp=result;rp!=NULL;rp=rp->ai_next){
+ 
+    printf("%d\n",rp->ai_protocol);
+
+  }
 
   freeaddrinfo(result);
 }
