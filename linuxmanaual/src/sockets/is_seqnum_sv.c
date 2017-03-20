@@ -21,6 +21,8 @@ main(int argc,char *argv[])
   char host[NI_MAXHOST];
   char service[NI_MAXSERV];
 
+  char ipstr[16];
+
   if(argc>1 && strcmp(argv[1],"--help")==0)
     usageErr("%s [init-seq-num]\n",argv[0]);
 
@@ -51,9 +53,67 @@ main(int argc,char *argv[])
 
   for(rp=result;rp!=NULL;rp=rp->ai_next){
  
-    printf("%d\n",rp->ai_protocol);
+    // inet_ntop(AF_INET,
+    //	      &(((struct sockaddr_in*)(rp->ai_addr))->sin_addr),
+    //	      ipstr,16);
+    //    printf("%s\n",ipstr);
+    lfd=socket(rp->ai_family,rp->ai_socktype,rp->ai_protocol);
+    if(lfd==-1)
+      continue;   		/* On error,try next address */
 
+    if(setsockopt(lfd,SOL_SOCKET,SO_REUSEADDR,&optval,sizeof(optval))
+       ==-1)
+      errExit("setsockopt");
+
+    if(bind(lfd,rp->ai_addr,rp->ai_addrlen)==0)
+      break;			/* Success */
+
+    /* bind() failed:close this socket and try next address */
+    close(lfd);
   }
 
+  if(rp==NULL)
+    fatal("Could not bind socket to any address");
+
+  if(listen(lfd,BACKLOG)==-1)
+    errExit("listen");
+
   freeaddrinfo(result);
+
+  for(;;){			/* Handler clients iteratively */
+    /* Accept a client connection,obtaining client's address */
+    addrlen=sizeof(struct sockaddr_storage);
+    cfd=accept(lfd,(struct sockaddr*)&claddr,&addrlen);
+    if(cfd==-1){
+      errMsg("accept");
+      continue;
+    }
+    if(getnameinfo((struct sockaddr*)&claddr,addrlen,
+		   host,NI_MAXHOST,service,NI_MAXSERV,0)==0)
+      snprintf(addrStr,ADDRSTRLEN,"(%s,%s)",host,service);
+    else
+      snprintf(addrStr,ADDRSTRLEN,"(?UNKNOWN?)");
+    printf("Connection from %s\n",addrStr);
+
+    /* Read client request,send sequence number back */
+
+    if(readLine(cfd,reqLenStr,INT_LEN)<=0){
+      close(cfd);
+      continue;			/* Failed read;skip request */
+    }
+
+    reqLen=atoi(reqLenStr);
+    if(reqLen<=0){		/* Watch for misbehaving clients */
+      close(cfd);
+      continue;			/* Bad request,skip it */
+    }
+
+    snprintf(seqNumStr,INT_LEN,"%d\n",seqNum);
+    if(write(cfd,&seqNumStr,strlen(seqNumStr))!=strlen(seqNumStr))
+      fprintf(stderr,"Error on write");
+    seqNum+=reqLen;		/* Update sequence number */
+
+    if(close(cfd)==-1)		/* Close connection */
+      errMsg("close");
+  }
 }

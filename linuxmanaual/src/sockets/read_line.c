@@ -3,7 +3,7 @@
 #include "read_line.h"
 
 ssize_t
-readline(int fd,void *buffer,size_t n)
+readLine(int fd,void *buffer,size_t n)
 {
   ssize_t numRead;		/* # of bytes fetched by last read() */
   size_t totRead;		/* Total bytes read so far */
