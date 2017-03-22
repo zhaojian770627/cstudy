@@ -53,3 +53,5 @@ void DBG_assert_func(char *fmt,...);
 void DBG_panic_func(char *fmt,...);
 void DBG_debug_write_func(int level,char *fmt,...);
 #endif	/* PUBLIC_DBG_H_INCLUDE */
+
+void dbg_zjtest();
