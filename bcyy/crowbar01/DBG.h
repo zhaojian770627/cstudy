@@ -21,7 +21,7 @@ void DBG_set_expression(char *expression);
 #define DBG_CURRENT_CONTROLLER dbg_default_controller
 #endif	/* DBG_CONTROLLER */
 
-extern DBG_Controller DBG_CURRENT_CONTROLLER
+extern DBG_Controller DBG_CURRENT_CONTROLLER;
 
 #define DBG_create_controller() (DBG_create_controller_func())
 #define DBG_set_debug_level(level)				\
@@ -43,8 +43,8 @@ extern DBG_Controller DBG_CURRENT_CONTROLLER
 
 typedef enum{
   DBG_TRUE=1,
-    DBG_FALSE=0
-    } DBG_Boolean;
+  DBG_FALSE=0
+} DBG_Boolean;
 
 DBG_Controller  DBG_create_controller_func(void);
 void DBG_set_debug_level_func(DBG_Controller controller,int level);
