@@ -29,6 +29,24 @@ entry:
 	mov	ds,ax
 	mov	es,ax
 
+	;; read disk
+	mov	ax,0x0820
+	mov	es,ax
+	mov	ch,0		;cylinder 0
+	mov	dh,0		;head 0
+	mov	cl,2		;sector 2
+
+	mov 	ah,0x02		;ah=0x02:read disk
+	mov	al,1		;1 sector
+	mov 	bx,0
+	mov 	dl,0x00		;A Fd0
+	int	0x13		;Call BIOS
+	jc	error
+fin:
+	hlt
+	jmp	fin
+
+error:
 	mov 	si,msg
 putloop:
 	mov 	al,[si]
@@ -39,13 +57,10 @@ putloop:
 	mov	bx,15
 	int	0x10
 	jmp	putloop
-fin:
-	hlt
-	jmp	fin
 
 msg:
 	db	0x0a,0x0a
-	db	"hello,zj,I has run"
+	db	"load error"
 	db	0x0a
 	db	0
 
