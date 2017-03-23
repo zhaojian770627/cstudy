@@ -22,6 +22,9 @@
 ;;(require 'semantic/bovine/semantic-c.el)
 
 (global-linum-mode 'linum-mode)
+(tool-bar-mode 0)
+(menu-bar-mode 0)
+(setq inhibit-splash-screen t)
 
 ;;bind key
 (global-set-key [f12] 'semantic-ia-fast-jump)
