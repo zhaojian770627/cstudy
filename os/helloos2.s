@@ -75,7 +75,7 @@ msg:
 	times 	0x1fe-($-$$) db	0
 	db	0x55,0xaa
 
-	db	"I am at 1 sector"
+	db	"I am at 1 sector" ;the 2'd sector
 	db	0x0a
 	db	0
 	times	0x400-($-$$) db 0
