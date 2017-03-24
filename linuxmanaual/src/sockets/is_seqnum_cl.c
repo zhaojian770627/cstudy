@@ -9,7 +9,6 @@ main(int argc,char *argv[])
   struct sockaddr_storage claddr;
   int cfd;
   ssize_t numRead;
-  socklen_t addrlen;
   struct addrinfo hints;
   struct addrinfo *result,*rp;
 
@@ -59,7 +58,7 @@ main(int argc,char *argv[])
   if(write(cfd,reqLenStr,strlen(reqLenStr))!=strlen(reqLenStr))
     fatal("Partial/failed write (reqLenStr)");
 
-  if(write(cfd,"\n",1)!=-1)
+  if(write(cfd,"\n",1)!=1)
     fatal("Partial/failed write (newline)");
 
   /* Read and display sequence number returned by server */
