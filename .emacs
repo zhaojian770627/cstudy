@@ -5,8 +5,14 @@
 (global-ede-mode 1)
 
 (add-to-list 'load-path "~/tools/ecb-2.40")
+(add-to-list 'load-path "~/tools/color-theme-6.6.0")
+
 (require 'ecb)
 (require 'ecb-autoloads)
+
+(require 'color-theme)
+(color-theme-initialize)
+(color-theme-matrix)
 
 
 (semantic-load-enable-minimum-features)
