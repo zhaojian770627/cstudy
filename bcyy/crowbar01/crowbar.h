@@ -160,4 +160,173 @@ typedef struct{
   Block *else_block;
 }IfStatement;
 
+typedef struct{
+  Expression *condition;
+  Block *else_block;
+}WhileStatement;
+
+typedef struct{
+  Expression *init;
+  Expression *condition;
+  Expression *post;
+  Block *block;
+}ForStatement;
+
+typedef struct{
+  Expression *return_value;
+}ReturnStatement;
+
+typedef enum{
+  EXPRESSION_STATEMENT=1,
+  GLOBAL_STATEMENT,
+  IF_STATEMENT,
+  WHILE_STATEMENT,
+  FOR_STATEMENT,
+  RETURN_STATEMENT,
+  BREAK_STATEMENT,
+  CONTINUE_STATEMENT,
+  STATEMENT_TYPE_COUNT_PLUS_1
+}StatementType;
+
+struct Statement_tag{
+  StatementType type;
+  int line_number;
+  union{
+    Expression *expression_s;
+    GlobalStatement global_s;
+    IfStatement if_s;
+    WhileStatement while_s;
+    ForStatement for_s;
+    ReturnStatement return_s;
+  }u;
+};
+
+typedef struct ParameterList_tag{
+  char *name;
+  struct ParameterList_tag *next;
+}ParameterList;
+
+typedef enum{
+  CROWBAR_FUNCTION_DEFINITION=1,
+  NATIVE_FUNCTION_DEFINITION
+}ParameterList;
+
+typedef struct FunctionDefinition_tag{
+  char *name;
+  FunctionDefinitionType type;
+  union{
+    struct{
+      ParameterList *parameter;
+      Block *block;
+    }crowbar_f;
+
+    struct{
+      CRB_NativeFunctionProc *proc;
+    }native_f;
+  }u;
+  struct FunctionDefinition_tag *next;
+}FunctionDefinition;
+
+typedef struct Variable_tag{
+  char *name;
+  CRB_Value value;
+  struct Variable_tag *next;
+}Variable;
+
+typedef enum{
+  NORMAL_STATEMENT_RESULT=1,
+  RETURN_STATEMENT_RESULT,
+  BREAD_STATEMENT_RESULT,
+  CONTINUE_STATEMENT_RESULT,
+  STATEMENT_RESULT_TYPE_COUNT_PLUS_1
+}StatementResultType;
+
+typedef struct{
+  StatementResultType type;
+  union{
+    CRB_Value return_value;
+  }u;
+}StatementResult;
+
+typedef struct GlobalVariableRef_tag{
+  Variable *variable;
+  struct GlobalVariableRef_tag *next;
+}GlobalVariableRef;
+
+typedef struct{
+  Variable *variable;
+  GlobalVariableRef *global_variable;
+}LocalEnvironment;
+
+struct CRB_String_tag{
+  int ref_count;
+  char *string;
+  CRB_Blloean is_literal;
+};
+
+typedef struct{
+  CRB_String *strings;
+}StringPool;
+
+struct CRB_Interpreter_tag{
+  MEM_Storage initerpreter_storage;
+  MEM_Storage execute_storage;
+  Variable *variable;
+  FunctionDefinition *function_list;
+  StatementList *statement_list;
+  int current_line_number;
+};
+
+/* create.c */
+void crb_function_define(char *identifier,ParameterList *parameter_list,
+			 Block *block);
+ParameterList *crb_create_parameter(char *identifier);
+ParameterList *crb_chain_parameter(ParameterList *list,
+				   char *identifier);
+ArgumentList *crb_create_argument_list(Expression *expression);
+ArgumentList *crb_chain_argument_list(ParameterList *list,
+				      char *identifier);
+StatementList *crb_create_statement_list(Statement *statement);
+StatementList *crb_chain_statement_list(Statement *list,
+					Statement *statement);
+Expression *crb_alloc_expression(ExpressionType type);
+Expression *crb_create_assign_expression(char *variable,Expression *operand);
+Expression *crb_create_binary_expression(ExpressionType operator,
+					 Expression *left,
+					 Expression *right);
+Expression *crb_create_minus_expression(Expression *operand);
+Expression *crb_create_identifier_expression(char *identifier);
+Expression *crb_create_function_call_expression(char *func_name,
+						ArgumentList *argument);
+Expression *crb_create_boolean_expression(CRB_Boolean value);
+Expression *crb_create_null_expression(void);
+
+Statement *crb_create_global_statement(IdentifierList *identifier_list);
+
+IdentifierList *crb_create_global_identifier(char *identifier);
+IdentifierList *crb_chain_identifier(IdentifierList *list,char *identifer);
+
+Statement *crb_create_if_statement(Expression *condition,
+				   Block *then_block,Elsif *elsif_list,
+				   Block *else_block);
+Elsif *crb_chain_elsif_list(Elsif *list,Elsif *add);
+Elsif *crb_create_elsif(Expression *expr,Block *block);
+
+Statement *crb_create_while_statement(Expression *condition,Block *block);
+Statement *crb_create_for_statement(Expression *init,Expression *condition,
+				    Expression *post,Block *block);
+
+Block *crb_create_block(StatementList *statement_list);
+
+Statement *crb_create_expression_statement(Expression *expression);
+Statement *crb_create_return_statement(EXPRESSION *expression);
+Statement *crb_create_break_statement(void);
+Statement *crb_create_continue_statement(void);
+
+/* string.c */
+char *crb_create_identifier(char *str);
+void crb_open_string_literal(void);
+void crb_add_string_literal(int letter);
+void crb_reset_string_literal_buffer(void);
+void *crb_close_string_literal(void);
 
