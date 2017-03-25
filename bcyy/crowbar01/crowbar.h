@@ -330,3 +330,4 @@ void crb_add_string_literal(int letter);
 void crb_reset_string_literal_buffer(void);
 void *crb_close_string_literal(void);
 
+/* execute.c */
