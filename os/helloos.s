@@ -72,7 +72,8 @@ next:				;read 18 sector
 	cmp 	ch,CYLS
 	jb	readloop	;if ch<CYLS,jmp readloop
 
-	;;jmp haribote.sys 
+	;;jmp haribote.sys
+	mov	[0x0ff0],ch
 	jmp	0xc400
 
 error:
