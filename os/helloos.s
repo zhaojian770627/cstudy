@@ -1,5 +1,7 @@
 	;; hello-os
 	;; TAB=4
+CYLS	equ	10
+	
 	org	0x7c00
 
 	jmp	entry
@@ -21,13 +23,13 @@
 	dd	0xffffffff	;lable num
 	db	"HELLO-OS    "	;disk name must 12 byte
 	db	"FAT12   "	;disk type name 8 byte
+space:
 	resb	18		;space 18
 entry:
 	mov	ax,0
 	mov 	ss,ax
 	mov	sp,0x7c00
 	mov	ds,ax
-	mov	es,ax
 
 	;; read disk
 	mov	ax,0x0820
@@ -35,16 +37,43 @@ entry:
 	mov	ch,0		;cylinder 0
 	mov	dh,0		;head 0
 	mov	cl,2		;sector 2
-
+readloop:	
+	mov	si,0		;record failed count
+retry:
 	mov 	ah,0x02		;ah=0x02:read disk
 	mov	al,1		;1 sector
 	mov 	bx,0
 	mov 	dl,0x00		;A Fd0
 	int	0x13		;Call BIOS
-	jc	error
-fin:
-	hlt
-	jmp	fin
+	jnc	next		;no error,jmp next
+	add	si,1		;error inc si
+	cmp	si,5		;cmp si and 5
+	jae	error		;when si>=5,jmp error
+
+	mov	ah,0x00
+	mov	dl,0x00		;A floppy
+	int	0x13		;reset floppy driver
+	jmp	retry
+next:				;read 18 sector
+	mov	ax,es		;add memory address 0x200
+	add	ax,0x0020
+	mov	es,ax
+	add	cl,1
+	cmp	cl,18
+	jbe	readloop	;if cl<=18 jmp readloop
+
+	mov	cl,1
+	add	dh,1
+	cmp	dh,2
+	jb	readloop
+	
+	mov	dh,0,
+	add	ch,1
+	cmp 	ch,CYLS
+	jb	readloop	;if ch<CYLS,jmp readloop
+
+	;;jmp haribote.sys 
+	jmp	0xc400
 
 error:
 	mov 	si,msg
@@ -57,7 +86,9 @@ putloop:
 	mov	bx,15
 	int	0x10
 	jmp	putloop
-
+fin:
+	hlt
+	jmp	fin
 msg:
 	db	0x0a,0x0a
 	db	"load error"
