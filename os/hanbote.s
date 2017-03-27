@@ -46,7 +46,7 @@
 	mov	eax,CR0
 	and	eax,0x7fffffff
 	or	eax,0x00000001
-	mov	cr0,eax
+	mov	CR0,eax
 	jmp	pipelineflush
 pipelineflush:
 	mov	ax,1*8
@@ -111,5 +111,6 @@ GDT0:
 GDTR0:
 	dw	8*3-1
 	dd	GDT0
+	
 	ALIGNB	16
 bootpack:	
