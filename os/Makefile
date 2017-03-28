@@ -8,7 +8,7 @@ blank.img:
 	dd if=/dev/zero of=blank.img bs=512 count=2880
 helloos.bin:
 	nasm -f bin helloos.s -o helloos.bin -l helloos.lst
-hanbote.sys:
-	nasm -f bin hanbote.s -o hanbote.sys -l hanbote.lst
+bootloader.sys:
+	nasm -f bin bootloader.s -o bootloader.bin -l bootloader.lst
 clean:
 	$(RM) boot.img blank.img helloos.img helloos.bin hanbote.sys *.lst 
