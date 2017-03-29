@@ -29,7 +29,7 @@ inetConnect(const char *host,const char *service,int type)
 
   /* Walk */
   for(rp=result;rp!=NULL;rp=rp->ai_next){
-    std=socket(rp->ai_family,rp->ai_socktype,rp->ai_protocol);
+    sfd=socket(rp->ai_family,rp->ai_socktype,rp->ai_protocol);
     if(sfd==-1)
       continue;			/* On error,try next address */
 
@@ -128,6 +128,6 @@ inetAddressStr(const struct sockaddr *addr,socklen_t addrlen,
   else
     snprintf(addrStr,addrStrlen,"(?UNKNOWN?)");
 
-  addrStr[addrstrlen-1]='\0';	/* Ensure result is null-terminated */
+  addrStr[addrStrlen-1]='\0';	/* Ensure result is null-terminated */
   return addrStr;
 }
