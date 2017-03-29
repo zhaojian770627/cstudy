@@ -126,3 +126,13 @@ crb_create_assign_expression(char *variable,Expression *operand)
   return exp;
 }
 
+static Expression
+convert_value_to_expression(CRB_Value *v)
+{
+  Expression expr;
+
+  if(v->type==CRB_INT_VALUE){
+    expr.type=INT_EXPRESSION;
+    expr.u.int_value=v.u.int_value;
+  }
+}
