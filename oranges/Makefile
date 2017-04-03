@@ -9,4 +9,4 @@ blank.img:
 boot.bin:
 	nasm -f bin boot.asm -o boot.bin -l boot.lst
 clean:
-	$(RM) *.img *.bin *.sys *.o  *.lst 
+	$(RM) *.img *.bin *.sys *.o  *.lst *.txt
