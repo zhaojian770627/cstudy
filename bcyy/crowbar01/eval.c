@@ -232,3 +232,128 @@ eval_binary_int(CRB_Interpreter *inter,ExpressionType operator,
     DBG_panic(("bad case..%d",operator));
   }
 }
+
+static void
+eval_binary_double(CRB_Interpreter *inter,ExpressionType operator,
+		int left,int right,
+		CRB_Value *result,int line_number)
+{
+  if(dkc_is_math_operator(operator)){
+    result->type=CRB_INT_VALUE;
+  }else if(dkc_is_compare_operator(operator)){
+    result->type=CRB_BOOLEAN_VALUE;
+  }else{
+    DBG_panic(("operator..%d\n",operator));
+  }
+
+  switch(operator){
+  case BOOLEAN_EXPRESSION:	/* FALLTHRU */
+  case INT_EXPRESSION:		/* FALLTHRU */
+  case DOUBLE_EXPRESSION:	/* FALLTHRU */
+  case STRING_EXPRESSION:	/* FALLTHRU */
+  case IDENTIFIER_EXPRESSION:	/* FALLTHRU */
+  case ASSIGN_EXPRESSION:
+    DBG_panic(("bad case...%d",operator));
+    break;
+  case ADD_EXPRESSION:
+    result->u.int_value=left+right;
+    break;
+  case SUB_EXPRESSION:
+    result->u.int_value=left-right;
+    break;
+  case MUL_EXPRESSION:
+    result->u.int_value=left*right;
+    break;
+  case DIV_EXPRESSION:
+    result->u.int_value=left/right;
+    break;
+  case MOD_EXPRESSION:
+    result->u.int_value=left%right;
+    break;
+  case LOGICAL_AND_EXPRESSION:	/* FALLTHRU */
+  case LOGICAL_OR_EXPRESSION:
+    DBG_panic("bad case...%d",operator);
+    break;
+  case EQ_EXPRESSION:
+    result->u.boolean_value=left==right;
+    break;
+  case NE_EXPRESSION:
+    result->u.boolean_value=left!=right;
+    break;
+  case GT_EXPRESSION:
+    result->u.boolean_value=left>right;
+    break;
+  case GE_EXPRESSION:
+    result->u.boolean_value=left>=right;
+    break;
+  case LT_EXPRESSION:
+    result->u.boolean_value=left<right;
+    break;
+  case LE_EXPRESSION:
+    result->u.boolean_value=left<=right;
+    break;
+  case MINUS_EXPRESSION:	/* FALLTHRU */
+  case FUNCTION_CALL_EXPRESSION: /* FALLTHRU */
+  case NULL_EXPRESSION:		 /* FALLTHRU */
+  case EXPRESSION_TYPE_COUNT_PLUS_1: /* FALLTHRU */
+  default:
+    DBG_panic(("bad case..%d",operator));
+  }
+}
+
+static CRB_Boolean
+eval_compare_string(ExpressionType operator,
+		    CRB_Value *left,CRB_Value *right,int line_number)
+{
+  CRB_Boolean result;
+  int cmp;
+
+  cmp=strcmp(left->u.string_value->string,right->u.string_value->string);
+
+  if(operator==EQ_EXPRESSION){
+    result=(cmp==0);
+  }else if(operator==NE_EXPRESSION){
+    result=(cmp!=0);
+  }else if(operator==GT_EXPRESSION){
+    result=(cmp>0);
+  }else if(operator==GE_EXPRESSION){
+    result=(cmp>=0);
+  }else if(operator==LT_EXPRESSION){
+    result=(cmp<0);
+  }else if(operator==LE_EXPRESSION){
+    result=(cmp<=0);
+  }else{
+    char *op_str=crb_get_operator_string(operator);
+    crb_runtime_error(line_number,BAD_OPERATOR_FOR_STRING_ERR,
+		      STRING_MESSAGE_ARGUMENT,"operator",op_str,
+		      MESSAGE_ARGUMENT_END);
+  }
+  crb_release_string(left->u.string_value);
+  crb_release_string(right->u.string_value);
+
+  return result;
+}
+
+static CRB_Boolean
+eval_binary_null(Crb_Interpreter *inter,ExpressionType operator,
+		 CRB_Value *left,CRB_Value *right,int line_number)
+{
+  CRB_Boolean result;
+
+  if(operator==EQ_EXPRESSION){
+    result=left->type==CRB_NULL_VALUE && right->type==CRB_NULL_VALUE;
+  }else if(operator==NE_EXPRESSION){
+    result=!(left->type==CRB_NULL_VALUE && right->type==CRB_NULL_VALUE);
+  }else{
+    char *op_str=crb_get_operator_string(operator);
+    crb_runtime_error(line_number,NOT_NULL_OPERATOR_ERR,
+		      STRING_MESSAGE_ARGUMENT,"operator",op_str,
+		      MESSAGE_ARGUMENT_END);
+  }
+  release_if_string(left);
+  release_if_string(right);
+
+  return result;
+}
+
+
