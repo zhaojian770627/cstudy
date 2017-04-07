@@ -374,3 +374,37 @@ chain_string(Crb_Interpreter *inter,CRB_String *left,CRB_String *right)
   return ret;
 }
 
+CRB_Value 
+crb_eval_binary_expression(CRB_Interpreter *inter,LocalEnvironment *env,
+			   ExpressionType operator,
+			   Expression *left,Expression *right)
+{
+  CRB_Value left_val;
+  CRB_Value right_val;
+  CRB_Value result;
+
+  left_val=eval_expression(inter,env,left);
+  right_val=eval_expression(inter,env,right);
+
+  if(left_val.type==CRB_INT_VALUE
+     && right_val.type==CRB_INT_VALUE){
+    eval_binary_int(inter,operator,left_val->u.int_value,right_val->u.int_value);
+  }else if(left_val.type==CRB_DOUBLE_VALUE
+     && right_val.type==CRB_DOUBLE_VALUE){
+    eval_binary_double(inter,operator,left_val->u.double_value,right_val->u.double_value);
+  }else if(left_val.type==CRB_INT_VALUE
+     && right_val.type==CRB_DOUBLE_VALUE){
+    left_val.u.double_value=left_val.u.int_value;
+    eval_binary_int(inter,operator,left_val->u.double_value,right_val->u.double_value);
+  }else if(left_val.type==CRB_DOUBLE_VALUE
+     && right_val.type==CRB_INT_VALUE){
+    right_val.u.double_value=right_val.u.int_value;
+    eval_binary_int(inter,operator,left_val->u.double_value,right_val->u.double_value);
+  }else if(left_val.type==CRB_BOOLEAN_VALUE 
+	   &&right_val.type==CRB_BOOLEAN_VALUE){
+    result.type=CRB_BOOLEAN_VALUE;
+    result.u.boolean_value=eval_binary_boolean(inter,operator,
+					       left_val.u.boolean_value,
+					       right_val.u.boolean_value,
+					       left->line_number);
+  }
