@@ -390,14 +390,14 @@ crb_eval_binary_expression(CRB_Interpreter *inter,LocalEnvironment *env,
      && right_val.type==CRB_INT_VALUE){
     eval_binary_int(inter,operator,left_val->u.int_value,right_val->u.int_value);
   }else if(left_val.type==CRB_DOUBLE_VALUE
-     && right_val.type==CRB_DOUBLE_VALUE){
+	   && right_val.type==CRB_DOUBLE_VALUE){
     eval_binary_double(inter,operator,left_val->u.double_value,right_val->u.double_value);
   }else if(left_val.type==CRB_INT_VALUE
-     && right_val.type==CRB_DOUBLE_VALUE){
+	   && right_val.type==CRB_DOUBLE_VALUE){
     left_val.u.double_value=left_val.u.int_value;
     eval_binary_int(inter,operator,left_val->u.double_value,right_val->u.double_value);
   }else if(left_val.type==CRB_DOUBLE_VALUE
-     && right_val.type==CRB_INT_VALUE){
+	   && right_val.type==CRB_INT_VALUE){
     right_val.u.double_value=right_val.u.int_value;
     eval_binary_int(inter,operator,left_val->u.double_value,right_val->u.double_value);
   }else if(left_val.type==CRB_BOOLEAN_VALUE 
@@ -407,4 +407,112 @@ crb_eval_binary_expression(CRB_Interpreter *inter,LocalEnvironment *env,
 					       left_val.u.boolean_value,
 					       right_val.u.boolean_value,
 					       left->line_number);
+  }else if(left_val.type==CRB_STRING_VALUE
+	   && operator==ADD_EXPRESSION){
+    char buf[LINE_NUMBER_SIZE];
+    CRB_String *right_str;
+
+    if(right_val.type==CRB_INT_VALUE){
+      sprintf(buf,"%d",right_val.u.int_value);
+      right_str=crb_create_crowbar_string(inter,MEM_strdup(buf));
+    }else if(right_val.type==CRB_DOUBLE_VALUE){
+      sprintf(buf,"%f",right_val.u.double_value);
+      right_str=crb_create_crowbar_string(inter,MEM_strdup(buf));
+    }else if(right_val.type==CRB_BOOLEAN_VALUE){
+      if(right_val.u.boolean_value){
+	right_str=crb_create_crowbar_string(inter,MEM_strdup("true"));
+      }else{
+	right_str=crb_create_crowbar_string(inter,MEM_strdup("false"));
+      }
+    }else if(right_val.type==CRB_STRING_VALUE){
+      right_str=right_val.u.string_value;
+    }else if(right_val.type==CRB_NATIVE_POINTER_VALUE){
+      sprintf(buf,"(%s:%p)",
+	      right_val.u.native_pointer.info->name,
+	      right_val.u.native_pointer.pointer);
+      right_str=crb_create_crowbar_string(inter,MEM_strdup(buf));
+    }else if(right_val.type==CRB_NULL_VALUE){
+      right_str=crb_create_crowbar_string(inter,MEM_strdup("null"));
+    }
+    result.type=CRB_STRING_VALUE;
+    result.u.string_value=chain_string(inter,MEM_strdup("null"));
+  }else if(left_val.type==CRB_STRING_VALUE
+	   && right_val.type==CRB_STRING_VALUE){
+    result.type=CRB_BOOLEAN_VALUE;
+    result.u.boolean_value=eval_compare_string(operator,&left_val,&right_val,
+					       left->line_number);
+  }else if(left_val.type==CRB_NULL_VALUE
+	   ||right_val.type==CRB_NULL_VALUE){
+    result.type=CRB_BOOLEAN_VALUE;
+    result.u.boolean_value=eval_binary_null(inter,operator,&left_val,&right_val,
+					    left->line_number);
+  }else{
+    char *op_str=crb_get_operator_string(operator);
+    crb_runtime_error(left->line_number,BAD_OPERATOR_TYPE_ERR,
+		      STRING_MESSAGE_ARGUMENT,"operator",op_str,
+		      MESSAGE_ARGUMENT_END);
   }
+  return result;
+}
+
+static CRB_Value
+eval_logical_and_or_expression(CRB_Interpreter *inter,
+			       LocalEnvironment *env,
+			       ExpressionType operator,
+			       Expression *left,Expression *right)
+{
+  CRB_Value left_val;
+  CRB_Value right_val;
+  CRB_Value result;
+
+  result.type=CRB_BOOLEAN_VALUE;
+  left_val=eval_expression(inter,env,left);
+
+  if(left_val.type!=CRB_BOOLEAN_VALUE){
+    crb_runtime_error(left->line_number,NOT_BOOLEAN_TYPE_ERR,
+		      MESSAGE_ARGUMENT_END);
+  }
+  if(operator==LOGICAL_AND_EXPRESSION){
+    if(!left_val.u.boolean_value){
+      result.u.boolean_value=CRB_FALSE;
+      return result;
+    }
+  }else if(operator==LOGICAL_OR_EXPRESSION){
+    if(left_val.u.boolean_value){
+      result.u.boolean_value=CRB_TRUE;
+      return result;
+    }
+  }else{
+    DBG_panic(("bad operator..%d\n",operator));
+  }
+
+  right_val=eval_expression(inter,env,right);
+  if(right_val.type!=CRB_BOOLEAN_VALUE){
+    crb_runtime_error(right->line_number,NOT_BOOLEAN_TYPE_ERR,
+		      MESSAGE_ARGUMENT_END);
+  }
+  result.u.boolean_value=right_val.u.boolean_value;
+
+  return result;
+}
+
+CRB_Value
+crb_eval_minus_expression(CRB_Interpreter *inter,LocalEnvironment *env,
+			  Expression *operand)
+{
+  CRB_Value operand_val;
+  CRB_Value result;
+
+  operand_val=eval_expression(inter,env,operand);
+  if(operand_val.type==CRB_INT_VALUE){
+    result.type=CRB_INT_VALUE;
+    result.u.int_value=-operand_val.u.int_value;
+  }else if(operand_val.type==CRB_DOUBLE_VALUE){
+    result.type=CRB_DOUBLE_VALUE;
+    result.u.double_value=-operand_val.u.double_value;
+  }else{
+    crb_runtime_error(operand->line_number,MINUS_OPERAND_TYPE_ERR,
+		      MESSAGE_ARGUMENT_END);
+  }
+  return result;
+}
