@@ -1,9 +1,9 @@
 #include <signal.h>
 #include <syslog.h>
 #include <sys/wait.h>
-#include "become_daemon.h"
+#include "../daemons/become_daemon.h"
 #include "inet_sockets.h"
-#include "tlpi_hdr.h"
+#include "../lib/tlpi_hdr.h"
 
 #define SERVICE "echo"
 #define BUF_SIZE 4096
@@ -41,7 +41,7 @@ handleRequest(int cfd)
 }
 
 int
-main(int argc,char *argc[])
+main(int argc,char *argv[])
 {
   /* Listening and connected sockets */
   int lfd,cfd;
