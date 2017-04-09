@@ -4,8 +4,9 @@ VPATH=../lib ../time ../daemons
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
 EXEF:=us_xfr_sv us_xfr_cl ud_ucase_sv ud_ucase_cl i6d_ucase_sv i6d_ucase_cl \
-is_seqnum_sv is_seqnum_cl id_echo_sv id_echo_cl is_echo_sv is_echo_cl
+is_seqnum_sv is_seqnum_cl id_echo_sv id_echo_cl is_echo_sv is_echo_cl socknames
 all:$(EXEF)
+socknames:socknames.o $(OBJECTS) inet_sockets.o
 is_echo_cl:is_echo_cl.o $(OBJECTS) inet_sockets.o become_daemon.o
 is_echo_sv:is_echo_sv.o $(OBJECTS) inet_sockets.o become_daemon.o
 id_echo_sv:id_echo_sv.o $(OBJECTS) inet_sockets.o become_daemon.o
