@@ -64,7 +64,7 @@ LABEL_BEGIN:
 	mov	[SPValueInRealMode],sp
 
 	;; Init 16bit Code desc
-	mav	ax,cs
+	mov	ax,cs
 	movzx	eax,ax
 	shl	eax,4
 	add	eax,LABEL_SEG_CODE16
@@ -96,7 +96,7 @@ LABEL_BEGIN:
 	;; Init stack section descriptor
 	xor 	eax,eax
 	mov	ax,ds
-	sh	eax,4
+	shl	eax,4
 	add	eax,LABEL_STACK
 	mov	word[LABEL_DESC_STACK+2],ax
 	shr	eax,16
@@ -139,7 +139,7 @@ LABEL_REAL_ENTRY:
 
 	mov	sp,[SPValueInRealMode]
 
-	int 	al,92h
+	in 	al,92h
 	and 	al,11111101b
 	out	92h,al
 	sti
@@ -194,7 +194,7 @@ TestRead:
 	xor	esi,esi
 	mov	ecx,8
 .loop:
-	mov	al,[es.esi]
+	mov	al,[es:esi]
 	call	 DispAL
 	inc	esi
 	loop	.loop
@@ -248,7 +248,7 @@ DispAL:
 	sub	al,0ah
 	add	al,'A'
 .2:
-	mov	[gs:edi',ax
+	mov	[gs:edi],ax
 	add	edi,2
 
 	mov	al,dl
@@ -279,11 +279,12 @@ DispReturn:
 	;; DispReturn End
 	jmp	$
 	SegCode32Len	equ	$-LABEL_SEG_CODE32
-	;; END of [SECTION .32
+	;; END of [SECTION .32]
 
 	[SECTION .s16code]
 	ALIGN 32
 	[BITS 16]
+LABEL_SEG_CODE16:	
 	mov	ax,SelectorNormal
 	mov	ds,ax
 	mov	es,ax
