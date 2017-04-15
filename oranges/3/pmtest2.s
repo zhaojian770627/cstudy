@@ -1,5 +1,5 @@
 %include "pm.inc"
-	org	07c00h
+	org	0100h
 	jmp	LABEL_BEGIN
 	[SECTION .gdt]
 	;; GDT
@@ -144,7 +144,7 @@ LABEL_REAL_ENTRY:
 	out	92h,al
 	sti
 
-	mov	ax,4200
+	mov	ax,4c00h
 	int 	21h
 	
 	[SECTION .s32]		;32bit code
@@ -277,7 +277,7 @@ DispReturn:
 
 	ret
 	;; DispReturn End
-	jmp	$
+
 	SegCode32Len	equ	$-LABEL_SEG_CODE32
 	;; END of [SECTION .32]
 
