@@ -88,10 +88,10 @@ LABEL_BEGIN:
 	mov	ax,ds
 	shl	eax,4
 	add	eax,LABEL_DATA
-	mov	word[LABEL_DATA+2],ax
+	mov	word[LABEL_DESC_DATA+2],ax
 	shr	eax,16
-	mov	byte[LABEL_DATA+4],al
-	mov	byte[LABEL_DATA+7],ah
+	mov	byte[LABEL_DESC_DATA+4],al
+	mov	byte[LABEL_DESC_DATA+7],ah
 
 	;; Init stack section descriptor
 	xor 	eax,eax
