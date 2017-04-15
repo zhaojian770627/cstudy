@@ -83,4 +83,139 @@ argument_list
 }
 ;
 
+statement_list
+:statement
+{
+  $$=crb_create_statement_list($1);
+}
+|statement_list statement
+{
+  $$=crb_chain_statement_list($1,$2);
+}
+;
+expression
+:logical_or_expression
+|IDENTIFIER ASSIGN expression
+{
+  $$=crb_create_assign_expression($1,$3);
+}
+;
+
+logical_or_expression
+:logical_and_expression
+|logical_or_expression LOGICAL_OR logical_and_expression
+{
+  $$=crb_create_binary_expression(LOGICAL_OR_EXPRESSION,$1,$3);
+}
+;
+
+logical_and_expression
+:equality_expression
+|logical_and_expression LOGICAL_AND equality_expression
+{
+  $$=crb_create_binary_expression(LOGICAL_AND_EXPRESSION,$1,$3);
+}
+;
+
+equality_expression
+:relational_expression
+|equality_expression EQ relational_expression
+{
+  $$=crb_create_binary_expression(EQ_EXPRESSION,$1,$3);
+}
+|equality_expression NE relational_expression
+{
+  $$=crb_create_binary_expression(NE_EXPRESSION,$1,$3);
+}
+;
+
+relational_expression
+:additive_expression
+|relational_expression GT additive_expression
+{
+  $$=crb_create_binary_expression(GT_EXPRESSION,$1,$3);
+}
+|relational_expression GE additive_expression
+{
+  $$=crb_create_binary_expression(GE_EXPRESSION,$1,$3);
+}
+|relational_expression LT additive_expression
+{
+  $$=crb_create_binary_expression(LT_EXPRESSION,$1,$3);
+}
+|relational_expression LE additive_expression
+{
+  $$=crb_create_binary_expression(LE_EXPRESSION,$1,$3);
+}
+;
+
+additive_expression
+:multiplicative_expression
+|additive_expression ADD multiplicative_expression
+{
+  $$=crb_create_binary_expression(ADD_EXPRESSION,$1,$3);
+}
+|add_expression SUB multiplicative_expression
+{
+  $$=crb_create_binary_expression(SUB_EXPRESSION,$1,$3);
+}
+;
+
+multiplicative_expression
+:unary_expression
+|multiplicative_expression MUL unary_expression
+{
+  $$=crb_create_binary_expression(MUL_EXPRESSION,$1,$3);
+}
+|multiplicative_expression DIV unary_expression
+{
+  $$=crb_create_binary_expression(DIV_EXPRESSION,$1,$3);
+}
+|multiplicative_expression MOD unary_expression
+{
+  $$=crb_create_binary_expression(MOD_EXPRESSION,$1,$3);
+}
+;
+
+unary_expression
+:primary_expression
+|SUB unary_expression
+{
+  $$=crb_create_minus_expression($2);
+}
+;
+
+primary_expression
+:IDENTIFIER LP argument_list RP
+{
+  $$=crb_create_function_call_expression($1,$3);
+}
+|IDENTIFIER LP RP
+{
+  $$=crb_create_function_call_expression($1,NULL);
+}
+|LP expression RP
+{
+  $$=$2;
+}
+|IDENTIFIER
+{
+  $$=crb_create_identifier_expression($1);
+}
+|INT_LITERAL
+|DOUBLE_LITERAL
+|STRING_LITERAL
+|TRUE_T
+{
+  $$=crb_create_boolean_expression(CRB_TRUE);
+}
+|FALSE_T
+{
+  $$=crb_create_boolean_expression(CRB_FALSE);
+}
+|NULL_T
+{
+  $$=crb_create_null_expression();
+}
+;
 
