@@ -219,3 +219,7 @@ primary_expression
 }
 ;
 
+statement
+:expression SEMICONLON
+{
+  $$=crb_create_expression_statement($1);
