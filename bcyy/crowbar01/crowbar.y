@@ -223,3 +223,117 @@ statement
 :expression SEMICONLON
 {
   $$=crb_create_expression_statement($1);
+}
+|global_statement
+|if_statement
+|while_statement
+|for_statement
+|return_statement
+|break_statement
+|continue_statement
+;
+global_statement
+:GLOBAL_T identifier_list SEMICONLON
+{
+  $$=crb_create_global_statement($2);
+}
+;
+identifier_list
+:IDENTIFIER
+{
+  $$=crb_create_global_identifier($1);
+}
+|identifier_list COMMA IDENTIFIER
+{
+  $$=crb_chain_identifier($1,$3);
+}
+;
+
+if_statement
+:IF LP expression RP block
+{
+  $$=crb_create_if_statement($3,$5,NULL,NULL);
+}
+|IF LP expression RP block ELSE block
+{
+  $$=crb_create_if_statement($3,$5,NULL,$7);
+}
+|IF LP expression RP block elsif_list
+{
+  $$=crb_create_if_statement($3,$5,$6,NULL);
+}
+|IF LP expression RP block elsif_list ELSE block
+{
+  $$=crb_create_if_statement($3,$5,$6,$8);
+}
+;
+
+elsif_list
+:elsif
+|elsif_list elsif
+{
+  $$=crb_chain_elsif_list($1,$2);
+}
+;
+
+elsif
+:ELSIF LP expression RP block
+{
+  $$=crb_create_elsif($3,$5);
+}
+;
+
+while_statement
+:WHILE LP expression RP block
+{
+  $$=crb_create_while_statement($3,$5);
+}
+;
+
+for_statement
+:FOR LP expression_opt SEMICONLON expression_opt SEMICONLON
+{
+  $$=crb_create_for_statement($3,$5,$7,$9);
+}
+;
+
+expression_opt
+:				/* empty */
+{
+  $$=NULL;
+}
+|expression
+;
+
+return_statement
+:RETURN_T expression_opt SEMICONLON
+{
+  $$=crb_create_return_statement($2);
+}
+;
+
+break_statement
+:BREAK SEMICONLON
+{
+  $$=crb_create_break_statement();
+}
+;
+
+continue_statement
+:CONTINUE SEMICONLON
+{
+  $$=crb_create_continue_statement();
+}
+;
+
+block
+:LC statement_list RC
+{
+  $$=crb_create_block($2);
+}
+|LC RC
+{
+  $$=crb_create_block(NULL);
+}
+;
+%%
