@@ -11,7 +11,7 @@ typedef struct CRB_String_tag CRB_String;
 
 typedef struct {
   char *name;
-}CRN_NativePointerInfo;
+}CRB_NativePointerInfo;
 
 typedef enum{
   CRB_BOOLEAN_VALUE=1,
@@ -38,7 +38,7 @@ typedef struct{
   }u;
 }CRB_Value;
 
-CRB_Value CRB_NativeFunctionProc(CRB_Interpreter *interpreter,
+typedef CRB_Value CRB_NativeFunctionProc(CRB_Interpreter *interpreter,
 				 int arg_count,CRB_Value *args);
 
 void CRB_add_native_function(CRB_Interpreter *interpreter,

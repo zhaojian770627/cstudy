@@ -79,7 +79,7 @@ typedef enum{
   NULL_EXPRESSION,
   EXPRESSION_TYPE_EXPRESSION,
   EXPRESSION_TYPE_COUNT_PLUS_1
-}Expression;
+}ExpressionType;
 
 #define dkc_is_math_operator(operator)				\
   ((operator)==ADD_EXPRESSION||(operator)==SUB_EXPRESSION	\
@@ -131,12 +131,16 @@ struct Expression_tag{
   }u;
 };
 
-typedef struct Statement_tag_Statement;
+typedef struct Statement_tag Statement;
 
 typedef struct StatementList_tag{
   Statement *statement;
   struct StatementList_tag *next;
 }StatementList;
+
+typedef struct{
+  StatementList *statement_list;
+}Block;
 
 typedef struct IdentifierList_tag{
   char *name;
@@ -151,12 +155,12 @@ typedef struct Elsif_tag{
   Expression *condition;
   Block *block;
   struct Elsif_tag *next;
-}Elseif;
+}Elsif;
 
 typedef struct{
   Expression *condition;
   Block *then_block;
-  Elseif *elsif_list;
+  Elsif *elsif_list;
   Block *else_block;
 }IfStatement;
 
@@ -209,8 +213,8 @@ typedef struct ParameterList_tag{
 typedef enum{
   CROWBAR_FUNCTION_DEFINITION=1,
   NATIVE_FUNCTION_DEFINITION
-}ParameterList;
-
+}FunctionDefinitionType;
+ 
 typedef struct FunctionDefinition_tag{
   char *name;
   FunctionDefinitionType type;
@@ -261,7 +265,7 @@ typedef struct{
 struct CRB_String_tag{
   int ref_count;
   char *string;
-  CRB_Blloean is_literal;
+  CRB_Boolean is_literal;
 };
 
 typedef struct{
@@ -269,7 +273,7 @@ typedef struct{
 }StringPool;
 
 struct CRB_Interpreter_tag{
-  MEM_Storage initerpreter_storage;
+  MEM_Storage interpreter_storage;
   MEM_Storage execute_storage;
   Variable *variable;
   FunctionDefinition *function_list;
@@ -319,7 +323,7 @@ Statement *crb_create_for_statement(Expression *init,Expression *condition,
 Block *crb_create_block(StatementList *statement_list);
 
 Statement *crb_create_expression_statement(Expression *expression);
-Statement *crb_create_return_statement(EXPRESSION *expression);
+Statement *crb_create_return_statement(Expression *expression);
 Statement *crb_create_break_statement(void);
 Statement *crb_create_continue_statement(void);
 

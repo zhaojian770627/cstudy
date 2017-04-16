@@ -34,7 +34,7 @@ extern DBG_Controller DBG_CURRENT_CONTROLLER;
     (DBG_set_expression(#expression)),				\
     DBG_assert_func arg))
 #define DBG_panic(arg)					\
-  ((DBG_set(DBG_CURRENT_CONTROLLER,__FILE__,LINE__)),	\
+  ((DBG_set(DBG_CURRENT_CONTROLLER,__FILE__,__LINE__)),	\
    DBG_panic_func arg)
 #define DBG_debug_write(arg)				\
   ((DBG_set(DBG_CURRENT_CONTROLLER,__FILE__,__LINE__)),	\

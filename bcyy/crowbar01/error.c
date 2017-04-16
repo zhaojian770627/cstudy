@@ -60,6 +60,7 @@ typedef struct{
     double double_val;
     char *string_val;
     void *pointer_val;
+    int character_val;
   }u;
 }MessageArgument;
 
@@ -80,10 +81,13 @@ create_message_argument(MessageArgument *arg,va_list ap)
       arg[index].u.double_val=va_arg(ap,double);
       break;
     case STRING_MESSAGE_ARGUMENT:
-      arg[index].u.string_val=va_arg(ap,double);
+      arg[index].u.string_val=va_arg(ap,char*);
       break;
     case POINTER_MESSAGE_ARGUMENT:
       arg[index].u.pointer_val=va_arg(ap,void*);
+      break;
+    case CHARACTER_MESSAGE_ARGUMENT:
+      arg[index].u.character_val=va_arg(ap,int);
       break;
     case MESSAGE_ARGUMENT_END:
       assert(0);
@@ -116,7 +120,7 @@ format_message(MessageFormat *format,VString *v,va_list ap)
 {
   int i;
   char buf[LINE_BUF_SIZE];
-  int ar_name_index;
+  int arg_name_index;
   char arg_name[LINE_BUF_SIZE];
   MessageArgument arg[MESSAGE_ARGUMENT_MAX];
   MessageArgument cur_arg;
@@ -154,6 +158,9 @@ format_message(MessageFormat *format,VString *v,va_list ap)
     case POINTER_MESSAGE_ARGUMENT:
       sprintf(buf,"%p",cur_arg.u.pointer_val);
       add_string(v,buf);
+      break;
+    case CHARACTER_MESSAGE_ARGUMENT:
+      sprintf(buf,"%c",cur_arg.u.character_val);
       break;
     case MESSAGE_ARGUMENT_END:
       assert(0);
