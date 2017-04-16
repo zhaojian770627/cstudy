@@ -175,7 +175,7 @@ void
 self_check()
 {
   if(strcmp(crb_compile_error_message_format[0].format,"dummy")!=0){
-    DBG_panic("compile error message format error.\n");
+    DBG_panic(("compile error message format error.\n"));
   }
   if(strcmp(crb_compile_error_message_format
 	    [COMPILE_ERROR_COUNT_PLUS_1].format,
@@ -213,7 +213,7 @@ crb_compile_error(CompileError id,...)
 }
 
 void
-crb_runtime_error(CompileError id,...)
+crb_runtime_error(int line_number,RuntimeError id,...)
 {
   va_list ap;
   VString message;
@@ -238,7 +238,7 @@ int yyerror(char const *str)
   }else{
     near_token=yytext;
   }
-  crb_compile_error(PASE_ERR,
+  crb_compile_error(PARSE_ERR,
 		    STRING_MESSAGE_ARGUMENT,"token",near_token,
 		    MESSAGE_ARGUMENT_END);
   return 0;
