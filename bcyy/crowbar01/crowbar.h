@@ -73,11 +73,10 @@ typedef enum{
   LT_EXPRESSION,
   LE_EXPRESSION,
   LOGICAL_AND_EXPRESSION,
-  LOGLCAL_OR_EXPRESSION,
+  LOGICAL_OR_EXPRESSION,
   MINUS_EXPRESSION,
   FUNCTION_CALL_EXPRESSION,
   NULL_EXPRESSION,
-  EXPRESSION_TYPE_EXPRESSION,
   EXPRESSION_TYPE_COUNT_PLUS_1
 }ExpressionType;
 
@@ -364,8 +363,8 @@ void *crb_malloc(size_t size);
 void *crb_execute_malloc(CRB_Interpreter *inter,size_t size);
 Variable *crb_search_local_variable(LocalEnvironment *env,
 				    char *indentifier);
-Variable *crb_search_global_variable(LocalEnvironment *env,
-				     char *identifer,CRB_Value *value);
+Variable *crb_search_global_variable(CRB_Interpreter *inter,
+				     char *identifer);
 CRB_NativeFunctionProc *
 crb_search_native_function(CRB_Interpreter *inter,char *name);
 FunctionDefinition *crb_search_funcion(char *name);

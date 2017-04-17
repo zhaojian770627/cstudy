@@ -1,6 +1,7 @@
 TARGET=crowbar
 CC=gcc
 OBJS=\
+util.o \
 native.o \
 error.o \
 error_message.o \
@@ -21,6 +22,7 @@ clean:
 ./debug/dbg.o:
 	cd ./debug;$(MAKE);
 
+util.o:crowbar.h
 native.o:crowbar.h
 error.o:crowbar.h
 error_message.o:error_message.c crowbar.h

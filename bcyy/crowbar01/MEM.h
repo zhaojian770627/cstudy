@@ -79,7 +79,7 @@ void MEM_check_all_blocks_func(MEM_Controller controller,
 
 #define MEM_storage_malloc(storage,size)			\
   (MEM_storage_malloc_func(MEM_CURRENT_CONTROLLER,		\
-			   __FILE__,__LINE__,storage,size)
+			   __FILE__,__LINE__,storage,size))
 
 #define MEM_free(ptr)\
   (MEM_free_func(MEM_CURRENT_CONTROLLER,ptr))

@@ -60,7 +60,7 @@ crb_search_local_variable(LocalEnvironment *env,char *identifier)
 
   if(env==NULL)
     return NULL;
-  for(pos=env->variable,pos;pos=pos->next){
+  for(pos=env->variable;pos;pos=pos->next){
     if(!strcmp(pos->name,identifier))
       break;
   }
