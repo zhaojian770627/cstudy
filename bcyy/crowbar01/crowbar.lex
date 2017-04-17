@@ -3,6 +3,7 @@
 #include <string.h>
 #include "DBG.h"
 #include "crowbar.h"
+#include "y.tab.h"
 
 int yywrap(void)
 {
@@ -15,7 +16,7 @@ static void
   crb_get_current_interpreter()->current_line_number++;
 }
 
- %}
+%}
 
 %start COMMENT STRING_LITERAL_STATE
 
@@ -36,7 +37,7 @@ static void
 <INITIAL>"(" return LP;
 <INITIAL>")" return RP;
 <INITIAL>"{" return LC;
-<INITIAL>")" return RC;
+<INITIAL>"}" return RC;
 <INITIAL>";" return SEMICOLON;
 <INITIAL>"," return COMMA;
 <INITIAL>"&&" return LOGICAL_AND;
@@ -53,19 +54,19 @@ static void
 <INITIAL>"*" return MUL;
 <INITIAL>"/" return DIV;
 <INITIAL>"%" return MOD;
-<INITIAL>[A-Za-z_][A-Za-z_0-9]*{
+<INITIAL>[A-Za-z_][A-Za-z_0-9]* {
   yylval.identifier=crb_create_identifier(yytext);
   return IDENTIFIER;
  }
 
-<INITIAL>([1-9][0-9]*)|"0"{
+<INITIAL>([1-9][0-9]*)|"0" {
   Expression *expression=crb_alloc_expression(INT_EXPRESSION);
   sscanf(yytext,"%d",&expression->u.int_value);
   yylval.expression=expression;
   return INT_LITERAL;
  }
 
-<INITIAL>[0-9]+\.[0-9]+{
+<INITIAL>[0-9]+\.[0-9]+ {
   Expression *expression=crb_alloc_expression(DOUBLE_EXPRESSION);
   sscanf(yytext,"%d",&expression->u.double_value);
   yylval.expression=expression;
@@ -121,4 +122,3 @@ static void
 <STRING_LITERAL_STATE>\\\\ crb_add_string_literal('\\');
 <STRING_LITERAL_STATE>. crb_add_string_literal(yytext[0]);
 %%
-

@@ -1,6 +1,8 @@
 TARGET=crowbar
 CC=gcc
 OBJS=\
+lex.yy.o \
+y.tab.o \
 util.o \
 native.o \
 error.o \
@@ -21,6 +23,16 @@ clean:
 	cd ./memory;$(MAKE);
 ./debug/dbg.o:
 	cd ./debug;$(MAKE);
+y.tab.h:crowbar.y
+	yacc -dv crowbar.y
+y.tab.o:y.tab.c crowbar.h MEM.h
+	$(CC) -c -g $*.c $(INCLUDES)
+lex.yy.o:lex.yy.c crowbar.h MEM.h
+	$(CC) -c -g $*.c $(INCLUDES)
+y.tab.c:
+	yacc -dv crowbar.y
+lex.yy.c:crowbar.lex crowbar.y y.tab.h
+	lex crowbar.lex
 
 util.o:crowbar.h
 native.o:crowbar.h
