@@ -31,7 +31,7 @@ static void
 <INITIAL>"break" return BREAK;
 <INITIAL>"continue" return CONTINUE;
 <INITIAL>"null" return NULL_T;
-<INITIAL>"true" return TRUE_T:
+<INITIAL>"true" return TRUE_T;
 <INITIAL>"false" return FALSE_T;
 <INITIAL>"global" return GLOBAL_T;
 <INITIAL>"(" return LP;

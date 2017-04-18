@@ -3,6 +3,8 @@ CC=gcc
 OBJS=\
 lex.yy.o \
 y.tab.o \
+string.o \
+string_pool.o \
 util.o \
 native.o \
 error.o \
@@ -16,9 +18,9 @@ INCLUDES=\
 $(TARGET):$(OBJS)
 #	cd ./memory;$(MAKE);
 #	cd ./debug;$(MAKE);
-#	$(CC) $(OBJS) -o $@ -lm
+	$(CC) $(OBJS) -o $@ -lm
 clean:
-	rm -f *.o lex.yy.c y.tab.c y.tab.h *~
+	rm -f *.o lex.yy.c y.tab.c y.tab.h *~ ./debug/*.o ./memory/*.o *.output
 ./memory/mem.o:
 	cd ./memory;$(MAKE);
 ./debug/dbg.o:
@@ -34,6 +36,8 @@ y.tab.c:
 lex.yy.c:crowbar.lex crowbar.y y.tab.h
 	lex crowbar.lex
 
+string.o:crowbar.h
+string_pool.o:crowbar.h
 util.o:crowbar.h
 native.o:crowbar.h
 error.o:crowbar.h

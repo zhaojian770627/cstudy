@@ -287,10 +287,10 @@ ParameterList *crb_create_parameter(char *identifier);
 ParameterList *crb_chain_parameter(ParameterList *list,
 				   char *identifier);
 ArgumentList *crb_create_argument_list(Expression *expression);
-ArgumentList *crb_chain_argument_list(ParameterList *list,
-				      char *identifier);
+ArgumentList *crb_chain_argument_list(ArgumentList *list,
+				      Expression *expr);
 StatementList *crb_create_statement_list(Statement *statement);
-StatementList *crb_chain_statement_list(Statement *list,
+StatementList *crb_chain_statement_list(StatementList *list,
 					Statement *statement);
 Expression *crb_alloc_expression(ExpressionType type);
 Expression *crb_create_assign_expression(char *variable,Expression *operand);
@@ -331,7 +331,7 @@ char *crb_create_identifier(char *str);
 void crb_open_string_literal(void);
 void crb_add_string_literal(int letter);
 void crb_reset_string_literal_buffer(void);
-void *crb_close_string_literal(void);
+char *crb_close_string_literal(void);
 
 /* execute.c */
 StatementResult

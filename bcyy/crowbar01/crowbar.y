@@ -19,8 +19,8 @@
 %token <expression> DOUBLE_LITERAL
 %token <expression> STRING_LITERAL;
 %token <identifier> IDENTIFIER
-%token FUNCTION IF ELSE ELSEIF WHILE FOR RETURN_T BREAK CONTINUE NULL_T
- LP RP LC RC SEMICONLON COMMA ASSIGN LOGICAL_ADN LOGICAL_OR
+%token FUNCTION IF ELSE ELSIF WHILE FOR RETURN_T BREAK CONTINUE NULL_T
+ LP RP LC RC SEMICOLON COMMA ASSIGN LOGICAL_AND LOGICAL_OR
  EQ NE GT GE LT LE ADD SUB MUL DIV MOD TRUE_T FALSE_T GLOBAL_T
 
 %type <parameter_list> parameter_list
@@ -44,20 +44,23 @@ translation_unit
 |translation_unit definition_or_statement
 ;
 
-function_or_definition
+definition_or_statement
 :function_definition
 |statement
 {
   CRB_Interpreter *inter=crb_get_current_interpreter();
-  inter->statement_list(inter->statement_list,$1);
+
+  inter->statement_list
+    =crb_chain_statement_list(inter->statement_list,$1);
 }
 ;
+
 function_definition
 :FUNCTION IDENTIFIER LP parameter_list RP block
 {
   crb_function_define($2,$4,$6);
 }
-|FUCNTION IDENTIFIER LP RP block
+|FUNCTION IDENTIFIER LP RP block
 {
   crb_function_define($2,NULL,$5);
 }
@@ -69,7 +72,7 @@ parameter_list
 }
 |parameter_list COMMA IDENTIFIER
 {
-  $$=crb=crb_chain_parameter($1,$3);
+  $$=crb_chain_parameter($1,$3);
 }
 ;
 argument_list
@@ -155,7 +158,7 @@ additive_expression
 {
   $$=crb_create_binary_expression(ADD_EXPRESSION,$1,$3);
 }
-|add_expression SUB multiplicative_expression
+|additive_expression SUB multiplicative_expression
 {
   $$=crb_create_binary_expression(SUB_EXPRESSION,$1,$3);
 }
@@ -292,6 +295,7 @@ while_statement
 
 for_statement
 :FOR LP expression_opt SEMICONLON expression_opt SEMICONLON
+ expression_opt RP block
 {
   $$=crb_create_for_statement($3,$5,$7,$9);
 }
