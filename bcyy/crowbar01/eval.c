@@ -110,7 +110,7 @@ eval_identifier_expression(CRB_Interpreter *inter,
   return v;
 }
 
-static CRB_Value_eval_expression(CRB_Interpreter *inter,
+static CRB_Value eval_expression(CRB_Interpreter *inter,
 				 LocalEnvironment *env,
 				 Exprssion *expr);
 

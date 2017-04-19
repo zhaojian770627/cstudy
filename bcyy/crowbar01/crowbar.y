@@ -223,7 +223,7 @@ primary_expression
 ;
 
 statement
-:expression SEMICONLON
+:expression SEMICOLON
 {
   $$=crb_create_expression_statement($1);
 }
@@ -236,7 +236,7 @@ statement
 |continue_statement
 ;
 global_statement
-:GLOBAL_T identifier_list SEMICONLON
+:GLOBAL_T identifier_list SEMICOLON
 {
   $$=crb_create_global_statement($2);
 }
@@ -294,7 +294,7 @@ while_statement
 ;
 
 for_statement
-:FOR LP expression_opt SEMICONLON expression_opt SEMICONLON
+:FOR LP expression_opt SEMICOLON expression_opt SEMICOLON
  expression_opt RP block
 {
   $$=crb_create_for_statement($3,$5,$7,$9);
@@ -310,21 +310,21 @@ expression_opt
 ;
 
 return_statement
-:RETURN_T expression_opt SEMICONLON
+:RETURN_T expression_opt SEMICOLON
 {
   $$=crb_create_return_statement($2);
 }
 ;
 
 break_statement
-:BREAK SEMICONLON
+:BREAK SEMICOLON
 {
   $$=crb_create_break_statement();
 }
 ;
 
 continue_statement
-:CONTINUE SEMICONLON
+:CONTINUE SEMICOLON
 {
   $$=crb_create_continue_statement();
 }

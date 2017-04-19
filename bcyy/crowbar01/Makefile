@@ -3,6 +3,7 @@ CC=gcc
 OBJS=\
 lex.yy.o \
 y.tab.o \
+eval.o \
 string.o \
 string_pool.o \
 util.o \

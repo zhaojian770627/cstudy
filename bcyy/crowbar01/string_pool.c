@@ -10,8 +10,8 @@ alloc_crb_string(CRB_Interpreter *inter,char *str,CRB_Boolean is_literal)
   CRB_String *ret;
 
   ret=MEM_malloc(sizeof(CRB_String));
-  ref->ref_count=0;
-  ref->is_literal=is_literal;
+  ret->ref_count=0;
+  ret->is_literal=is_literal;
   ret->string=str;
 
   return ret;
@@ -23,7 +23,7 @@ crb_literal_to_crb_string(CRB_Interpreter *inter,char *str)
   CRB_String *ret;
 
   ret=alloc_crb_string(inter,str,CRB_TRUE);
-  ret->ret_count=1;
+  ret->ref_count=1;
 
   return ret;
 }
