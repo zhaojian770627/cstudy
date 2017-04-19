@@ -369,7 +369,7 @@ void crb_add_local_variable(LocalEnvironment *env,
 			    char *identifer,CRB_Value *value);
 CRB_NativeFunctionProc *
 crb_search_native_function(CRB_Interpreter *inter,char *name);
-FunctionDefinition *crb_search_funcion(char *name);
+FunctionDefinition *crb_search_function(char *name);
 char *crb_get_operator_string(ExpressionType type);
 
 /* error.c */

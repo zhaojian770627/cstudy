@@ -59,7 +59,7 @@ crb_create_argument_list(Expression *expression)
   al->expression=expression;
   al->next=NULL;
 
-  return ai;
+  return al;
 }
 
 ArgumentList *
@@ -69,7 +69,7 @@ crb_chain_argument_list(ArgumentList *list,Expression *expr)
 
   for(pos=list;pos->next;pos=pos->next)
     ;
-  pos.next=crb_create_argument_list(expr);
+  pos->next=crb_create_argument_list(expr);
 
   return list;
 }
@@ -92,7 +92,7 @@ crb_chain_statement_list(StatementList *list,Statement *statement)
   StatementList *pos;
 
   if(list==NULL)
-    return crb_create_statement_list(statemen);
+    return crb_create_statement_list(statement);
 
   for(pos=list;pos->next;pos=pos->next)
     ;
@@ -133,7 +133,7 @@ convert_value_to_expression(CRB_Value *v)
 
   if(v->type==CRB_INT_VALUE){
     expr.type=INT_EXPRESSION;
-    expr.u.int_value=v.u.int_value;
+    expr.u.int_value=v->u.int_value;
   }else if(v->type==CRB_DOUBLE_VALUE){
     expr.type=DOUBLE_EXPRESSION;
     expr.u.double_value=v->u.double_value;
@@ -170,7 +170,7 @@ crb_create_binary_expression(ExpressionType operator,
 }
 
 Expression *
-crb_create_minus_expression(Expression *operator)
+crb_create_minus_expression(Expression *operand)
 {
   if(operand->type==INT_EXPRESSION
      ||operand->type==DOUBLE_EXPRESSION){
@@ -238,7 +238,7 @@ alloc_statement(StatementType type)
   Statement *st;
 
   st=crb_malloc(sizeof(Statement));
-  st_type=type;
+  st->type=type;
   st->line_number=crb_get_current_interpreter()->current_line_number;
 
   return st;
@@ -255,7 +255,7 @@ crb_create_global_statement(IdentifierList *identifier_list)
   return st;
 }
 
-Identifier_List *
+IdentifierList *
 crb_create_global_identifier(char *identifier)
 {
   IdentifierList *i_list;
@@ -367,7 +367,7 @@ crb_create_expression_statement(Expression *expression)
   st=alloc_statement(EXPRESSION_STATEMENT);
   st->u.expression_s=expression;
 
-  return s;
+  return st;
 }
 
 Statement *

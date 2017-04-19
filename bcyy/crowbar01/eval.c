@@ -640,7 +640,7 @@ eval_function_call_expression(CRB_Interpreter *inter,LocalEnvironment *env,
 
   char *identifier=expr->u.function_call_expression.identifier;
 
-  func=crb_search_funcion(identifier);
+  func=crb_search_function(identifier);
   if(func==NULL){
     crb_runtime_error(expr->line_number,FUNCTION_NOT_FOUND_ERR,
 		      STRING_MESSAGE_ARGUMENT,"name",identifier,
