@@ -165,7 +165,7 @@ typedef struct{
 
 typedef struct{
   Expression *condition;
-  Block *else_block;
+  Block *block;
 }WhileStatement;
 
 typedef struct{

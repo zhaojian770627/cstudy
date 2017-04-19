@@ -74,7 +74,7 @@ execute_elsif(CRB_Interpreter *inter,LocalEnvironment *env,
 
   *executed=CRB_FALSE;
   result.type=NORMAL_STATEMENT_RESULT;
-  for(pos=elsif_list;pos;pos->next){
+  for(pos=elsif_list;pos;pos=pos->next){
     cond=crb_eval_expression(inter,env,pos->condition);
     if(cond.type!=CRB_BOOLEAN_VALUE){
       crb_runtime_error(pos->condition->line_number,
@@ -122,6 +122,7 @@ execute_if_statement(CRB_Interpreter *inter,LocalEnvironment *env,
     }
   }
  FUNC_END:
+  return result;
 }
 
 static StatementResult
@@ -135,7 +136,7 @@ execute_while_statement(CRB_Interpreter *inter,LocalEnvironment *env,
   for(;;){
     cond=crb_eval_expression(inter,env,statement->u.while_s.condition);
     if(cond.type!=CRB_BOOLEAN_VALUE){
-      crb_runtime_error(statement->u.while_s.confition->line_number,
+      crb_runtime_error(statement->u.while_s.condition->line_number,
 			NOT_BOOLEAN_TYPE_ERR,MESSAGE_ARGUMENT_END);
     }
     DBG_assert(cond.type==CRB_BOOLEAN_VALUE,
@@ -168,7 +169,7 @@ execute_for_statement(CRB_Interpreter *inter,LocalEnvironment *env,Statement *st
   }
 
   for(;;){
-    if(statement->u.for_s.confition){
+    if(statement->u.for_s.condition){
       cond=crb_eval_expression(inter,env,statement->u.for_s.condition);
       if(cond.type!=CRB_BOOLEAN_VALUE){
 	crb_runtime_error(statement->u.for_s.condition->line_number,NOT_BOOLEAN_TYPE_ERR,MESSAGE_ARGUMENT_END);
@@ -200,9 +201,9 @@ execute_return_statement(CRB_Interpreter *inter,LocalEnvironment *env,Statement 
 
   result.type=RETURN_STATEMENT_RESULT;
   if(statement->u.return_s.return_value){
-result.u.return_value
-  =crb_eval_expression(inter,env,
-		       statement->u.return_s.return_value)
+    result.u.return_value
+      =crb_eval_expression(inter,env,
+			   statement->u.return_s.return_value);
   }else{
     result.u.return_value.type=CRB_NULL_VALUE;
   }
@@ -231,7 +232,7 @@ execute_continue_statement(CRB_Interpreter *inter,LocalEnvironment *env,
 }
 
 static StatementResult
-execcute_statement(CRB_Interpreter *inter,LocalEnvironment *env,
+execute_statement(CRB_Interpreter *inter,LocalEnvironment *env,
 		   Statement *statement)
 {
   StatementResult result;
@@ -280,7 +281,7 @@ crb_execute_statement_list(CRB_Interpreter *inter,LocalEnvironment *env,
   result.type=NORMAL_STATEMENT_RESULT;
   for(pos=list;pos;pos=pos->next){
     result=execute_statement(inter,env,pos->statement);
-    if(result!=NORMAL_STATEMENT_RESULT)
+    if(result.type!=NORMAL_STATEMENT_RESULT)
       goto FUNC_END;
   }
  FUNC_END:
