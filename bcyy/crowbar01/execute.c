@@ -31,9 +31,6 @@ execute_global_statement(CRB_Interpreter *inter,LocalEnvironment *env,
   IdentifierList *pos;
   StatementResult result;
 
-  IdentifierList *pos;
-  StatementResult result;
-
   result.type=NORMAL_STATEMENT_RESULT;
 
   if(env==NULL){
@@ -69,15 +66,15 @@ execute_global_statement(CRB_Interpreter *inter,LocalEnvironment *env,
 
 static StatementResult
 execute_elsif(CRB_Interpreter *inter,LocalEnvironment *env,
-	      Elseif *elsif_list,CRB_Boolean *executed)
+	      Elsif *elsif_list,CRB_Boolean *executed)
 {
   StatementResult result;
   CRB_Value cond;
-  Elseif *pos;
+  Elsif *pos;
 
-  *executed=CRB_False;
+  *executed=CRB_FALSE;
   result.type=NORMAL_STATEMENT_RESULT;
-  for(pos=elseif_list;pos;pos->next){
+  for(pos=elsif_list;pos;pos->next){
     cond=crb_eval_expression(inter,env,pos->condition);
     if(cond.type!=CRB_BOOLEAN_VALUE){
       crb_runtime_error(pos->condition->line_number,
@@ -99,7 +96,7 @@ static StatementResult
 execute_if_statement(CRB_Interpreter *inter,LocalEnvironment *env,
 		     Statement *statement)
 {
-  StatementResult reslut;
+  StatementResult result;
   CRB_Value cond;
 
   result.type=NORMAL_STATEMENT_RESULT;

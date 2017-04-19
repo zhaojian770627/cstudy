@@ -239,7 +239,7 @@ typedef struct Variable_tag{
 typedef enum{
   NORMAL_STATEMENT_RESULT=1,
   RETURN_STATEMENT_RESULT,
-  BREAD_STATEMENT_RESULT,
+  BREAK_STATEMENT_RESULT,
   CONTINUE_STATEMENT_RESULT,
   STATEMENT_RESULT_TYPE_COUNT_PLUS_1
 }StatementResultType;
@@ -365,6 +365,8 @@ Variable *crb_search_local_variable(LocalEnvironment *env,
 				    char *indentifier);
 Variable *crb_search_global_variable(CRB_Interpreter *inter,
 				     char *identifer);
+void crb_add_local_variable(LocalEnvironment *env,
+			    char *identifer,CRB_Value *value);
 CRB_NativeFunctionProc *
 crb_search_native_function(CRB_Interpreter *inter,char *name);
 FunctionDefinition *crb_search_funcion(char *name);

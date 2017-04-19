@@ -1,6 +1,7 @@
 #include <math.h>
 #include <string.h>
 #include "MEM.h"
+#include "DBG.h"
 #include "crowbar.h"
 
 static CRB_Value
@@ -156,7 +157,7 @@ eval_assign_expression(CRB_Interpreter *inter,LocalEnvironment *env,
 
 static CRB_Boolean
 eval_binary_boolean(CRB_Interpreter *inter,ExpressionType operator,
-		    CRB_Boolean left,CRB_Blloean right,int line_number)
+		    CRB_Boolean left,CRB_Boolean right,int line_number)
 {
   CRB_Boolean result;
 
@@ -212,7 +213,7 @@ eval_binary_int(CRB_Interpreter *inter,ExpressionType operator,
     break;
   case LOGICAL_AND_EXPRESSION:	/* FALLTHRU */
   case LOGICAL_OR_EXPRESSION:
-    DBG_panic("bad case...%d",operator);
+    DBG_panic(("bad case...%d",operator));
     break;
   case EQ_EXPRESSION:
     result->u.boolean_value=left==right;
@@ -280,7 +281,7 @@ eval_binary_double(CRB_Interpreter *inter,ExpressionType operator,
     break;
   case LOGICAL_AND_EXPRESSION:	/* FALLTHRU */
   case LOGICAL_OR_EXPRESSION:
-    DBG_panic("bad case...%d",operator);
+    DBG_panic(("bad case...%d",operator));
     break;
   case EQ_EXPRESSION:
     result->u.boolean_value=left==right;
@@ -343,7 +344,7 @@ eval_compare_string(ExpressionType operator,
 }
 
 static CRB_Boolean
-eval_binary_null(Crb_Interpreter *inter,ExpressionType operator,
+eval_binary_null(CRB_Interpreter *inter,ExpressionType operator,
 		 CRB_Value *left,CRB_Value *right,int line_number)
 {
   CRB_Boolean result;
@@ -365,7 +366,7 @@ eval_binary_null(Crb_Interpreter *inter,ExpressionType operator,
 }
 
 CRB_String *
-chain_string(Crb_Interpreter *inter,CRB_String *left,CRB_String *right)
+chain_string(CRB_Interpreter *inter,CRB_String *left,CRB_String *right)
 {
   int len;
   char *str;
@@ -396,18 +397,18 @@ crb_eval_binary_expression(CRB_Interpreter *inter,LocalEnvironment *env,
 
   if(left_val.type==CRB_INT_VALUE
      && right_val.type==CRB_INT_VALUE){
-    eval_binary_int(inter,operator,left_val->u.int_value,right_val->u.int_value);
+    eval_binary_int(inter,operator,left_val.u.int_value,right_val.u.int_value,&result,left->line_number);
   }else if(left_val.type==CRB_DOUBLE_VALUE
 	   && right_val.type==CRB_DOUBLE_VALUE){
-    eval_binary_double(inter,operator,left_val->u.double_value,right_val->u.double_value);
+    eval_binary_double(inter,operator,left_val.u.double_value,right_val.u.double_value,&result,left->line_number);
   }else if(left_val.type==CRB_INT_VALUE
 	   && right_val.type==CRB_DOUBLE_VALUE){
     left_val.u.double_value=left_val.u.int_value;
-    eval_binary_int(inter,operator,left_val->u.double_value,right_val->u.double_value);
+    eval_binary_int(inter,operator,left_val.u.double_value,right_val.u.double_value,&result,left->line_number);
   }else if(left_val.type==CRB_DOUBLE_VALUE
 	   && right_val.type==CRB_INT_VALUE){
     right_val.u.double_value=right_val.u.int_value;
-    eval_binary_int(inter,operator,left_val->u.double_value,right_val->u.double_value);
+    eval_binary_int(inter,operator,left_val.u.double_value,right_val.u.double_value,&result,left->line_number);
   }else if(left_val.type==CRB_BOOLEAN_VALUE 
 	   &&right_val.type==CRB_BOOLEAN_VALUE){
     result.type=CRB_BOOLEAN_VALUE;
@@ -417,7 +418,7 @@ crb_eval_binary_expression(CRB_Interpreter *inter,LocalEnvironment *env,
 					       left->line_number);
   }else if(left_val.type==CRB_STRING_VALUE
 	   && operator==ADD_EXPRESSION){
-    char buf[LINE_NUMBER_SIZE];
+    char buf[LINE_BUF_SIZE];
     CRB_String *right_str;
 
     if(right_val.type==CRB_INT_VALUE){
@@ -443,20 +444,19 @@ crb_eval_binary_expression(CRB_Interpreter *inter,LocalEnvironment *env,
       right_str=crb_create_crowbar_string(inter,MEM_strdup("null"));
     }
     result.type=CRB_STRING_VALUE;
-    result.u.string_value=chain_string(inter,MEM_strdup("null"));
+    result.u.string_value=chain_string(inter,left_val.u.string_value,
+				       right_str);
   }else if(left_val.type==CRB_STRING_VALUE
 	   && right_val.type==CRB_STRING_VALUE){
     result.type=CRB_BOOLEAN_VALUE;
-    result.u.boolean_value=eval_compare_string(operator,&left_val,&right_val,
-					       left->line_number);
+    result.u.boolean_value=eval_compare_string(operator,&left_val,&right_val,left->line_number);
   }else if(left_val.type==CRB_NULL_VALUE
 	   ||right_val.type==CRB_NULL_VALUE){
     result.type=CRB_BOOLEAN_VALUE;
-    result.u.boolean_value=eval_binary_null(inter,operator,&left_val,&right_val,
-					    left->line_number);
+    result.u.boolean_value=eval_binary_null(inter,operator,&left_val,&right_val, left->line_number);
   }else{
     char *op_str=crb_get_operator_string(operator);
-    crb_runtime_error(left->line_number,BAD_OPERATOR_TYPE_ERR,
+    crb_runtime_error(left->line_number,BAD_OPERAND_TYPE_ERR,
 		      STRING_MESSAGE_ARGUMENT,"operator",op_str,
 		      MESSAGE_ARGUMENT_END);
   }
@@ -585,7 +585,7 @@ call_native_function(CRB_Interpreter *inter,LocalEnvironment *env,
   }
   MEM_free(args);
 
-  return true;
+  return value;
 }
 
 static CRB_Value
@@ -606,14 +606,14 @@ call_crowbar_function(CRB_Interpreter *inter,LocalEnvironment *env,
       arg_p=arg_p->next,param_p=param_p->next){
     CRB_Value arg_val;
 
-    if(parm_p==NULL){
+    if(param_p==NULL){
       crb_runtime_error(expr->line_number,ARGUMENT_TOO_MANY_ERR,
 			MESSAGE_ARGUMENT_END);
     }
     arg_val=eval_expression(inter,env,arg_p->expression);
-    crb_add_local_variable(local_env,parm_p->name,&arg_val);
+    crb_add_local_variable(local_env,param_p->name,&arg_val);
   }
-  if(parm_p){
+  if(param_p){
     crb_runtime_error(expr->line_number,ARGUMENT_TOO_FEW_ERR,
 		      MESSAGE_ARGUMENT_END);
   }
@@ -676,7 +676,7 @@ eval_expression(CRB_Interpreter *inter,LocalEnvironment *env,
     v=eval_double_expression(expr->u.double_value);
     break;
   case STRING_EXPRESSION:
-    v=eval_string_expression(expr->u.string_value);
+    v=eval_string_expression(inter,expr->u.string_value);
     break;
   case IDENTIFIER_EXPRESSION:
     v=eval_identifier_expression(inter,env,expr);
