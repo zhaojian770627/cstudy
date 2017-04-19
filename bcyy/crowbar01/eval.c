@@ -61,6 +61,14 @@ static void
 refer_if_string(CRB_Value *v)
 {
   if(v->type==CRB_STRING_VALUE){
+    crb_refer_string(v->u.string_value);
+  }
+}
+
+static void
+release_if_string(CRB_Value *v)
+{
+  if(v->type==CRB_STRING_VALUE){
     crb_release_string(v->u.string_value);
   }
 }
@@ -112,7 +120,7 @@ eval_identifier_expression(CRB_Interpreter *inter,
 
 static CRB_Value eval_expression(CRB_Interpreter *inter,
 				 LocalEnvironment *env,
-				 Exprssion *expr);
+				 Expression *expr);
 
 static CRB_Value 
 eval_assign_expression(CRB_Interpreter *inter,LocalEnvironment *env,
