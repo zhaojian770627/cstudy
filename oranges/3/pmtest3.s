@@ -108,7 +108,7 @@ LABEL_BEGIN:
 	mov	ax,ds
 	shl	eax,4
 	add	eax,LABEL_LDT
-	mov	word[LABEL_DESC_LDT+4],al
+	mov	word[LABEL_DESC_LDT+2],ax
 	shr	eax,16
 	mov	byte[LABEL_DESC_LDT+4],al
 	mov	byte[LABEL_DESC_LDT+7],ah
@@ -172,8 +172,6 @@ LABEL_REAL_ENTRY:
 LABEL_SEG_CODE32:
 	mov	ax,SelectorData
 	mov	ds,ax		;Data selector
-	mov	ax,SelectorTest
-	mov	es,ax
 	mov 	ax,SelectorVideo
 	mov	gs,ax
 
@@ -203,82 +201,12 @@ LABEL_SEG_CODE32:
 .2:	  			;;DIsplay over
 	call 	DispReturn
 
-	call	TestRead
-	call	TestWrite
-	call	TestRead
+	;; Load LDT
+	mov	ax,SelectorLDT
+	lldt	ax
 
-	;; Stop
-	jmp	SelectorCode16:0
-
-TestRead:
-	xor	esi,esi
-	mov	ecx,8
-.loop:
-	mov	al,[es:esi]
-	call	 DispAL
-	inc	esi
-	loop	.loop
-
-	call	DispReturn
-
-	ret
-	;; TestRead end
-
-TestWrite:
-	push 	esi
-	push 	edi
-	xor	esi,esi
-	xor	edi,edi
-	mov	esi,OffsetStrTest ;soruce data offset
-	cld
-.1:
-	lodsb
-	test	al,al
-	jz	.2
-	mov	[es:edi],al
-	inc	edi
-	jmp	.1
-.2:
-	pop	edi
-	pop	esi
-
-	ret
-	;; TestWrite End
-
-	;; --------------------------------------
-	;; Display Number in AL
-	;; default number has already in AL
-	;; edi point next char pos
-	;; register:ax,edi
-DispAL:
-	push	ecx
-	push	edx
-
-	mov	ah,0ch		;0000 bg black 1100 fg red
-	mov	dl,al
-	shr	al,4
-	mov	ecx,2
-.begin:
-	and	al,01111b
-	cmp	al,9
-	ja	.1
-	add	al,'0'
-	jmp	.2
-.1:
-	sub	al,0ah
-	add	al,'A'
-.2:
-	mov	[gs:edi],ax
-	add	edi,2
-
-	mov	al,dl
-	loop	.begin
-	add	edi,2
-
-	pop	edx
-	pop 	ecx
-	ret
-	;; DespAL end
+	;; jmp local task
+	jmp	SelectorLDTCodeA:0
 
 	;; ---------------------------------------
 DispReturn:
@@ -321,3 +249,33 @@ LABEL_GO_BACK_TO_REAL:
 
 	Code16Len	equ $-LABEL_SEG_CODE16
 	;; End of [SECTION .s16code]
+
+	;; LDT
+	[SECTION .ldt]
+	ALIGN	32
+LABEL_LDT:
+
+LABEL_LDT_DESC_CODEA:	Descriptor 	0,CodeALen-1,DA_C+DA_32 ;Code,32 bit
+	
+	LDTLen	equ	$-LABEL_LDT
+
+	;; LDT Selector
+	SelectorLDTCodeA equ LABEL_LDT_DESC_CODEA -LABEL_LDT+SA_TIL
+	;; END of [SECTION .ldt]
+
+	;; CodeA (LDT,32 bit]
+	[SECTION .la]
+	ALIGN 32
+	[BITS 32]
+LABEL_CODE_A:
+	mov	ax,SelectorVideo
+	mov	gs,ax
+
+	mov	edi,(80*12+0)*2
+	mov	ah,0ch
+	mov	al,'L'
+	mov	[gs:edi],ax
+
+	jmp	SelectorCode16:0
+	CodeALen	equ	$-LABEL_CODE_A
+	;; END of [SECTION .la]
