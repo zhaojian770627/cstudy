@@ -25,7 +25,7 @@ $(TARGET):$(OBJS)
 #	cd ./debug;$(MAKE);
 	$(CC) $(OBJS) -o $@ -lm
 clean:
-	rm -f *.o lex.yy.c y.tab.c y.tab.h *~ ./debug/*.o ./memory/*.o *.output
+	rm -f *.o lex.yy.c y.tab.c y.tab.h *~ ./debug/*.o ./memory/*.o *.output crowbar
 ./memory/mem.o:
 	cd ./memory;$(MAKE);
 ./debug/dbg.o:
