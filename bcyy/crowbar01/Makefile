@@ -3,6 +3,7 @@ CC=gcc
 OBJS=\
 lex.yy.o \
 y.tab.o \
+main.o \
 interface.o \
 create.o \
 execute.o \

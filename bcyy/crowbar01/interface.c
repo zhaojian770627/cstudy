@@ -84,7 +84,7 @@ CRB_dispose_interpreter(CRB_Interpreter *interpreter)
 }
 
 void
-crb_add_native_function(CRB_Interpreter *interpreter,
+CRB_add_native_function(CRB_Interpreter *interpreter,
 			char *name,CRB_NativeFunctionProc *proc)
 {
   FunctionDefinition *fd;
