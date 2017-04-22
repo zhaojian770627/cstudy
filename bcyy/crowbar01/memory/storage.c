@@ -62,6 +62,7 @@ MEM_storage_malloc_func(MEM_Controller controller,
      &&(storage->page_list->use_cell_num+cell_num
 	<storage->page_list->cell_num)){
     p=&(storage->page_list->cell[storage->page_list->use_cell_num]);
+    storage->page_list->use_cell_num+=cell_num;
   }else{
     int alloc_cell_num;
 
