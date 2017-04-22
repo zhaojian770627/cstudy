@@ -80,7 +80,7 @@ CRB_dispose_interpreter(CRB_Interpreter *interpreter)
   if(interpreter->execute_storage){
     MEM_dispose_storage(interpreter->execute_storage);
   }
-  MEM_dispose_storage(interpreter->execute_storage);
+  MEM_dispose_storage(interpreter->interpreter_storage);
 }
 
 void
