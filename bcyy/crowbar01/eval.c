@@ -375,7 +375,7 @@ chain_string(CRB_Interpreter *inter,CRB_String *left,CRB_String *right)
   len=strlen(left->string)+strlen(right->string);
   str=MEM_malloc(len+1);
   strcpy(str,left->string);
-  strcpy(str,right->string);
+  strcat(str,right->string);
   ret=crb_create_crowbar_string(inter,str);
   crb_release_string(left);
   crb_release_string(right);
