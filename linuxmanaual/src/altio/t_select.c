@@ -19,6 +19,7 @@ main(int argc,char *argv[])
   fd_set readfds,writefds;
   int ready,nfds,fd,numRead,j;
   struct timeval timeout;
+  struct timeval *pto;
   char buf[10];			/* Large enouth to hold "rw\0" */
 
   if(argc<2 || strcmp(argv[1],"--help")==0)
