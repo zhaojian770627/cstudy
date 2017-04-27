@@ -10,7 +10,7 @@ LABEL_DESC_NORMAL:	Descriptor	0,		0ffffh,		DA_DRW
 LABEL_DESC_CODE32:	Descriptor	0,		SegCode32Len-1,	DA_C+DA_32
 LABEL_DESC_CODE16:	Descriptor	0,		0ffffh,		DA_C
 LABEL_DESC_CODE_DEST:	Descriptor	0,		SegCodeDestLen-1,	DA_C+DA_32
-LABEL_DESC_CODE_RING3:	Descriptor 	0		SegCodeRing3Len-1	DA_C+DA_32+DA_DPL3
+LABEL_DESC_CODE_RING3:	Descriptor 	0,		SegCodeRing3Len-1,	DA_C+DA_32+DA_DPL3
 LABEL_DESC_DATA:	Descriptor	0,		DataLen-1,	DA_DRW
 LABEL_DESC_STACK:	Descriptor	0,		TopOfStack,	DA_DRWA+DA_32
 LABEL_DESC_STACK3:	Descriptor 	0,		TopOfStack3,	DA_DRWA+DA_32+DA_DPL3 ;32位
@@ -31,8 +31,10 @@ LABEL_CALL_GATE_TEST:	Gate		SelectorCodeDest,	0,	0,	DA_386CGate+DA_DPL0
 	SelectorCode32	equ	LABEL_DESC_CODE32 - LABEL_GDT
 	SelectorCode16	equ	LABEL_DESC_CODE16 - LABEL_GDT
 	SelectorCodeDest equ	LABEL_DESC_CODE_DEST-LABEL_GDT
+	SelectorCodeRing3 equ	LABEL_DESC_CODE_RING3 - LABEL_GDT+SA_RPL3
 	SelectorData	equ	LABEL_DESC_DATA	- LABEL_GDT
 	SelectorStack	equ	LABEL_DESC_STACK - LABEL_GDT
+	SelectorStack3	equ	LABEL_DESC_STACK3 - LABEL_GDT + SA_RPL3
 	SelectorLDT 	equ 	LABEL_DESC_LDT - LABEL_GDT
 	SelectorVideo	equ	LABEL_DESC_VIDEO - LABEL_GDT
 
@@ -72,7 +74,7 @@ LABEL_STACK:
 	[BITS	32]
 LABEL_STACK3:
 	times	512 db 0
-	TopOfStack3 $ - LABEL_STACK3-1
+	TopOfStack3 equ  $ - LABEL_STACK3-1
 	;; END of [SECTION .s3]
 
 	
@@ -352,7 +354,7 @@ LABEL_CODE_A:
 	CodeALen	equ	$-LABEL_CODE_A
 	;; END of [SECTION .la]
 
-	；CodeRing3
+	;; CodeRing3
 	[SECTION .ring3]
 	ALIGN	32
 	[BITS	32]
