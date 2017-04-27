@@ -144,11 +144,11 @@ LABEL_BEGIN:
 	xor	eax,eax
 	mov	ax,ds
 	shl	eax,4
-	add 	eax,LABEL_LDT
-	mov	word[LABEL_DESC_LDT+2],ax
+	add 	eax,LABEL_STACK3
+	mov	word[LABEL_DESC_STACK3+2],ax
 	shr	eax,16
-	mov	byte[LABEL_DESC_LDT+4],al
-	mov	byte[LABEL_DESC_LDT+7],ah
+	mov	byte[LABEL_DESC_STACK3+4],al
+	mov	byte[LABEL_DESC_STACK3+7],ah
 
 	;; Init LDT Pos in GDT
 	xor	eax,eax
@@ -169,7 +169,16 @@ LABEL_BEGIN:
 	shr	eax,16
 	mov	byte[LABEL_LDT_DESC_CODEA+4],al
 	mov	byte[LABEL_LDT_DESC_CODEA+7],ah
-	
+
+	;; 初始化Ring3描述符
+	xor 	eax,eax
+	mov	ax,ds
+	shl	eax,4
+	add	eax,LABEL_CODE_RING3
+	mov	word[LABEL_DESC_CODE_RING3+2],ax
+	shr	eax,16
+	mov	byte[LABEL_DESC_CODE_RING3+4],al
+	mov	byte[LABEL_DESC_CODE_RING3+7],ah
 	
 	;; prepare load GDTR
 	xor	eax,eax
