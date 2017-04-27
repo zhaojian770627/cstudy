@@ -13,8 +13,10 @@ LABEL_DESC_CODE_DEST:	Descriptor	0,		SegCodeDestLen-1,	DA_C+DA_32
 LABEL_DESC_CODE_RING3:	Descriptor 	0		SegCodeRing3Len-1	DA_C+DA_32+DA_DPL3
 LABEL_DESC_DATA:	Descriptor	0,		DataLen-1,	DA_DRW
 LABEL_DESC_STACK:	Descriptor	0,		TopOfStack,	DA_DRWA+DA_32
+LABEL_DESC_STACK3:	Descriptor 	0,		TopOfStack3,	DA_DRWA+DA_32+DA_DPL3 ;32位
 LABEL_DESC_LDT:		Descriptor	0h,		LDTLen-1,	DA_LDT
-LABEL_DESC_VIDEO:	Descriptor	0B8000h,	0ffffh,		DA_DRW
+
+LABEL_DESC_VIDEO:	Descriptor	0B8000h,	0ffffh,		DA_DRW+DA_DPL3
 
 	;; Gate				Target Selector		offset	DCount	Attribute
 LABEL_CALL_GATE_TEST:	Gate		SelectorCodeDest,	0,	0,	DA_386CGate+DA_DPL0
@@ -62,6 +64,17 @@ LABEL_STACK:
 
 	TopOfStack	equ	$ - LABEL_STACK -1
 	;; End of [SECTION .gs]
+	
+
+	;; 堆栈段ring3
+	[SECTION .s3]
+	ALIGN	32
+	[BITS	32]
+LABEL_STACK3:
+	times	512 db 0
+	TopOfStack3 $ - LABEL_STACK3-1
+	;; END of [SECTION .s3]
+
 	
 	[SECTION .s16]
 	[BITS 16]
@@ -124,6 +137,16 @@ LABEL_BEGIN:
 	shr	eax,16
 	mov	byte[LABEL_DESC_STACK+4],al
 	mov	byte[LABEL_DESC_STACK+7],ah
+
+	;; Init stack3 section descriptor
+	xor	eax,eax
+	mov	ax,ds
+	shl	eax,4
+	add 	eax,LABEL_LDT
+	mov	word[LABEL_DESC_LDT+2],ax
+	shr	eax,16
+	mov	byte[LABEL_DESC_LDT+4],al
+	mov	byte[LABEL_DESC_LDT+7],ah
 
 	;; Init LDT Pos in GDT
 	xor	eax,eax
@@ -223,6 +246,12 @@ LABEL_SEG_CODE32:
 .2:	  			;;DIsplay over
 	call 	DispReturn
 
+	push 	SelectorStack3
+	push	TopOfStack3
+	push	SelectorCodeRing3
+	push	0
+	retf
+	
 	;; Test call get,will print 'c'
 	call 	SelectorCallGateTest:0
 	
@@ -322,3 +351,20 @@ LABEL_CODE_A:
 	jmp	SelectorCode16:0
 	CodeALen	equ	$-LABEL_CODE_A
 	;; END of [SECTION .la]
+
+	；CodeRing3
+	[SECTION .ring3]
+	ALIGN	32
+	[BITS	32]
+LABEL_CODE_RING3:
+	mov	ax,SelectorVideo
+	mov	gs,ax
+
+	mov	edi,(80*14+0)*2
+	mov	ah,0ch
+	mov	al,'3'
+	mov	[gs:edi],ax
+
+	jmp	$
+	SegCodeRing3Len	equ $ - LABEL_CODE_RING3
+	;; END of [SECTION .ring3]
