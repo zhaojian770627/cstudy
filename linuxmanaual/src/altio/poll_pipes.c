@@ -15,6 +15,8 @@ main(int argc,char *argv[])
   /* Allocate the arrays that we use,The arrays are sized 
      according to number of pipes specified on command line */
   numPipes=getInt(argv[1],GN_GT_0,"num-pipes");
+
+  pfds=calloc(numPipes,sizeof(int[2]));
   if(pfds==NULL)
     errExit("malloc");
 
