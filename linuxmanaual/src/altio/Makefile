@@ -1,16 +1,15 @@
 #
-GPATH=../lib ../time ../users_groups ../procexec
-VPATH=../lib ../time ../users_groups ../procexec
+GPATH=../lib ../tty
+VPATH=../lib ../tty
 CFLAGS+=-g
 OBJECTS=get_num.o error_functions.o 
-EXEF:=t_select poll_pipes
+EXEF:=t_select poll_pipes demo_sigio
 all:$(EXEF)
+demo_sigio:demo_sigio.o $(OBJECTS) tty_functions.o
 poll_pipes:poll_pipes.o $(OBJECTS)
 t_select:t_select.o $(OBJECTS)
 get_num.o:get_num.c tlpi_hdr.h
 error_functions.o:error_functions.c error_functions.h ename.c.inc tlpi_hdr.h
-#curr_time.o:curr_time.c
-print_wait_status.o:print_wait_status.c
-#ugid_functions.o:ugid_functions.c
+tty_functions.o:tty_functions.c
 clean:
 	$(RM) *.o *.d $(EXEF)
