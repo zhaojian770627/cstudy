@@ -49,7 +49,7 @@ add_character(VString *v,int ch)
   current_len=my_strlen(v->string);
   v->string=MEM_realloc(v->string,current_len+2);
   v->string[current_len]=ch;
-  v->string[current_len]='\0';
+  v->string[current_len+1]='\0';
 }
 
 typedef struct{
