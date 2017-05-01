@@ -404,11 +404,11 @@ crb_eval_binary_expression(CRB_Interpreter *inter,LocalEnvironment *env,
   }else if(left_val.type==CRB_INT_VALUE
 	   && right_val.type==CRB_DOUBLE_VALUE){
     left_val.u.double_value=left_val.u.int_value;
-    eval_binary_int(inter,operator,left_val.u.double_value,right_val.u.double_value,&result,left->line_number);
+    eval_binary_double(inter,operator,left_val.u.double_value,right_val.u.double_value,&result,left->line_number);
   }else if(left_val.type==CRB_DOUBLE_VALUE
 	   && right_val.type==CRB_INT_VALUE){
     right_val.u.double_value=right_val.u.int_value;
-    eval_binary_int(inter,operator,left_val.u.double_value,right_val.u.double_value,&result,left->line_number);
+    eval_binary_double(inter,operator,left_val.u.double_value,right_val.u.double_value,&result,left->line_number);
   }else if(left_val.type==CRB_BOOLEAN_VALUE 
 	   &&right_val.type==CRB_BOOLEAN_VALUE){
     result.type=CRB_BOOLEAN_VALUE;

@@ -10,6 +10,9 @@ MessageFormat crb_compile_error_message_format[]={
 };
 
 MessageFormat crb_runtime_error_message_format[]={
+  {"dummy"},
+  {"foundn't varible($(name))"},
+  {"foundn't function($(name))"},
   {"input args more than function definition args."},
   {"inout args less than function definition args."},
   {"condition expr must be boolean."},
