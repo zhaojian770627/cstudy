@@ -244,7 +244,7 @@ eval_binary_int(CRB_Interpreter *inter,ExpressionType operator,
 
 static void
 eval_binary_double(CRB_Interpreter *inter,ExpressionType operator,
-		int left,int right,
+		double left,double right,
 		CRB_Value *result,int line_number)
 {
   if(dkc_is_math_operator(operator)){
