@@ -265,41 +265,41 @@ eval_binary_double(CRB_Interpreter *inter,ExpressionType operator,
     DBG_panic(("bad case...%d",operator));
     break;
   case ADD_EXPRESSION:
-    result->u.int_value=left+right;
+    result->u.double_value=left+right;
     break;
   case SUB_EXPRESSION:
-    result->u.int_value=left-right;
+    result->u.double_value=left-right;
     break;
   case MUL_EXPRESSION:
-    result->u.int_value=left*right;
+    result->u.double_value=left*right;
     break;
   case DIV_EXPRESSION:
-    result->u.int_value=left/right;
+    result->u.double_value=left/right;
     break;
   case MOD_EXPRESSION:
-    result->u.int_value=left%right;
+    result->u.double_value=fmod(left,right);
     break;
   case LOGICAL_AND_EXPRESSION:	/* FALLTHRU */
   case LOGICAL_OR_EXPRESSION:
     DBG_panic(("bad case...%d",operator));
     break;
   case EQ_EXPRESSION:
-    result->u.boolean_value=left==right;
+    result->u.int_value=left==right;
     break;
   case NE_EXPRESSION:
-    result->u.boolean_value=left!=right;
+    result->u.int_value=left!=right;
     break;
   case GT_EXPRESSION:
-    result->u.boolean_value=left>right;
+    result->u.int_value=left>right;
     break;
   case GE_EXPRESSION:
-    result->u.boolean_value=left>=right;
+    result->u.int_value=left>=right;
     break;
   case LT_EXPRESSION:
-    result->u.boolean_value=left<right;
+    result->u.int_value=left<right;
     break;
   case LE_EXPRESSION:
-    result->u.boolean_value=left<=right;
+    result->u.int_value=left<=right;
     break;
   case MINUS_EXPRESSION:	/* FALLTHRU */
   case FUNCTION_CALL_EXPRESSION: /* FALLTHRU */

@@ -152,7 +152,9 @@ crb_create_binary_expression(ExpressionType operator,
 {
   if((left->type==INT_EXPRESSION
       ||left->type==DOUBLE_EXPRESSION)
-     &&(right->type==DOUBLE_EXPRESSION)){
+     &&(right->type==DOUBLE_EXPRESSION
+	||right->type==DOUBLE_EXPRESSION
+	)){
     CRB_Value v;
     v=crb_eval_binary_expression(crb_get_current_interpreter(),
 				 NULL,operator,left,right);
