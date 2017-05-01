@@ -177,6 +177,7 @@ self_check()
   if(strcmp(crb_compile_error_message_format[0].format,"dummy")!=0){
     DBG_panic(("compile error message format error.\n"));
   }
+
   if(strcmp(crb_compile_error_message_format
 	    [COMPILE_ERROR_COUNT_PLUS_1].format,
 	    "dummy")!=0){
@@ -185,6 +186,9 @@ self_check()
 	       COMPILE_ERROR_COUNT_PLUS_1));
   }
 
+  if(strcmp(crb_runtime_error_message_format[0].format,"dummy")!=0){
+    DBG_panic(("runtime error message format error.\n"));
+  }
 
   if(strcmp(crb_runtime_error_message_format
 	    [RUNTIME_ERROR_COUNT_PLUS_1].format,
