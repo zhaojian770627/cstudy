@@ -184,6 +184,8 @@ self_check()
 	       "COMPILE_ERROR_COUNT_PLUS_1..%d\n",
 	       COMPILE_ERROR_COUNT_PLUS_1));
   }
+
+
   if(strcmp(crb_runtime_error_message_format
 	    [RUNTIME_ERROR_COUNT_PLUS_1].format,
 	    "dummy")!=0){
