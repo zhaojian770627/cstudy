@@ -248,7 +248,7 @@ eval_binary_double(CRB_Interpreter *inter,ExpressionType operator,
 		CRB_Value *result,int line_number)
 {
   if(dkc_is_math_operator(operator)){
-    result->type=CRB_INT_VALUE;
+    result->type=CRB_DOUBLE_VALUE;
   }else if(dkc_is_compare_operator(operator)){
     result->type=CRB_BOOLEAN_VALUE;
   }else{
