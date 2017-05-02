@@ -107,6 +107,7 @@ CRB_add_global_variable(CRB_Interpreter *inter,char *identifier,
   new_variable->name=crb_execute_malloc(inter,strlen(identifier)+1);
   strcpy(new_variable->name,identifier);
   new_variable->next=inter->variable;
+  inter->variable=new_variable;
   new_variable->value=*value;
 }
 
