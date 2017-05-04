@@ -156,10 +156,10 @@ LABEL_REAL_ENTRY:
 	[SECTION .s32]		;32bit code
 	[BITS	32]
 LABEL_SEG_CODE32:
+	call 	SetupPaging
+	
 	mov	ax,SelectorData
 	mov	ds,ax		;Data selector
-	mov	ax,SelectorTest
-	mov	es,ax
 	mov 	ax,SelectorVideo
 	mov	gs,ax
 
@@ -194,8 +194,41 @@ LABEL_SEG_CODE32:
 SetupPaging:
 	;; 为简化处理，所有线性地址对应相等的物理地址
 
+	;; 首先初始化页目录
+	mov	ax,SelectorPageDir ;此段首地址为PageDirBase
+	mov	es,ax
+	mov	ecx,1024	;共1K个表项
+	xor	edi,edi
+	xor	eax,eax
+	mov	eax,PageTblBase|PG_P|PG_USU|PG_RWW
+.1:
+	stosd
+	add	eax,4096	;为了简化，所有页表在内存中是连续的
+	loop	.1
 
+	;; 再初始化所有页表(1K个，4M内存空间)
+	mov	ax,SelectorPageTbl ;此段首地址为PageTblBase
+	mov	es,ax
+	mov	ecx,1024*1024	;共1M个表项，也即有1M个页
+	xor	edi,edi
+	xor	eax,eax
+	mov	eax,PG_P|PG_USU|PG_RWW
+.2:
+	stosd
+	add 	eax,4096	;每一页指向4K的空间
+	loop	.2
 
+	mov	eax,PageDirBase
+	mov	cr3,eax
+	mov	eax,cr0
+	or 	eax,80000000h
+	mov	cr0,eax
+	jmp	short .3
+.3:
+	nop
+
+	ret
+	
 	;; 分页机制启动完毕--------------------------------------
 
 	SegCode32Len	equ	$-LABEL_SEG_CODE32
