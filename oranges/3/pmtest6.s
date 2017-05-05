@@ -246,7 +246,7 @@ LABEL_SEG_CODE16:
 	mov	ss,ax
 
 	mov	eax,cr0
-	and 	al,11111110b
+	and 	eax,7ffffffeh	;PE=0,PG=0
 	mov	cr0,eax
 
 LABEL_GO_BACK_TO_REAL:
