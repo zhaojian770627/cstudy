@@ -204,8 +204,9 @@ LABEL_SEG_CODE32:
 	;;call	DispStr
 	;;add	esp,4
 
-	mov	al,11h
-	call 	DispAL
+	push	123456h
+	call 	DispInt
+	add	esp,4
 	
 
 	jmp	SelectorCode16:0

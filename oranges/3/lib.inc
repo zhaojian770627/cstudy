@@ -35,3 +35,32 @@ DispAL:
 
 	ret
 ;;DispAL结束
+
+;; 显示一个整型数
+DispInt:
+	mov	eax,[esp+4]
+	shr	eax,24
+	call	DispAL
+
+	mov	eax,[esp+4]
+	shr	eax,16
+	call 	DispAL
+
+	mov	eax,[esp+4]
+	shr	eax,8
+	call 	DispAL
+
+	mov	eax,[esp+4]
+	call 	DispAL
+
+	mov	ah,07h
+	mov	al,'h'
+	push	edi
+	mov	edi,[dwDispPos]
+	mov	[gs:edi],ax
+	add	edi,4
+	mov    	[dwDispPos],edi
+	pop	edi
+
+	ret
+;; DispInt 结束
