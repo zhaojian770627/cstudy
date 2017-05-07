@@ -64,3 +64,55 @@ DispInt:
 
 	ret
 ;; DispInt 结束
+
+;; 显示一个字符串
+DispStr:
+	push	ebp
+	mov	ebp,esp
+	push	ebx
+	push	esi
+	push 	edi
+
+	mov	esi,[ebp+8]	;posInfo
+	mov	edi,[dwDispPos]
+	mov	ah,0fh
+
+.1:
+	lodsb
+	test	al,al
+	jz	.2
+	cmp	al,0ah	;是回车吗
+	jnz	.3
+	push	eax
+	mov	eax,edi
+	mov	bl,160
+	div	bl
+	and 	eax,0ffh
+	inc	eax
+	mov	bl,160
+	mul	bl
+	mov	edi,eax
+	pop	eax
+	jmp	.1
+.3:
+	mov	[gs:edi],ax
+	add	edi,2
+	jmp	.1
+.2:
+	mov	[dwDispPos],edi
+	
+	pop	edi
+	pop	esi
+	pop	ebx
+	pop	ebp
+	ret
+;; DispStr结束
+
+;; 换行
+DispReturn:
+	push	szReturn
+	call	DispStr ;printf("\n");
+	add	esp,4
+	
+	ret
+;; DispReturn 结束

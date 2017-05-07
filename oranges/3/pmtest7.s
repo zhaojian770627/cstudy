@@ -43,18 +43,38 @@ LABEL_DATA:
 	SPValueInRealMode	dw	0
 	;; string
 _szPMMessage:	db	"In Protect Mode now.^-^",0ah,0ah,0 ;diplay in protected
-
+_szMemChkTitle:	db "BaseAddrL BaseAddrH LengthLow LengthHith   Type",0ah,0
+_szRAMSize:	db 	"RAM size:",0
+_szReturn:	db	0ah,0
 	;; 变量
 _dwMCRNumber:	dd	0	;Memory Check Result
 _dwDispPos:	dd	(80*6+0)*2 ;屏幕第6行，第0列
+_dwMemSize:	dd	0
+
+_ARDStruct:			;Address Range Descriptor Structure
+	_dwBaseAddrLow:		dd	0
+	_dwBaseAddrHigh:	dd	0
+	_dwLengthLow:		dd	0
+	_dwLengthHigh:		dd	0
+	_dwType:		dd	0
+
+_MemChkBuf:	times	256 db 0
 	
 	;; 保护模式下使用这些符号
 	szPMMessage	equ	_szPMMessage - $$
+	szMemChkTitle	equ 	_szMemChkTitle - $$
+	szRAMSize	equ 	_szRAMSize - $$
+	szReturn	equ	_szReturn - $$
 	dwDispPos	equ	_dwDispPos - $$
-
-	;; -------------查看内存---------------
-_MemChkBuf:	times	256 db 0
-	
+	dwMemSize	equ	_dwMemSize - $$ 
+	dwMCRNumber	equ	_dwMCRNumber - $$
+	ARDStruct	equ	_ARDStruct - $$
+		dwBaseAddrLow	equ	_dwBaseAddrLow - $$
+		dwBaseAddrHigh	equ	_dwBaseAddrHigh - $$
+		dwLengthLow	equ	_dwLengthLow - $$
+		dwLengthHigh	equ 	_dwLengthHigh - $$
+		dwType		equ	_dwType - $$
+	MemChkBuf	equ	_MemChkBuf - $$
 	
 	DataLen	equ	$ - LABEL_DATA
 	;; End of [SECTION .data]
@@ -187,10 +207,11 @@ LABEL_REAL_ENTRY:
 	[SECTION .s32]		;32bit code
 	[BITS	32]
 LABEL_SEG_CODE32:
-	call 	SetupPaging
-	
 	mov	ax,SelectorData
 	mov	ds,ax		;Data selector
+
+	mov	es,ax
+
 	mov 	ax,SelectorVideo
 	mov	gs,ax
 
@@ -200,15 +221,16 @@ LABEL_SEG_CODE32:
 	mov	esp,TopOfStack
 
 	;; 下面显示一个字符串
-	;;push	szPMMessage	
-	;;call	DispStr
-	;;add	esp,4
-
-	push	123456h
-	call 	DispInt
+	push	szPMMessage	
+	call	DispStr
 	add	esp,4
-	
 
+	push	szMemChkTitle	
+	call	DispStr
+	add	esp,4
+
+	call 	DispMemSize	;显示内存信息
+	
 	jmp	SelectorCode16:0
 
 	;; 启动分页机制-------------------------------------------
@@ -252,6 +274,51 @@ SetupPaging:
 	
 	;; 分页机制启动完毕--------------------------------------
 
+
+DispMemSize:
+	push	esi
+	push	edi
+	push	ecx
+
+	mov	esi,MemChkBuf
+	mov	ecx,[dwMCRNumber]
+.loop:
+	mov	edx,5
+	mov	edi,ARDStruct
+.1:
+	push	dword[esi]
+	call	DispInt
+	pop	eax
+	stosd
+	add	esi,4
+	dec	edx
+	cmp	edx,0
+	jnz	.1
+	call 	DispReturn
+	cmp	dword[dwType],1
+	jne	.2
+	mov	eax,[dwBaseAddrLow]
+	add	eax,[dwLengthLow]
+	cmp	eax,[dwMemSize]
+	jb	.2
+	mov	[dwMemSize],eax
+.2:
+	loop	.loop
+
+	call 	DispReturn
+	push	szRAMSize
+	call	DispStr
+	add	esp,4
+
+	push	dword[dwMemSize]
+	call	DispInt
+	add	esp,4
+
+	pop	ecx
+	pop	edi
+	pop	esi
+	ret
+	
 %include "lib.inc"
 	
 	SegCode32Len	equ	$-LABEL_SEG_CODE32
