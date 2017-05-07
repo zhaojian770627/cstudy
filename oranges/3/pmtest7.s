@@ -230,17 +230,30 @@ LABEL_SEG_CODE32:
 	add	esp,4
 
 	call 	DispMemSize	;显示内存信息
+
+	call 	SetupPaging	;启动分页基址
 	
 	jmp	SelectorCode16:0
 
 	;; 启动分页机制-------------------------------------------
 SetupPaging:
+	;; 根据内存大小计算应初始化多少PDE以及多少页表
+	xor	edx,edx
+	mov	eax,[dwMemSize]
+	mov	ebx,400000h	;400000h=4M=4096*1024,一个页表对应的内存大小
+	div	ebx
+	mov	ecx,eax		;此时ecx为页表的个数，也即PDE应该的个数
+	test	edx,edx
+	jz	.no_remainder
+	inc	ecx		;如果余数不为0，就需要增加一个页表
+.no_remainder:
+	push	ecx		;暂存页表个数
+
 	;; 为简化处理，所有线性地址对应相等的物理地址
 
 	;; 首先初始化页目录
 	mov	ax,SelectorPageDir ;此段首地址为PageDirBase
 	mov	es,ax
-	mov	ecx,1024	;共1K个表项
 	xor	edi,edi
 	xor	eax,eax
 	mov	eax,PageTblBase|PG_P|PG_USU|PG_RWW
@@ -252,7 +265,10 @@ SetupPaging:
 	;; 再初始化所有页表(1K个，4M内存空间)
 	mov	ax,SelectorPageTbl ;此段首地址为PageTblBase
 	mov	es,ax
-	mov	ecx,1024*1024	;共1M个表项，也即有1M个页
+	pop	eax		;页表个数
+	mov	ebx,1024	;每个页表1024个PTE
+	mul	ebx
+	mov	ecx,eax		;PTE个数=页表个数*1024
 	xor	edi,edi
 	xor	eax,eax
 	mov	eax,PG_P|PG_USU|PG_RWW
