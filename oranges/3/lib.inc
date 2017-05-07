@@ -12,7 +12,7 @@ DispAL:
 	shr	al,4
 	mov	ecx,2
 .begin:
-	and	al,0111b
+	and	al,01111b
 	cmp	al,9
 	ja	.1
 	add	al,'0'
