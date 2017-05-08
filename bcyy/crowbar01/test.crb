@@ -59,23 +59,38 @@
 ###########################################
 # Check flow control
 ##########################################
-if(true){
-	print("true\n");
-}
-if(false){
-	print("false\n");
-}
-if(false){
-	print("bad\n");
-}else{
-	print("good\n");
-}
-i=0;
-for(;;){
-	print(" i.. " + i);
-	if(i>5){
-		break;
+#if(true){
+#	print("true\n");
+#}
+#if(false){
+#	print("false\n");
+#}
+#if(false){
+#	print("bad\n");
+#}else{
+#	print("good\n");
+#}
+#i=0;
+#for(;;){
+#	print(" i.. " + i);
+#	if(i>5){	
+#	break;
+#	}
+#	i=i+1;
+#}
+#print("\n");
+for(i=0;i<5;i=i+1){
+	print("*** i.."+i+"***\n");
+	if(i==0){
+		print("i == 0\n");
+	}elsif(i==1){
+		print("i == 1\n");
+	}elsif(i==2){
+		print("i == 2\n");
+	}else{
+		print("i == else\n");
 	}
-	i=i+1;
+	if(i!=3){
+		print("i!=3\n");
+	}
 }
-print("\n");
