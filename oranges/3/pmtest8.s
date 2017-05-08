@@ -1,8 +1,16 @@
 %include "pm.inc"
 
-	PageDirBase	equ	200000h ;页目录开始地址:2M
-	PageTblBase	equ	201000h ;页表开始地址:2M+4K
+	PageDirBase0	equ	200000h ;页目录开始地址:	2M
+	PageTblBase0	equ	201000h ;页表开始地址:	2M+4K
 
+	PageDirBase1	equ	210000h ;页目录开始地址:	2M+64K
+	PageTblBase1	equ	211000h ;页表开始地址:	2M+64k+4K
+
+	LinearAddrDemo	equ	00401000h
+	ProcFoo		equ	00401000h
+	ProcBar		equ	00501000h
+	ProcPagingDemo	equ	00301000h
+	
 	org	0100h
 	jmp	LABEL_BEGIN
 	[SECTION .gdt]
@@ -11,8 +19,8 @@
 	;; Blank Desc
 LABEL_GDT:		Descriptor	0,		0,		0
 LABEL_DESC_NORMAL:	Descriptor	0,		0ffffh,		DA_DRW
-LABEL_DESC_PAGE_DIR:	Descriptor	PageDirBase,	4095,		DA_DRW ;Page Directory
-LABEL_DESC_PAGE_TBL:	Descriptor	PageTblBase,	4096*8-1,		DA_DRW|DA_LIMIT_4K ;Page Tables
+LABEL_DESC_FLAT_C:	Descriptor	0,		0ffffh,		DA_CR|DA_32|DA_LIMIT_4K ;0~4G
+LABEL_DESC_FLAT_RW:	Descriptor	0,		0ffffh,		DA_DRW|DA_LIMIT_4K ;0~4G
 LABEL_DESC_CODE32:	Descriptor	0,		SegCode32Len-1,	DA_C+DA_32
 LABEL_DESC_CODE16:	Descriptor	0,		0ffffh,		DA_C
 LABEL_DESC_DATA:	Descriptor	0,		DataLen-1,	DA_DRW
@@ -25,8 +33,8 @@ LABEL_DESC_VIDEO:	Descriptor	0B8000h,	0ffffh,		DA_DRW
 		dd	0
 	;; GDT selector
 	SelectorNormal	equ	LABEL_DESC_NORMAL - LABEL_GDT
-	SelectorPageDir	equ	LABEL_DESC_PAGE_DIR - LABEL_GDT
-	SelectorPageTbl	equ	LABEL_DESC_PAGE_TBL - LABEL_GDT
+	SelectorFlatC	equ	LABEL_DESC_FLAT_C - LABEL_GDT
+	SelectorFlatRW	equ	LABEL_DESC_FLAT_RW - LABEL_GDT
 	SelectorCode32	equ	LABEL_DESC_CODE32 - LABEL_GDT
 	SelectorCode16	equ	LABEL_DESC_CODE16 - LABEL_GDT
 	SelectorData	equ	LABEL_DESC_DATA	- LABEL_GDT
@@ -57,7 +65,8 @@ _ARDStruct:			;Address Range Descriptor Structure
 	_dwLengthLow:		dd	0
 	_dwLengthHigh:		dd	0
 	_dwType:		dd	0
-
+_PageTableNumber	dd	0
+	
 _MemChkBuf:	times	256 db 0
 	
 	;; 保护模式下使用这些符号
@@ -75,6 +84,7 @@ _MemChkBuf:	times	256 db 0
 		dwLengthHigh	equ 	_dwLengthHigh - $$
 		dwType		equ	_dwType - $$
 	MemChkBuf	equ	_MemChkBuf - $$
+	PageTableNumber	equ	_PageTableNumber - $$
 	
 	DataLen	equ	$ - LABEL_DATA
 	;; End of [SECTION .data]
@@ -247,29 +257,27 @@ SetupPaging:
 	jz	.no_remainder
 	inc	ecx		;如果余数不为0，就需要增加一个页表
 .no_remainder:
-	push	ecx		;暂存页表个数
+	mov	[PageTableNumber],ecx		;暂存页表个数
 
 	;; 为简化处理，所有线性地址对应相等的物理地址
 
 	;; 首先初始化页目录
-	mov	ax,SelectorPageDir ;此段首地址为PageDirBase
+	mov	ax,SelectorFlatRW
 	mov	es,ax
-	xor	edi,edi
+	mov	edi,PageDirBase0 ;此段首地址为PageDirBase0
 	xor	eax,eax
-	mov	eax,PageTblBase|PG_P|PG_USU|PG_RWW
+	mov	eax,PageTblBase0|PG_P|PG_USU|PG_RWW
 .1:
 	stosd
 	add	eax,4096	;为了简化，所有页表在内存中是连续的
 	loop	.1
 
 	;; 再初始化所有页表(1K个，4M内存空间)
-	mov	ax,SelectorPageTbl ;此段首地址为PageTblBase
-	mov	es,ax
-	pop	eax		;页表个数
+	mov	eax,[PageTableNumber]		;页表个数
 	mov	ebx,1024	;每个页表1024个PTE
 	mul	ebx
 	mov	ecx,eax		;PTE个数=页表个数*1024
-	xor	edi,edi
+	mov	edi,PageTblBase0 ;此段首地址为 PageTblBase0
 	xor	eax,eax
 	mov	eax,PG_P|PG_USU|PG_RWW
 .2:
@@ -277,7 +285,7 @@ SetupPaging:
 	add 	eax,4096	;每一页指向4K的空间
 	loop	.2
 
-	mov	eax,PageDirBase
+	mov	eax,PageDirBase0
 	mov	cr3,eax
 	mov	eax,cr0
 	or 	eax,80000000h
@@ -287,10 +295,131 @@ SetupPaging:
 	nop
 
 	ret
-	
 	;; 分页机制启动完毕--------------------------------------
 
+	;; 测试分页机制
+PagingDemo:
+	mov	ax,cs
+	mov	ds,ax
+	mov	ax,SelectorFlatRW
+	mov	es,ax
 
+	push 	LenFoo
+	push	OffsetFoo
+	push	ProcFoo
+	call	MemCpy
+	add	esp,12
+
+	push	LenBar
+	push	OffsetBar
+	push	ProcBar
+	call	MemCpy
+	add	esp,12
+
+	push	LenPagingDemoAll
+	push	OffsetPagingDemoProc
+	push	ProcPagingDemo
+	call	MemCpy
+	add	esp,12
+
+	mov	ax,SelectorData
+	mov	ds,ax		;数据段选择子
+	mov	es,ax
+
+	call	SetupPaging	;启动分页
+
+	call	SelectorFlatC:ProcPagingDemo
+	call	PSwitch		;切换页目录，改变地址映射关系
+	call	SelectorFlatC:ProcPagingDemo
+
+	ret
+	;; ---------------------------------------
+
+	;; 切换页表-----------------------------------
+PSwitch:
+	;; 初始化页目录
+	mov	ax,SelectorFlatRW
+	mov	es,ax
+	mov	edi,PageDirBase1 ;此段首地址为PageDirBase1
+	xor	eax,eax
+	mov	eax,PageTblBase1|PG_P|PG_USU|PG_RWW
+	mov	ecx,[PageTableNumber]
+.1:
+	stosd
+	add	eax,4096	;为来简化，所有页表在内存中是连续的
+	loop	.1
+
+	;; 再初始化所有页表
+	mov	eax,[PageTableNumber] ;页表个数
+	mov	ebx,1024	      ;每个页表1024个PTE
+	mul	ebx
+	mov	ecx,eax
+	mov	edi,PageTblBase1
+	xor	eax,eax
+	mov	eax,PG_P|PG_USU|PG_RWW
+.2:
+	stosd
+	add	eax,4096
+	loop	.2
+
+	;; 在此假设内存是大于8M的,如下代码将ProcBar地址放入LinearAddrDemo对应的页表条目
+	;; 即指向的其实是00501000h
+	mov	eax,LinearAddrDemo
+	shr	eax,22
+	mov	ebx,4096
+	mul	ebx
+	mov	ecx,eax
+	mov	eax,LinearAddrDemo
+	shr	eax,12
+	and 	eax,03ffh	;1111111111b
+	mov	ebx,4
+	mul	ebx
+	add	eax,ecx
+	add	eax,PageTblBase1
+	mov	dword[es:eax],ProcBar|PG_P|PG_USU|PG_RWW
+
+	mov	eax,PageDirBase1
+	mov	cr3,eax
+	jmp	short .3
+.3:
+	nop
+	ret
+	;; ---------------------------------------
+
+
+PagingDemoProc:
+	OffsetPagingDemoProc	equ	PagingDemoProc - $$
+	mov	eax,LinearAddrDemo
+	call	eax
+	retf
+	LenPagingDemoAll	equ 	$ - PagingDemoProc
+
+foo:
+	OffSetFoo	equ	foo - $$
+
+	mov	ah,0ch		;0000:黑底 1100:红字
+	mov	al,'F'
+	mov	[gs:((80*17+0)*2)],ax ;屏幕第17行，第0列
+	mov	al,'o'
+	mov	[gs:((80*17+1)*2)],ax
+	mov	[gs:((80*17+2)*2)],ax
+	ret
+	LenFoo	equ 	$ - foo
+
+bar:
+	OffSetBar	equ	bar - $$
+
+	mov	ah,0ch		;0000:黑底 1100:红字
+	mov	al,'B'
+	mov	[gs:((80*18+0)*2)],ax ;屏幕第17行，第0列
+	mov	al,'a'
+	mov	[gs:((80*18+1)*2)],ax
+	mov	al,'r'
+	mov	[gs:((80*18+2)*2)],ax
+	ret
+	LenBar	equ 	$ - bar
+	
+	;; 显示内存信息
 DispMemSize:
 	push	esi
 	push	edi
