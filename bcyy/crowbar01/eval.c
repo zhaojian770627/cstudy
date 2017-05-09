@@ -109,7 +109,7 @@ eval_identifier_expression(CRB_Interpreter *inter,
     if(vp!=NULL){
       v=vp->value;
     }else{
-      crb_runtime_error(expr->line_number,VARIABLE_NOT_FOUND_ERR<
+      crb_runtime_error(expr->line_number,VARIABLE_NOT_FOUND_ERR,
 			STRING_MESSAGE_ARGUMENT,
 			"name",expr->u.identifier,
 			MESSAGE_ARGUMENT_END);
