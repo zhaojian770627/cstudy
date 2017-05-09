@@ -25,7 +25,7 @@ static void
 <INITIAL>"if" return IF;
 <INITIAL>"else" return ELSE;
 <INITIAL>"elsif" return ELSIF;
-<INITIAL>"while" return FOR;
+<INITIAL>"while" return WHILE;
 <INITIAL>"for" return FOR;
 <INITIAL>"return" return RETURN_T;
 <INITIAL>"break" return BREAK;

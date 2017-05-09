@@ -79,18 +79,47 @@
 #	i=i+1;
 #}
 #print("\n");
-for(i=0;i<5;i=i+1){
-	print("*** i.."+i+"***\n");
-	if(i==0){
-		print("i == 0\n");
-	}elsif(i==1){
-		print("i == 1\n");
-	}elsif(i==2){
-		print("i == 2\n");
-	}else{
-		print("i == else\n");
-	}
-	if(i!=3){
-		print("i!=3\n");
-	}
+#for(i=0;i<5;i=i+1){
+#	print("*** i.."+i+"***\n");
+#	if(i==0){
+#		print("i == 0\n");
+#	}elsif(i==1){
+#		print("i == 1\n");
+#	}elsif(i==2){
+#		print("i == 2\n");
+#	}else{
+#		print("i == else\n");
+#	}
+#	if(i!=3){
+#		print("i!=3\n");
+#	}
+#	if(i==2||i==3){
+#		print("i==2 || i==3\n");
+#	}
+#	for(j=0;j<5;j=j+1){
+#		if(i==2 && j==3){
+#			print("i==2 && j=="+j+"\n");
+#		}
+#	}
+#}
+
+#for(i=0;i<=5;i=i+1){
+#	print(" i.. "+i);
+#}
+#print("\n");
+#for(i=5;i>=0;i=i-1){
+#	print(" i.. "+i);
+#}
+#print("\n");
+#i=5;
+#while(i>0) {
+#	print(" i.. "+i);
+#	i=i-1;
+#}
+#print("\n");
+#
+i=5;
+while(i<10){
+	print(" i.."+i);
+	i=i+1;
 }
