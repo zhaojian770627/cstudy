@@ -148,7 +148,7 @@ execute_while_statement(CRB_Interpreter *inter,LocalEnvironment *env,
 				      statement->u.while_s.block->statement_list);
     if(result.type==RETURN_STATEMENT_RESULT){
       break;
-    }else if(result.type==BREAK_STATEMENT){
+    }else if(result.type==BREAK_STATEMENT_RESULT){
       result.type=NORMAL_STATEMENT_RESULT;
       break;
     }
