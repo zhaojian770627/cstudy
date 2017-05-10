@@ -241,7 +241,7 @@ LABEL_SEG_CODE32:
 
 	call 	DispMemSize	;显示内存信息
 
-	call 	SetupPaging	;启动分页基址
+	call 	PagingDemo	;启动分页基址
 	
 	jmp	SelectorCode16:0
 
@@ -305,13 +305,13 @@ PagingDemo:
 	mov	es,ax
 
 	push 	LenFoo
-	push	OffsetFoo
+	push	OffSetFoo
 	push	ProcFoo
 	call	MemCpy
 	add	esp,12
 
 	push	LenBar
-	push	OffsetBar
+	push	OffSetBar
 	push	ProcBar
 	call	MemCpy
 	add	esp,12
@@ -328,9 +328,9 @@ PagingDemo:
 
 	call	SetupPaging	;启动分页
 
-	call	SelectorFlatC:ProcPagingDemo
-	call	PSwitch		;切换页目录，改变地址映射关系
-	call	SelectorFlatC:ProcPagingDemo
+	;;call	SelectorFlatC:ProcPagingDemo
+	;;call	PSwitch		;切换页目录，改变地址映射关系
+	;;call	SelectorFlatC:ProcPagingDemo
 
 	ret
 	;; ---------------------------------------

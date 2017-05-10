@@ -137,7 +137,7 @@ MemCpy:
 	jz	.2		;计数器为0时跳出
 
 	mov	al,[ds:esi]
-	inc	edi
+	inc	esi
 	
 	mov	byte[es:edi],al	;逐字节移动
 	inc	edi
