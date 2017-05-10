@@ -121,5 +121,61 @@
 i=5;
 while(i<10){
 	print(" i.."+i);
+	if(i==5){
+		break;
+	}
 	i=i+1;
 }
+print("\n");
+i=0;
+while(i<10){
+	i=i+1;
+	if(i<5){
+		continue;
+	}
+	print(" i.."+i);
+}
+print("\n");
+for(i=0;i<10;i=i+1){
+	if(i<5){
+		continue;
+	}
+	print(" i.."+i);
+}
+print("\n");
+###############################################
+# check boolean operations
+#############################################
+a=true;
+print("a.."+a+"\n");
+if(a){
+	print("true\n");
+}else{
+	print("false\n");
+}
+if(a||false){
+	print("a || false\n");
+}
+if(a&&false){
+	print("a || false\n");
+}
+if(true==true){
+	print("true==true good\n");
+}
+if(true==false){
+	print("true==false bad\n");
+}
+if(true!=true){
+	print("true!=true bad\n");
+}
+if(true!=false){
+	print("true!=false good\n");
+}
+############################################
+# Check string conversion
+###########################################
+print(3);
+print("\n");
+z=print(3.0);
+print("\n");
+print("z.."+z+"\n");
