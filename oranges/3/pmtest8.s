@@ -19,8 +19,8 @@
 	;; Blank Desc
 LABEL_GDT:		Descriptor	0,		0,		0
 LABEL_DESC_NORMAL:	Descriptor	0,		0ffffh,		DA_DRW
-LABEL_DESC_FLAT_C:	Descriptor	0,		0ffffh,		DA_CR|DA_32|DA_LIMIT_4K ;0~4G
-LABEL_DESC_FLAT_RW:	Descriptor	0,		0ffffh,		DA_DRW|DA_LIMIT_4K ;0~4G
+LABEL_DESC_FLAT_C:	Descriptor	0,		0fffffh,	DA_CR|DA_32|DA_LIMIT_4K ;0~4G
+LABEL_DESC_FLAT_RW:	Descriptor	0,		0fffffh,	DA_DRW|DA_LIMIT_4K ;0~4G
 LABEL_DESC_CODE32:	Descriptor	0,		SegCode32Len-1,	DA_CR|DA_32
 LABEL_DESC_CODE16:	Descriptor	0,		0ffffh,		DA_C
 LABEL_DESC_DATA:	Descriptor	0,		DataLen-1,	DA_DRW
