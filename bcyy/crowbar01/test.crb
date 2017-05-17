@@ -179,3 +179,27 @@ print("\n");
 z=print(3.0);
 print("\n");
 print("z.."+z+"\n");
+a=5;
+print("a.."+a+"\n");
+a=5.0;
+print("a.."+a+"\n");
+a="piyopiyo";
+print("a.."+a+"\n");
+
+##############################################
+# Check string comparing
+##############################################
+str="abc";
+
+if(str=="abc"){
+	print("== good.\n");
+}
+
+if(str!="abc"){
+	print("== bad.\n");
+}
+
+if(str<"abc"){
+	print("<good.\n");
+
+}
