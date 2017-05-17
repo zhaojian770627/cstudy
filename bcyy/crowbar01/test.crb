@@ -207,3 +207,19 @@ if(str<="abc"){
 if(str<="abc"){
 	print("<good.\n");
 }
+
+if(str<="abb"){
+	print("<bad.\n");
+}
+
+if(str>=">=abc"){
+	print(">=good.\n");
+}
+
+if(str>=">=abb"){
+	print(">=good.\n");
+}
+
+if(str>="abd"){
+	print(">=bad.\n");
+}
