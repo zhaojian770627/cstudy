@@ -232,6 +232,9 @@ b=hoge(2,5);
 print("b.."+b+"\n");
 
 print("int_func().."+int_func()+"\n");
+print("real_func().."+real_func()+"\n");
+print("string_func().." + string_func() + "\n");
+print("void_func().." + void_func() + "\n");
 
 function hoge(a,b){
 	 c=a+b;
@@ -248,3 +251,36 @@ function int_func(){
      	}
 	print("int func out\n");
 }
+
+function real_func() {
+    print("real func in\n");
+    for (i = 0; i < 10; i = i + 1) {
+     	print("i.." + i + "\n");
+        return 0.1;
+    }
+    print("real func out\n");
+}
+
+function string_func() {
+    zzz = "zzz";
+    for (i = 0; i < 10; i = i + 1) {
+    print("i.." + i + "\n");
+    return "abc";
+    }
+}
+
+function void_func() {
+    qq = ww = ee = "abc";
+    print("qq.." + qq + "\n");
+    return;
+}
+
+"zzz";
+
+function func(a){
+	 return a;
+}
+
+a=func("abc");
+
+print("a.."+a+"\n");
