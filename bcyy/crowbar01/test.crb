@@ -284,3 +284,22 @@ function func(a){
 a=func("abc");
 
 print("a.."+a+"\n");
+
+################################################
+#
+###############################################
+gtest=10;
+
+function gtestfunc(){
+	 global gtest;
+	 gtest=20;
+}
+
+function gtestfunc2(){
+	 gtest=30;
+	 print("gtest.."+gtest+"\n");
+}
+
+gtestfunc();
+gtestfunc2();
+print("gtest.."+gtest+"\n");
