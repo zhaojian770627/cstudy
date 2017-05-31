@@ -28,5 +28,13 @@ MessageFormat crb_runtime_error_message_format[]={
   {"global variable $(name) not exists."},
   {"can't use global statement outside function."},
   {"operator $(operator) can't useed in string type."},
+  {"operand is not left value"},
+  {"subscript operator left operand is not array type"},
+  {"subscript operator left operand is not int type"},
+  {"array subscript out bounds.array size $(size).the access subscript is [$(index)]."},
+  {"object has no such $(method_name) method."},
+  {"please input int type (array size) for new_array() function"},
+  {"inc/dec target is not int type"},
+  {"array's resize() must input int type."},
   {"dummy"}
 };
