@@ -89,7 +89,12 @@ typedef enum{
   LOGICAL_OR_EXPRESSION,
   MINUS_EXPRESSION,
   FUNCTION_CALL_EXPRESSION,
+  METHOD_CALL_EXPRESSION,
   NULL_EXPRESSION,
+  ARRAY_EXPRESSION,
+  INDEX_EXPRESSION,
+  INCREMENT_EXPRESSION,
+  DECREMENT_EXPRESSION,
   EXPRESSION_TYPE_COUNT_PLUS_1
 }ExpressionType;
 
@@ -112,7 +117,7 @@ typedef struct ArgumentList_tag{
 }ArgumentList;
 
 typedef struct{
-  char *variable;
+  Expression *left;
   Expression *operand;
 }AssignExpression;
 
