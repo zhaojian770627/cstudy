@@ -351,7 +351,7 @@ struct CRB_String_tag{
 typedef enum{
   ARRAY_OBJECT=1,
   STRING_OBJECT,
-  OBJECT_TYPE_COUNT_PLUS_1;
+  OBJECT_TYPE_COUNT_PLUS_1
 }ObjectType;
 
 #define dkc_is_object_value(type) \
@@ -432,23 +432,23 @@ char *crb_close_string_literal(void);
 /* execute.c */
 StatementResult
 crb_execute_statement_list(CRB_Interpreter *inter,
-			   LocalEnvironment *env,StatementList *list);
+			   CRB_LocalEnvironment *env,StatementList *list);
 
 /* eval.c */
 CRB_Value crb_eval_binary_expression(CRB_Interpreter *inter,
-				     LocalEnvironment *env,
+				     CRB_LocalEnvironment *env,
 				     ExpressionType operator,
 				     Expression *left,Expression *right);
 CRB_Value crb_eval_minus_expression(CRB_Interpreter *inter,
-				    LocalEnvironment *env,Expression *operand);
+				    CRB_LocalEnvironment *env,Expression *operand);
 CRB_Value crb_eval_expression(CRB_Interpreter *inter,
-			      LocalEnvironment *env,Expression *expr);
+			      CRB_LocalEnvironment *env,Expression *expr);
 
 
 /* heap.c */
-CRB_Object *crb_literal_to_crb_string(CRB_interpreter *inter,char *str);
-CRB_Object *crb_create_crowbar_string_i(Crb_Interpreter *inter,char *str);
-CRB_Object *crb_create_array_i(Crb_Interpreter *inter,int size);
+CRB_Object *crb_literal_to_crb_string(CRB_Interpreter *inter,char *str);
+CRB_Object *crb_create_crowbar_string_i(CRB_Interpreter *inter,char *str);
+CRB_Object *crb_create_array_i(CRB_Interpreter *inter,int size);
 void crb_array_add(CRB_Interpreter *inter,CRB_Object *obj,CRB_Value v);
 void crb_array_resize(CRB_Interpreter *inter,CRB_Object *obj,int new_size);
 void crb_garbage_collect(CRB_Interpreter *inter);
