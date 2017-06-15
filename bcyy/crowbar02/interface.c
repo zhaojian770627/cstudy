@@ -66,9 +66,6 @@ release_global_strings(CRB_Interpreter *interpreter)
   while(interpreter->variable){
     Variable *temp=interpreter->variable;
     interpreter->variable=temp->next;
-    if(temp->value.type==CRB_STRING_VALUE){
-      crb_release_string(temp->value.u.string_value);
-    }
   }
 }
 
