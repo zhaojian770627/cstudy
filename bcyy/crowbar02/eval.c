@@ -4,15 +4,52 @@
 #include "DBG.h"
 #include "crowbar.h"
 
+static void
+push_value(CRB_Interpreter *inter,CRB_Value *value)
+{
+  DBG_assert(inter->stack.stack_pointer <= inter->stack.stack_alloc_size,
+	     ("stack_pointer..%d,stack_alloc_size..%d\n",
+	      inter->stack.stack_pointer,inter->stack.stack_alloc_size));
+  if(inter->stack.stack_pointer==inter->stack.stack_alloc_size){
+    inter->stack.stack_alloc_size+=STACK_ALLOC_SIZE;
+    inter->stack.stack=MEM_realloc(inter->stack.stack,
+				   sizeof(CRB_Value)*inter->stack.stack_alloc_size);
+  }
+  inter->stack.stack[inter->stack.stack_pointer]=*value;
+  inter->stack.stack_pointer++;
+}
+
 static CRB_Value
-eval_boolean_expression(CRB_Boolean boolean_value)
+pop_value(CRB_Interpreter *inter)
+{
+  CRB_Value ret;
+
+  ret=inter->stack.stack[inter->stack.stack_pointer-1];
+  inter->stack.stack_pointer--;
+
+  return ret;
+}
+
+staic CRB_Value *
+peek_value(CRB_Interpreter *inter,int index)
+{
+  return  &inter->stack.stack[inter->stack.stack_pointer-index -1];
+}
+
+static void
+shrink_stack(CRB_Interpreter *inter,int shrink_size)
+{
+  inter->stack.stack_pointer-=shrink_size;
+}
+
+static void
+eval_boolean_expression(CRB_Interpreter *inter,CRB_Boolean boolean_value)
 {
   CRB_Value v;
 
   v.type=CRB_BOOLEAN_VALUE;
   v.u.boolean_value=boolean_value;
-
-  return v;
+  push_value(inter,&v);
 }
 
 static CRB_Value
@@ -37,15 +74,14 @@ eval_double_expression(double double_value)
   return v;
 }
 
-static CRB_Value
+static void
 eval_string_expression(CRB_Interpreter *inter,char *string_value)
 {
   CRB_Value v;
 
   v.type=CRB_STRING_VALUE;
-  v.u.string_value=crb_literal_to_crb_string(inter,string_value);
-
-  return v;
+  v.u.object=crb_literal_to_crb_string(inter,string_value);
+  push_value(inter,&v);
 }
 
 static CRB_Value
@@ -56,22 +92,6 @@ eval_null_expression(void)
   v.type=CRB_NULL_VALUE;
 
   return v;
-}
-
-static void
-refer_if_string(CRB_Value *v)
-{
-  if(v->type==CRB_STRING_VALUE){
-    crb_refer_string(v->u.string_value);
-  }
-}
-
-static void
-release_if_string(CRB_Value *v)
-{
-  if(v->type==CRB_STRING_VALUE){
-    crb_release_string(v->u.string_value);
-  }
 }
 
 static Variable *
@@ -95,7 +115,7 @@ search_global_variable_from_env(CRB_Interpreter *inter,
 
 static CRB_Value
 eval_identifier_expression(CRB_Interpreter *inter,
-			   LocalEnvironment *env,Expression *expr)
+			   CRB_LocalEnvironment *env,Expression *expr)
 {
   CRB_Value v;
   Variable *vp;
@@ -120,11 +140,11 @@ eval_identifier_expression(CRB_Interpreter *inter,
 }
 
 static CRB_Value eval_expression(CRB_Interpreter *inter,
-				 LocalEnvironment *env,
+				 CRB_LocalEnvironment *env,
 				 Expression *expr);
 
 static CRB_Value 
-eval_assign_expression(CRB_Interpreter *inter,LocalEnvironment *env,
+eval_assign_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
 		       char *identifier,Expression *expression)
 {
   CRB_Value v;
@@ -236,6 +256,11 @@ eval_binary_int(CRB_Interpreter *inter,ExpressionType operator,
   case MINUS_EXPRESSION:	/* FALLTHRU */
   case FUNCTION_CALL_EXPRESSION: /* FALLTHRU */
   case NULL_EXPRESSION:		 /* FALLTHRU */
+  case METHOD_CALL_EXPRESSION:	 /* FALLTHRU */
+  case ARRAY_EXPRESSION:	 /* FALLTHRU */
+  case INDEX_EXPRESSION:	 /* FALLTHRU */
+  case INCREMENT_EXPRESSION:	 /* FALLTHRU */
+  case DECREMENT_EXPRESSION:	 /* FALLTHRU */
   case EXPRESSION_TYPE_COUNT_PLUS_1: /* FALLTHRU */
   default:
     DBG_panic(("bad case..%d",operator));
@@ -317,7 +342,7 @@ eval_compare_string(ExpressionType operator,
   CRB_Boolean result;
   int cmp;
 
-  cmp=strcmp(left->u.string_value->string,right->u.string_value->string);
+  cmp=strcmp(left->u.object->u.string.string->string,right->u.object->u.string.string);
 
   if(operator==EQ_EXPRESSION){
     result=(cmp==0);
@@ -384,7 +409,7 @@ chain_string(CRB_Interpreter *inter,CRB_String *left,CRB_String *right)
 }
 
 CRB_Value 
-crb_eval_binary_expression(CRB_Interpreter *inter,LocalEnvironment *env,
+crb_eval_binary_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
 			   ExpressionType operator,
 			   Expression *left,Expression *right)
 {
@@ -465,7 +490,7 @@ crb_eval_binary_expression(CRB_Interpreter *inter,LocalEnvironment *env,
 
 static CRB_Value
 eval_logical_and_or_expression(CRB_Interpreter *inter,
-			       LocalEnvironment *env,
+			       CRB_LocalEnvironment *env,
 			       ExpressionType operator,
 			       Expression *left,Expression *right)
 {
@@ -505,7 +530,7 @@ eval_logical_and_or_expression(CRB_Interpreter *inter,
 }
 
 CRB_Value
-crb_eval_minus_expression(CRB_Interpreter *inter,LocalEnvironment *env,
+crb_eval_minus_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
 			  Expression *operand)
 {
   CRB_Value operand_val;
@@ -525,12 +550,12 @@ crb_eval_minus_expression(CRB_Interpreter *inter,LocalEnvironment *env,
   return result;
 }
 
-static LocalEnvironment *
+static CRB_LocalEnvironment *
 alloc_local_environment()
 {
-  LocalEnvironment *ret;
+  CRB_LocalEnvironment *ret;
 
-  ret=MEM_malloc(sizeof(LocalEnvironment));
+  ret=MEM_malloc(sizeof(CRB_LocalEnvironment));
   ret->variable=NULL;
   ret->global_variable=NULL;
 
@@ -538,7 +563,7 @@ alloc_local_environment()
 }
 
 static void
-dispose_local_environment(CRB_Interpreter *inter,LocalEnvironment *env)
+dispose_local_environment(CRB_Interpreter *inter,CRB_LocalEnvironment *env)
 {
   while(env->variable){
     Variable *temp;
@@ -559,7 +584,7 @@ dispose_local_environment(CRB_Interpreter *inter,LocalEnvironment *env)
 }
 
 static CRB_Value
-call_native_function(CRB_Interpreter *inter,LocalEnvironment *env,
+call_native_function(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
 		     Expression *expr,CRB_NativeFunctionProc *proc)
 {
   CRB_Value value;
@@ -589,14 +614,14 @@ call_native_function(CRB_Interpreter *inter,LocalEnvironment *env,
 }
 
 static CRB_Value
-call_crowbar_function(CRB_Interpreter *inter,LocalEnvironment *env,
+call_crowbar_function(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
 		      Expression *expr,FunctionDefinition *func)
 {
   CRB_Value value;
   StatementResult result;
   ArgumentList *arg_p;
   ParameterList *param_p;
-  LocalEnvironment *local_env;
+  CRB_LocalEnvironment *local_env;
 
   local_env=alloc_local_environment();
 
@@ -632,7 +657,7 @@ call_crowbar_function(CRB_Interpreter *inter,LocalEnvironment *env,
 }
 
 static CRB_Value
-eval_function_call_expression(CRB_Interpreter *inter,LocalEnvironment *env,
+eval_function_call_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
 			      Expression *expr)
 {
   CRB_Value value;
@@ -661,7 +686,7 @@ eval_function_call_expression(CRB_Interpreter *inter,LocalEnvironment *env,
 }
 
 static CRB_Value
-eval_expression(CRB_Interpreter *inter,LocalEnvironment *env,
+eval_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
 		Expression *expr)
 {
   CRB_Value v;
@@ -725,7 +750,7 @@ eval_expression(CRB_Interpreter *inter,LocalEnvironment *env,
 }
 
 CRB_Value
-crb_eval_expression(CRB_Interpreter *inter,LocalEnvironment *env,
+crb_eval_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
 		    Expression *expr)
 
 {
