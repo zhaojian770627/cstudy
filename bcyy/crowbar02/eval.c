@@ -30,7 +30,7 @@ pop_value(CRB_Interpreter *inter)
   return ret;
 }
 
-staic CRB_Value *
+static CRB_Value *
 peek_value(CRB_Interpreter *inter,int index)
 {
   return  &inter->stack.stack[inter->stack.stack_pointer-index -1];
@@ -84,19 +84,19 @@ eval_string_expression(CRB_Interpreter *inter,char *string_value)
   push_value(inter,&v);
 }
 
-static CRB_Value
+static void
 eval_null_expression(void)
 {
   CRB_Value v;
 
   v.type=CRB_NULL_VALUE;
 
-  return v;
+  push_value(inter,&v);
 }
 
 static Variable *
 search_global_variable_from_env(CRB_Interpreter *inter,
-				LocalEnvironment *env,char *name)
+				CRB_LocalEnvironment *env,char *name)
 {
   GlobalVariableRef *pos;
 
@@ -135,8 +135,7 @@ eval_identifier_expression(CRB_Interpreter *inter,
 			MESSAGE_ARGUMENT_END);
     }
   }
-  refer_if_string(&v);
-  return v;
+  push_value(inter,&v);
 }
 
 static CRB_Value eval_expression(CRB_Interpreter *inter,
