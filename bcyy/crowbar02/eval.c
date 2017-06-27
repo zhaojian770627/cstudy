@@ -156,7 +156,63 @@ get_identifier_lvalue(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
     return &left->value;
 
   if(env!=NULL){
+    new_var=crb_add_local_variable(env,identifier);
+    left=new_var;
+  }else{
+    new_var=crb_add_global_variable(inter,identifier);
+    left=new_var;
+  }
+  return &left->value;
+}
 
+CRB_Value *
+get_array_element_lvalue(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
+			 Expression *expr)
+{
+  CRB_Value array;
+  CRB_Value index;
+
+  eval_expression(inter,env,expr->u.index_expression.array);
+  eval_expression(inter,env,expr->u.index_expression.index);
+
+  index=pop_value(inter);
+  array=pop_value(inter);
+
+  if(array.type!=CRB_ARRAY_VALUE){
+    crb_runtime_error(expr->line_number,INDEX_OPERAND_NOT_ARRAY_ERR,
+		      MESSAGE_ARGUMENT_END);
+  }
+  if(index.type!=CRB_INT_VALUE){
+    crb_runtime_error(expr->line_number,INDEX_OPERAND_NOT_INT_ERR,
+		      MESSAGE_ARGUMENT_END);
+  }
+  if(index.u.int_value<0 ||
+     index.u.int_value>=array.u.object->u.array.size){
+    crb_runtime_error(expr->line_number,ARRAY_INDEX_OUT_OF_BOUNDS_ERR,
+		      INT_MESSAGE_ARGUMENT,
+		      "size",array.u.object->u.array.size,
+		      INT_MESSAGE_ARGUMENT,"index",index.u.int_value,
+		      MESSAGE_ARGUMENT_END);
+  }
+  return &array.u.object->u.array.array[index.u.int_value];
+}
+
+CRB_Value *
+get_lvalue(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
+	   Expression *expr)
+{
+  CRB_Value *dest;
+
+  if(expr->type==IDENTIFIER_EXPRESSION){
+    dest=get_identifier_lvalue(inter,env,expr->u.identifier);
+  }else if(expr->type==INDEX_EXPRESSION){
+    dest=get_array_element_lvalue(inter,env,expr);
+  }else{
+    crb_runtime_error(expr->line_number,NOT_LVALUE_ERR,
+		      MESSAGE_ARGUMENT_END);
+  }
+  return dest;
+}
 
 static CRB_Value 
 eval_assign_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
