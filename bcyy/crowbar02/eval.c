@@ -60,7 +60,7 @@ eval_int_expression(int int_value)
   v.type=CRB_INT_VALUE;
   v.u.int_value=int_value;
 
-  return v;
+  push_value(inter,&v);
 }
 
 static CRB_Value
@@ -71,7 +71,7 @@ eval_double_expression(double double_value)
   v.type=CRB_DOUBLE_VALUE;
   v.u.double_value=double_value;
 
-  return v;
+  push_value(inter,&v);
 }
 
 static void
@@ -141,6 +141,22 @@ eval_identifier_expression(CRB_Interpreter *inter,
 static CRB_Value eval_expression(CRB_Interpreter *inter,
 				 CRB_LocalEnvironment *env,
 				 Expression *expr);
+static CRB_Value 
+get_identifier_lvalue(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
+		      char *identifier)
+{
+  Variable *new_var;
+  Variable *left;
+
+  left=crb_search_local_variable(env,identifier);
+  if(left==NULL){
+    left=search_global_variable_from_env(inter,env,identifier);
+  }
+  if(left!=NULL)
+    return &left->value;
+
+  if(env!=NULL){
+
 
 static CRB_Value 
 eval_assign_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
