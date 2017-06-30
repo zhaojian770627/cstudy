@@ -544,7 +544,7 @@ crb_eval_binary_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
   return pop_value(inter);
 }
 
-static CRB_Value
+static
 eval_logical_and_or_expression(CRB_Interpreter *inter,
 			       CRB_LocalEnvironment *env,
 			       ExpressionType operator,
@@ -570,7 +570,7 @@ eval_logical_and_or_expression(CRB_Interpreter *inter,
   }else if(operator==LOGICAL_OR_EXPRESSION){
     if(left_val.u.boolean_value){
       result.u.boolean_value=CRB_TRUE;
-      return FUNC_END;
+      goto FUNC_END;
     }
   }else{
     DBG_panic(("bad operator..%d\n",operator));
@@ -583,14 +583,15 @@ eval_logical_and_or_expression(CRB_Interpreter *inter,
   push_value(inter,&result);
 }
 
-CRB_Value
-crb_eval_minus_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
-			  Expression *operand)
+static void
+eval_minus_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
+		      Expression *operand)
 {
   CRB_Value operand_val;
   CRB_Value result;
 
-  operand_val=eval_expression(inter,env,operand);
+  eval_expression(inter,env,operand);
+  operand_val=pop_value(inter);  
   if(operand_val.type==CRB_INT_VALUE){
     result.type=CRB_INT_VALUE;
     result.u.int_value=-operand_val.u.int_value;
@@ -601,30 +602,53 @@ crb_eval_minus_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
     crb_runtime_error(operand->line_number,MINUS_OPERAND_TYPE_ERR,
 		      MESSAGE_ARGUMENT_END);
   }
-  return result;
+  push_value(inter,&result);
+}
+
+CRB_Value
+crb_eval_minus_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
+			  Expression *operand)
+{
+  eval_minus_expression(inter,env,operand);
+  return pop_value(inter);
 }
 
 static CRB_LocalEnvironment *
-alloc_local_environment()
+alloc_local_environment(CRB_Interpreter *inter)
 {
   CRB_LocalEnvironment *ret;
 
   ret=MEM_malloc(sizeof(CRB_LocalEnvironment));
   ret->variable=NULL;
   ret->global_variable=NULL;
+  ref->ref_in_native_method=NULL;
+
+  ret->next=inter->top_environment;
+  inter->top_environment=ret;
 
   return ret;
 }
 
 static void
+dispose_ref_in_native_method(CRB_LocalEnvironment *env)
+{
+  RefInNativeFunc *ref;
+
+  while(env->ref_in_native_method){
+    ref=env->ref_in_native_method;
+    env->ref_in_native_method=ref->next;
+    MEM_free(ref);
+  }
+}
+
+static void
 dispose_local_environment(CRB_Interpreter *inter,CRB_LocalEnvironment *env)
 {
+  CRB_LocalEnvironment *env=inter->top_environment;
+
   while(env->variable){
     Variable *temp;
     temp=env->variable;
-    if(env->variable->value.type==CRB_STRING_VALUE){
-      crb_release_string(env->variable->value.u.string_value);
-    }
     env->variable=temp->next;
     MEM_free(temp);
   }
@@ -634,63 +658,60 @@ dispose_local_environment(CRB_Interpreter *inter,CRB_LocalEnvironment *env)
     env->global_variable=ref->next;
     MEM_free(ref);
   }
+  dispose_ref_in_native_method(env);
+
+  inter->top_environment=env->next;
   MEM_free(env);
 }
 
 static CRB_Value
 call_native_function(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
+		     CRB_LocalEnvironment *caller_env,		
 		     Expression *expr,CRB_NativeFunctionProc *proc)
 {
   CRB_Value value;
   int arg_count;
   ArgumentList *arg_p;
   CRB_Value *args;
-  int i;
 
   for(arg_count=0,arg_p=expr->u.function_call_expression.argument;
       arg_p;arg_p=arg_p->next){
+    eval_expression(inter,caller_env,arg_p->expression);
     arg_count++;
   }
 
-  args=MEM_malloc(sizeof(CRB_Value)*arg_count);
+  args=&inter->stack.stack[inter->stack.stack_pointer-arg_count];
+  value=proc(inter,env,arg_count,args);
+  shrink_stack(inter,arg_count);
 
-  for(arg_p=expr->u.function_call_expression.argument,i=0;
-      arg_p;arg_p=arg_p->next,i++){
-    args[i]=eval_expression(inter,env,arg_p->expression);
-  }
-  value=proc(inter,arg_count,args);
-  for(i=0;i<arg_count;i++){
-    release_if_string(&args[i]);
-  }
-  MEM_free(args);
-
-  return value;
+  push_value(inter,&value);
 }
 
 static CRB_Value
 call_crowbar_function(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
+		      CRB_LocalEnvironment *caller_env,
 		      Expression *expr,FunctionDefinition *func)
 {
   CRB_Value value;
   StatementResult result;
   ArgumentList *arg_p;
   ParameterList *param_p;
-  CRB_LocalEnvironment *local_env;
-
-  local_env=alloc_local_environment();
 
   for(arg_p=expr->u.function_call_expression.argument,
 	param_p=func->u.crowbar_f.parameter;
       arg_p;
       arg_p=arg_p->next,param_p=param_p->next){
+    Variable *new_var;
     CRB_Value arg_val;
 
     if(param_p==NULL){
       crb_runtime_error(expr->line_number,ARGUMENT_TOO_MANY_ERR,
 			MESSAGE_ARGUMENT_END);
     }
-    arg_val=eval_expression(inter,env,arg_p->expression);
-    crb_add_local_variable(local_env,param_p->name,&arg_val);
+    eval_expression(inter,call_env,arg_p->expression);
+    arg_val=opo_value(inter);
+    new_var=crb_add_local_variable(env,param_p->name);
+    new_var->value=arg_val;
   }
   if(param_p){
     crb_runtime_error(expr->line_number,ARGUMENT_TOO_FEW_ERR,
@@ -705,9 +726,7 @@ call_crowbar_function(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
   else{
     value.type=CRB_NULL_VALUE;
   }
-  dispose_local_environment(inter,local_env);
-
-  return value;
+  push_value(inter,&value);
 }
 
 static CRB_Value
