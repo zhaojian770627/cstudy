@@ -42,8 +42,8 @@ typedef enum{
   GLOBAL_STATEMENT_IN_TOPLEVEL_ERR,
   BAD_OPERATOR_FOR_STRING_ERR,
   NOT_LVALUE_ERR,
-  INDEX_OPERATOR_NOT_ARRAY_ERR,
-  INDEX_OPERATOR_NOT_INT_ERR,
+  INDEX_OPERAND_NOT_ARRAY_ERR,
+  INDEX_OPERAND_NOT_INT_ERR,
   ARRAY_INDEX_OUT_OF_BOUNDS_ERR,
   NO_SUCH_METHOD_ERR,
   NEW_ARRAY_ARGUMENT_TYPE_ERR,
@@ -462,9 +462,9 @@ Variable *crb_search_local_variable(CRB_LocalEnvironment *env,
 				    char *indentifier);
 Variable *crb_search_global_variable(CRB_Interpreter *inter,
 				     char *identifer);
-Variable crb_add_local_variable(CRB_LocalEnvironment *env,
+Variable *crb_add_local_variable(CRB_LocalEnvironment *env,
 				char *identifer);
-Variable crb_add_global_variable(CRB_Interpreter *inter,char *indentifier);
+Variable *crb_add_global_variable(CRB_Interpreter *inter,char *indentifier);
 CRB_NativeFunctionProc *
 crb_search_native_function(CRB_Interpreter *inter,char *name);
 FunctionDefinition *crb_search_function(char *name);

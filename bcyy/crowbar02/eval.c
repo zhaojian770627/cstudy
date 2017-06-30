@@ -53,7 +53,7 @@ eval_boolean_expression(CRB_Interpreter *inter,CRB_Boolean boolean_value)
 }
 
 static CRB_Value
-eval_int_expression(int int_value)
+eval_int_expression(CRB_Interpreter *inter,int int_value)
 {
   CRB_Value v;
 
@@ -64,7 +64,7 @@ eval_int_expression(int int_value)
 }
 
 static CRB_Value
-eval_double_expression(double double_value)
+eval_double_expression(Crb_Interpreter *inter, double double_value)
 {
   CRB_Value v;
 
@@ -85,7 +85,7 @@ eval_string_expression(CRB_Interpreter *inter,char *string_value)
 }
 
 static void
-eval_null_expression(void)
+eval_null_expression(CRB_Interpreter *inter)
 {
   CRB_Value v;
 
@@ -113,7 +113,7 @@ search_global_variable_from_env(CRB_Interpreter *inter,
   return NULL;
 }
 
-static CRB_Value
+static void
 eval_identifier_expression(CRB_Interpreter *inter,
 			   CRB_LocalEnvironment *env,Expression *expr)
 {
@@ -141,7 +141,7 @@ eval_identifier_expression(CRB_Interpreter *inter,
 static CRB_Value eval_expression(CRB_Interpreter *inter,
 				 CRB_LocalEnvironment *env,
 				 Expression *expr);
-static CRB_Value 
+static CRB_Value * 
 get_identifier_lvalue(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
 		      char *identifier)
 {
