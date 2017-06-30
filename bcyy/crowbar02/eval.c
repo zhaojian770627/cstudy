@@ -733,8 +733,8 @@ static CRB_Value
 eval_function_call_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
 			      Expression *expr)
 {
-  CRB_Value value;
   FunctionDefinition *func;
+  CRB_LocalEnvironment *local_env;
 
   char *identifier=expr->u.function_call_expression.identifier;
 
@@ -744,18 +744,21 @@ eval_function_call_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
 		      STRING_MESSAGE_ARGUMENT,"name",identifier,
 		      MESSAGE_ARGUMENT_END);
   }
+
+  local_env=alloc_local_environment(inter);
+
   switch(func->type){
   case CROWBAR_FUNCTION_DEFINITION:
-    value=call_crowbar_function(inter,env,expr,func);
+    value=call_crowbar_function(inter,local_env,env,expr,func);
     break;
   case NATIVE_FUNCTION_DEFINITION:
-    value=call_native_function(inter,env,expr,func->u.native_f.proc);
+    value=call_native_function(inter,local_env,env,expr,func->u.native_f.proc);
     break;
+  case FUNCTION_DEFINITION_TYPE_COUNT_PLUS_1:
   default:
     DBG_panic(("bad case..%d\n",func->type));
   }
-
-  return value;
+  dispose_local_environment(inter);
 }
 
 static CRB_Value
