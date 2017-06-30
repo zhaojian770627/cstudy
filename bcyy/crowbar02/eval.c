@@ -879,32 +879,51 @@ static void
 eval_inc_dec_expression(CRB_Interpreter *inter,
 			CRB_LocalEnvironment *env,Expression *expr)
 {
+  CRB_Value *operand;
+  CRB_Value result;
+  int old_value;
+
+  operand=get_lvalue(inter,env,expr->u.inc_dec.operand);
+  if(operand->type!=CRB_INT_VALUE){
+    crb_runtime_error(expr->line_number,INC_DEC_OPERAND_TYPE_ERR,
+		      MESSAGE_ARGUMENT_END);
+  }
+  old_value=operand->u.int_value;
+  if(expr->type==INCREMENT_EXPRESSION){
+    operand->u.int_value++;
+  }else{
+    DBG_assert(expr->type==DECREMENT_EXPRESSION,("expr->type..%d\n",
+						 expr->type));
+    operand->u.int_value--;
+  }
+  result.type=CRB_INT_VALUE;
+  result.u.int_value=old_value;
+  push_value(inter,&result);
 }
 
-static CRB_Value
+static void
 eval_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
 		Expression *expr)
 {
-  CRB_Value v;
   switch(expr->type){
   case BOOLEAN_EXPRESSION:
-    v=eval_boolean_expression(expr->u.boolean_value);
+    eval_boolean_expression(inter,expr->u.boolean_value);
     break;
   case INT_EXPRESSION:
-    v=eval_int_expression(expr->u.int_value);
+    eval_int_expression(inter,expr->u.int_value);
     break;
   case DOUBLE_EXPRESSION:
-    v=eval_double_expression(expr->u.double_value);
+    eval_double_expression(inter,expr->u.double_value);
     break;
   case STRING_EXPRESSION:
-    v=eval_string_expression(inter,expr->u.string_value);
+    eval_string_expression(inter,expr->u.string_value);
     break;
   case IDENTIFIER_EXPRESSION:
-    v=eval_identifier_expression(inter,env,expr);
+    eval_identifier_expression(inter,env,expr);
     break;
   case ASSIGN_EXPRESSION:
-    v=eval_assign_expression(inter,env,
-			     expr->u.assign_expression.variable,
+    eval_assign_expression(inter,env,
+			     expr->u.assign_expression.left,
 			     expr->u.assign_expression.operand);
     break;
   case ADD_EXPRESSION:		/* FALLTHRU */
@@ -918,31 +937,42 @@ eval_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
   case GE_EXPRESSION:		/* FALLTHRU */
   case LT_EXPRESSION:		/* FALLTHRU */
   case LE_EXPRESSION:		/* FALLTHRU */
-    v=crb_eval_binary_expression(inter,env,
+    crb_eval_binary_expression(inter,env,
 				 expr->type,
 				 expr->u.binary_expression.left,
 				 expr->u.binary_expression.right);
     break;
   case LOGICAL_AND_EXPRESSION:	/* FALLTHRU */
   case LOGICAL_OR_EXPRESSION:	/* FALLTHRU */
-    v=eval_logical_and_or_expression(inter,env,expr->type,
+    eval_logical_and_or_expression(inter,env,expr->type,
 				     expr->u.binary_expression.left,
 				     expr->u.binary_expression.right);
     break;
   case MINUS_EXPRESSION:
-    v=crb_eval_minus_expression(inter,env,expr->u.minus_expression);
+    crb_eval_minus_expression(inter,env,expr->u.minus_expression);
     break;
   case FUNCTION_CALL_EXPRESSION:
-    v=eval_function_call_expression(inter,env,expr);
+    eval_function_call_expression(inter,env,expr);
     break;
+  case METHOD_CALL_EXPRESSION:
+    eval_method_call_expression(inter,env,expr);
   case NULL_EXPRESSION:
-    v=eval_null_expression();
+    eval_null_expression();
+    break;
+  case ARRAY_EXPRESSION:
+    eval_array_expression(inter,env,expr->u.array_literal);
+    break;
+  case INDEX_EXPRESSION:
+    eval_int_expression(inter,env,expr);
+    break;
+  case INCREMENT_EXPRESSION:	/* FALLTHRU */
+  case DECREMENT_EXPRESSION:
+    eval_inc_dec_expression(inter,env,expr);
     break;
   case EXPRESSION_TYPE_COUNT_PLUS_1: /* FALLTHRU */
   default:
     DBG_panic(("bad case.type..%d\n",expr->type));
   }
-  return v;
 }
 
 CRB_Value
@@ -950,5 +980,12 @@ crb_eval_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
 		    Expression *expr)
 
 {
-  return eval_expression(inter,env,expr);
+  eval_expression(inter,env,expr);
+  return pop_value(inter);
+}
+
+void 
+CRB_shrink_stack(CRB_Interpreter *inter,int shrink_size)
+{
+  shrink_stack(inter,shrink_size);
 }
