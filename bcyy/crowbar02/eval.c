@@ -761,6 +761,126 @@ eval_function_call_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
   dispose_local_environment(inter);
 }
 
+static void
+check_method_argument_count(int line_number,
+			    ArgumentList *arg_list,int arg_count)
+{
+  ArgumentList *arg_p;
+  int count=0;
+
+  for(arg_p=arg_list;arg_p;arg_p=arg_p->next){
+    count++;
+  }
+
+  if(count<arg_count){
+    crb_runtime_error(line_number,ARGUMENT_TOO_FEW_ERR,
+		      MESSAGE_ARGUMENT_END);
+  }else if(count>arg_count){
+    crb_runtime_error(line_number,ARGUMENT_TOO_MANY_ERR,
+		      MESSAGE_ARGUMENT_END);
+  }
+}
+
+static void
+eval_method_call_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *evn,
+			    Expression *expr)
+{
+  CRB_Value *left;
+  CRB_Value result;
+  CRB_Boolean error_flag=CRB_FALSE;
+
+  eval_expression(inter,env,expr->u.method_call_expression.expression);
+  left=peek_stack(inter,0);
+
+  if(left->type==CRB_ARRAY_VALUE){
+    if(!strcmp(expr->u.method_call_expression.identifier,"add")){
+      CRB_Value *add;
+      check_method_argument_count(expr->line_number,
+				  expr->u.method_call_expression.argument,1);
+      eval_expression(inter,env,expr->u.method_call_expression.argument->expression);
+      add=peek_stack(inter,0);
+      crb_array_add(inter,left->u.object,*add);
+      pop_value(inter);
+      result.type=CRB_NULL_VALUE;
+    }else if(!strcmp(expr->u.method_call_expression.identifier,"size")){
+      check_method_argument_count(expr->line_number,
+				  expr->u.method_call_expression.argument,0);
+      result.type=CRB_INT_VALUE;
+      result.u.int_value=left->u.object->u.array.size;
+    }else if(!strcmp(expr->u.method_call_expression.identifier,"resize")){
+      CRB_Value new_size;
+      check_method_argument_count(expr->line_number,expr->u.method_call_expression.argument,1);
+      eval_expression(inter,env,expr->u.method_call_expression.argument->expression);
+      new_size=pop_value(inter);
+      if(new_size.type!=CRB_INT_VALUE){
+	crb_runtime_error(expr->line_number,
+			  ARRAY_RESIZE_ARGUMENT_ERR,
+			  MESSAGE_ARGUMENT_END);
+      }
+      crb_array_resize(inter,left->u.object,new_size.u.int_value);
+      result.type=CRB_NULL_VALUE;
+    }else{
+      error_flag=CRB_TRUE;
+    }
+  }else if(left->type==CRB_STRING_VALUE){
+    if(!strcmp(expr->u.method_call_expression.identifier,"length")){
+      check_method_argument_count(expr->line_number,
+				  expr->u.method_call_expression.argument,0);
+      result.type=CRB_INT_VALUE;
+      result.u.int_value=strlen(left->u.object->u.string.string);
+    }else{
+      error_flag=CRB_TRUE;
+    }
+  }else{
+    error_flag=CRB_TRUE;
+  }
+  if(error_flag){
+    crb_runtime_error(expr->line_number,NO_SUCH_METHOD_ERR,
+		      STRING_MESSAGE_ARGUMENT,"method_name",
+		      expr->u.method_call_expression.identifier,
+		      MESSAGE_ARGUMENT_END);
+  }
+  pop_value(inter);
+  push_value(inter,&result);
+}
+
+static void
+eval_array_expression(CRB_Interpreter *inter,
+		      CRB_LocalEnvironment *env,ExpressionList *list)
+{
+  CRB_Value v;
+  int size;
+  ExpressionList *pos;
+  int i;
+
+  size=0;
+  for(pos=list;pos;pos=pos->next){
+    size++;
+  }
+  v.type=CRB_ARRAY_VALUE;
+  v.u.object=crb_create_array_i(inter,size);
+  push_value(inter,&v);
+
+  for(pos=list,i=0;pos;pos=pos->next,i++){
+    eval_expression(inter,env,pos->expression);
+    v.u.object->u.array.array[i]=pop_value(inter);
+  }
+}
+
+static void
+eval_index_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,Expression *expr)
+{
+  CRB_Value *left;
+  left=get_array_element_lvalue(inter,env,expr);
+  push_value(inter,left);
+}
+
+static void
+eval_inc_dec_expression(CRB_Interpreter *inter,
+			CRB_LocalEnvironment *env,Expression *expr)
+{
+}
+
 static CRB_Value
 eval_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
 		Expression *expr)
