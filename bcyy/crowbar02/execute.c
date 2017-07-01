@@ -13,11 +13,10 @@ execute_expression_statement(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
 			     Statement *statement)
 {
   StatementResult result;
-  CRB_Value v;
 
   result.type=NORMAL_STATEMENT_RESULT;
 
-  v=crb_eval_expression(inter,env,statement->u.expression_s);
+  result.u.return_value=crb_eval_expression(inter,env,statement->u.expression_s);
 
   return result;
 }
