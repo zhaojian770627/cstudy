@@ -1,8 +1,19 @@
 #include <stdio.h>
 #include <string.h>
 #include "MEM.h"
-#include "DBG.h"
 #include "crowbar.h"
+
+#define STRING_ALLOC_SIZE (256)
+
+static char *st_string_literal_buffer=NULL;
+static int st_string_literal_buffer_size=0;
+static int st_string_literal_buffer_alloc_size=0;
+
+void
+crb_open_string_literal(void)
+{
+  st_string_literal_buffer_size=0;
+}
 
 static CRB_String *
 alloc_crb_string(CRB_Interpreter *inter,char *str,CRB_Boolean is_literal)
