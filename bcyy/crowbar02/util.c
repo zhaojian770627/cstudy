@@ -84,20 +84,20 @@ crb_search_global_variable(CRB_Interpreter *inter,char *identifier)
   return NULL;
 }
 
-void
-crb_add_local_variable(LocalEnvironment *env,
-		       char *identifier,CRB_Value *value)
+Variable *
+crb_add_local_variable(CRB_LocalEnvironment *env, char *identifier)
 {
   Variable *new_variable;
 
   new_variable=MEM_malloc(sizeof(Variable));
   new_variable->name=identifier;
-  new_variable->value=*value;
   new_variable->next=env->variable;
   env->variable=new_variable;
+
+  return new_variable;
 }
 
-void
+Variable *
 CRB_add_global_variable(CRB_Interpreter *inter,char *identifier,
 			CRB_Value *value)
 {
@@ -108,7 +108,7 @@ CRB_add_global_variable(CRB_Interpreter *inter,char *identifier,
   strcpy(new_variable->name,identifier);
   new_variable->next=inter->variable;
   inter->variable=new_variable;
-  new_variable->value=*value;
+  return  new_variable;
 }
 
 char *
@@ -170,7 +170,12 @@ crb_get_operator_string(ExpressionType type)
     str="-";
     break;
   case FUNCTION_CALL_EXPRESSION: /* FALLTHRU */
+  case METHOD_CALL_EXPRESSION:	 /* FALLTHRU */
   case NULL_EXPRESSION:		 /* FALLTHRU */
+  case ARRAY_EXPRESSION:	 /* FALLTHRU */
+  case INDEX_EXPRESSION:	 /* FALLTHRU */
+  case INCREMENT_EXPRESSION:	 /* FALLTHRU */
+  case DECREMENT_EXPRESSION:	 /* FALLTHRU */
   case EXPRESSION_TYPE_COUNT_PLUS_1:
   default:
     DBG_panic(("bad expression type..%d",type));

@@ -9,7 +9,6 @@ create.o \
 execute.o \
 eval.o \
 string.o \
-string_pool.o \
 util.o \
 native.o \
 error.o \
@@ -42,7 +41,6 @@ lex.yy.c:crowbar.lex crowbar.y y.tab.h
 	lex crowbar.lex
 #eval.o:crowbar.h
 string.o:crowbar.h
-string_pool.o:crowbar.h
 util.o:crowbar.h
 native.o:crowbar.h
 error.o:crowbar.h
