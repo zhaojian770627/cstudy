@@ -98,8 +98,7 @@ crb_add_local_variable(CRB_LocalEnvironment *env, char *identifier)
 }
 
 Variable *
-crb_add_global_variable(CRB_Interpreter *inter,char *identifier,
-			CRB_Value *value)
+crb_add_global_variable(CRB_Interpreter *inter,char *identifier)
 {
   Variable *new_variable;
 

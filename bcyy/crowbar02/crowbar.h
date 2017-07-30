@@ -369,7 +369,7 @@ struct CRB_Object_tag{
 };
 
 typedef struct{
-  char *strings;
+  char *string;
 }VString;
 
 
@@ -464,7 +464,7 @@ Variable *crb_search_global_variable(CRB_Interpreter *inter,
 				     char *identifer);
 Variable *crb_add_local_variable(CRB_LocalEnvironment *env,
 				char *identifer);
-Variable *crb_add_global_variable(CRB_Interpreter *inter,char *indentifier);
+Variable *crb_add_global_variable(CRB_Interpreter *inter,char *identifier);
 CRB_NativeFunctionProc *
 crb_search_native_function(CRB_Interpreter *inter,char *name);
 FunctionDefinition *crb_search_function(char *name);
@@ -480,22 +480,22 @@ void crb_runtime_error(int line_number,RuntimeError id,...);
 /* native.c */
 CRB_Value crb_nv_print_proc(CRB_Interpreter *interpreter,
 			    CRB_LocalEnvironment *env,
-			    int arg_count,CRB_Value *argc);
+			    int arg_count,CRB_Value *args);
 CRB_Value crb_nv_fopen_proc(CRB_Interpreter *interpreter,
 			    CRB_LocalEnvironment *env,
-			    int arg_count,CRB_Value *argc);
+			    int arg_count,CRB_Value *args);
 CRB_Value crb_nv_fclose_proc(CRB_Interpreter *interpreter,
 			    CRB_LocalEnvironment *env,
-			    int arg_count,CRB_Value *argc);
+			    int arg_count,CRB_Value *args);
 CRB_Value crb_nv_fgets_proc(CRB_Interpreter *interpreter,
 			    CRB_LocalEnvironment *env,
-			    int arg_count,CRB_Value *argc);
+			    int arg_count,CRB_Value *args);
 CRB_Value crb_nv_fputs_proc(CRB_Interpreter *interpreter,
 			    CRB_LocalEnvironment *env,
-			    int arg_count,CRB_Value *argc);
+			    int arg_count,CRB_Value *args);
 CRB_Value crb_nv_new_array_proc(CRB_Interpreter *interpreter,
 			    CRB_LocalEnvironment *env,
-			    int arg_count,CRB_Value *argc);
+			    int arg_count,CRB_Value *args);
 void crb_add_std_fp(CRB_Interpreter *inter);
 
 #endif	/* PRIVATE_CROWBAR_HE_INCLUDED */
