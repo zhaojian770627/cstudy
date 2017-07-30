@@ -34,7 +34,7 @@ CRB_Value crb_nv_print_proc(CRB_Interpreter *interpreter,
 
   check_argument_count(arg_count,1);
   str=CRB_value_to_string(&args[0]);
-  print("%s",str);
+  printf("%s",str);
   MEM_free(str);
 
   return value;
@@ -214,7 +214,7 @@ crb_nv_new_array_proc(CRB_Interpreter *interpreter,
   CRB_Value value;
 
   if(arg_count<1){
-    crb_runtime_error(e.ARGUMENT_TOO_MANY_ERR,
+    crb_runtime_error(0,ARGUMENT_TOO_MANY_ERR,
 		      MESSAGE_ARGUMENT_END);
   }
   value=new_array_sub(interpreter,env,arg_count,args,0);
