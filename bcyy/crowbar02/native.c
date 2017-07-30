@@ -18,7 +18,7 @@ check_argument_count(int arg_count,int true_count)
     crb_runtime_error(0,ARGUMENT_TOO_FEW_ERR,
 		      MESSAGE_ARGUMENT_END);
   }else if(arg_count>true_count){
-    crb_runtime_error(0.ARGUMENT_TOO_MANY_ERR,
+    crb_runtime_error(0,ARGUMENT_TOO_MANY_ERR,
 		      MESSAGE_ARGUMENT_END);
   }
 }
@@ -34,13 +34,14 @@ CRB_Value crb_nv_print_proc(CRB_Interpreter *interpreter,
 
   check_argument_count(arg_count,1);
   str=CRB_value_to_string(&args[0]);
-  priinit("%s",str);
+  print("%s",str);
   MEM_free(str);
 
   return value;
 }
 
 CRB_Value crb_nv_fopen_proc(CRB_Interpreter *interpreter,
+			    CRB_LocalEnvironment *env,		
 			    int arg_count,CRB_Value *args)
 {
   CRB_Value value;
@@ -54,7 +55,7 @@ CRB_Value crb_nv_fopen_proc(CRB_Interpreter *interpreter,
 		      MESSAGE_ARGUMENT_END);
   }
   fp=fopen(args[0].u.object->u.string.string,
-	   args[1].u.object->u.string.->string);
+	   args[1].u.object->u.string.string);
 
   if(fp==NULL){
     value.type=CRB_NULL_VALUE;
@@ -79,7 +80,7 @@ CRB_Value crb_nv_fclose_proc(CRB_Interpreter *interpreter,
   CRB_Value value;
   FILE *fp;
 
-  check_argument_count(arg_count,1)
+  check_argument_count(arg_count,1);
 
   value.type=CRB_NULL_VALUE;
 
