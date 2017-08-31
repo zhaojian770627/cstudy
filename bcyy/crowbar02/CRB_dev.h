@@ -54,5 +54,8 @@ void CRB_add_global_variable(CRB_Interpreter *inter,
 CRB_Object *
 CRB_create_crowbar_string(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
 			  char *str);
+CRB_Object *
+CRB_create_array(CRB_Interpreter *inter,Crb_Localenvironment *env,
+		 int size);
 char *CRB_value_to_string(CRB_Value *value);
 #endif	/* PUBLIC_CRB_DEV_H_INCLUDE */

@@ -130,7 +130,7 @@ CRB_Value crb_nv_fgets_proc(CRB_Interpreter *interpreter,
 
   if(ret_len>0){
     value.type=CRB_STRING_VALUE;
-    value.u.object=crb_create_crowbar_string(interpreter,env,ret_buf);
+    value.u.object=CRB_create_crowbar_string(interpreter,env,ret_buf);
   }else{
     value.type=CRB_NULL_VALUE;
   }
