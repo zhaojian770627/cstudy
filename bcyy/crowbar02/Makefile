@@ -9,6 +9,7 @@ create.o \
 execute.o \
 eval.o \
 string.o \
+heap.o \
 util.o \
 native.o \
 error.o \
