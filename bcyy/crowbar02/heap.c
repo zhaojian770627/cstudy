@@ -18,3 +18,8 @@ check_gc(CRB_Interpreter *inter)
       =inter->heap.current_heap_size+HEAP_THRESHOLD_SIZE;
   }
 }
+
+static CRB_Object *
+alloc_object(CRB_Interpreter *inter,ObjectType type)
+{
+}
