@@ -280,9 +280,9 @@ LABEL_SEG_CODE32:
 
 	call	Init8259A
 	
-	;int	080h		
-	;sti
-	;jmp	$
+	int	080h		
+	sti
+	jmp	$
 	
 	;; 下面显示一个字符串
 	push	szPMMessage	
