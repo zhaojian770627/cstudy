@@ -22,4 +22,17 @@ check_gc(CRB_Interpreter *inter)
 static CRB_Object *
 alloc_object(CRB_Interpreter *inter,ObjectType type)
 {
+  CRB_Object *ret;
+
+  check_gc(inter);
+  ret=MEM_Malloc(sizeof(CRB_Object));
+  inter->heap.current_heap_size+=sizeof(CRB_Object);
+  ret->type=type;
+  ret->marked=CRB_FALSE;
+  ret->prev=NULL;
+  ret->next=inter->heap.header;
+  if(ret->next){
+    ret->next->prev=ret;
+  }
+  return ret;
 }
