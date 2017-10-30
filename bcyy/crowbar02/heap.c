@@ -36,3 +36,14 @@ alloc_object(CRB_Interpreter *inter,ObjectType type)
   }
   return ret;
 }
+
+static void
+add_ref_in_native_method(CRB_LocalEnvironment *env,CRB_Object *obj)
+{
+  RefInNativeFunc *new_ref;
+
+  new_ref=MEM_Malloc(sizeof(RefInNativeFunc));
+  new_ref->object=obj;
+  new_ref->next=env->ref_in_native_method;
+  env->ref_in_native_method=new_ref;
+}
