@@ -16,7 +16,7 @@
 	BPB_RootEntCnt 	dw 224	      ;根目录文件数最大值
 	BPB_TotSec16	dw 2880	      ;逻辑扇区总数
 	BPB_Media	db 0xf0	      ;媒体描述符
-	BPB_FATSz16	dw 0	      ;每FAT扇区数
+	BPB_FATSz16	dw 9	      ;每FAT扇区数
 	BPB_SecPerTrk	dw 18	      ;每磁道扇区数
 	BPB_NumHeads	dw 2	      ;刺头数(面数)
 	BPB_HiddSec	dd 0	      ;隐藏扇区数
