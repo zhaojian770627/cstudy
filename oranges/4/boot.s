@@ -15,6 +15,8 @@ BaseOfLoader	equ	09000h	;LOADER.BIN　被加载到的位置---段地址
 OffsetOfLoader	equ	0100h	;LOADER.BIN　被加载到的位置---偏移地址
 RootDirSectors	equ	14	;根目录占用空间
 SectorNoOfRootDirectory equ	19 ;Root Directory的第一个扇区
+SectorNoOfFAT1	equ	1	   ;FAT1的第一个扇区号=BPB_RsvdSecCnt
+DeltaSectorNo	equ	17	   ;DeltaSectorNo=BPB_RsvdSecCnt+(BPB_NumFats*FATSz)-2
 ;;; ==================================================================
 
 	jmp	short LABEL_START ;Start to boot.
@@ -182,6 +184,55 @@ ReadSector:
 	add	esp,2
 	pop	bp
 
+	ret
+;;; -----------------------------------------------------------------
+;;; 函数名：GetFATEntry
+;;; 作用:
+;;; 	找到序号为ax的Sector在FAT中的条目，结果放在ax中
+;;;  	需要注意的是，中间需要读FAT的扇区到es:bx处，所以函数一开始保存了es和bx
+GetFATEntry:
+	push	es
+	push 	bx
+	push	ax
+	mov	ax,BaseOfLoader
+	sub	ax,0100h	;在BaseOfLoader后面留出4K空间用户存放FAT
+	mov	es,ax
+	pop	ax
+	mov	byte[bOdd],0
+	mov	bx,3
+	mul	bx		;dx:ax=ax*3
+	mov	bx,2
+	div	bx		;div:ax/2==>ax<-商，dx<-余数
+	cmp	dx,0
+	jz	LABEL_EVEN
+	mov	byte[bOdd],1
+LABEL_EVEN:			;偶数
+	;; 现在ax中是FATEntry在FAT中的偏移量，下面来计算FATEntry在
+	;; 哪个扇区中(FAT占用不止一个扇区)
+	xor	dx,dx
+	mov	bx,[BPB_BytePerSec]
+	;; dx:ax/BPB/BytePersec
+	;; ax<-商(FATEnry所在的扇区相对于FAT的扇区号)
+	;; dx<-余数(FATEntry在扇区内的偏移)
+	div	bx
+	push	dx
+	mov	bx,0		;bx<-0 ex:bx=(BaseOfLoader-100):00
+	add	ax,SectorNoOfFAT1 ;此句之后的ax就是FATEntry所在的扇区号
+	mov	cl,2
+	;; 读取FATEntry所在的扇区，一次读两个，避免在边界发生错误
+	;; 因为一个FATEntry可能跨越两个扇区
+	call	ReadSector
+	pop	dx
+	add	bx,dx
+	mov	ax,[es:bx]
+	cmp	byte[bOdd],1
+	jnz	LABEL_EVEN_2
+	shr	ax,4
+LABEL_EVEN_2:
+	and 	ax,0fffh
+LABEL_GET_FAT_ENTRY_OK:
+	pop	bx
+	pop	es
 	ret
 ;;; =====================================================================
 	times	510-($-$$)	db 0 ;填充剩下的空间，生成的二进制代码刚好512
