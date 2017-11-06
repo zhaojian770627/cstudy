@@ -112,9 +112,46 @@ LABEL_NO_LOADERBIN:
 %endif
 
 LABEL_FILENAME_FOUND:			; 找到 LOADER.BIN 后便来到这里继续
-	mov	dh,3
+	mov	ax,RootDirSectors
+	and	di,0ffe0h	; di -> 当前条目的开始
+	add	di,01ah		; di -> 首 Sector
+	mov	cx,word[es:di]
+	push	cx		;保存此Sector在FAT中的序号
+	add	cx,ax
+	add	cx,DeltaSectorNo ;cl <- LOADER.BIN的起始扇区号(0-based)
+	mov	ax,BaseOfLoader
+	mov	es,ax		  ; es <- BaseOfLoader
+	mov	bx,OffsetOfLoader ; bx <- OffsetOfLoader
+	mov	ax,cx		  ; ax <- Sector 号
+LABEL_GOON_LOADING_FILE:
+	push	ax
+	push	bx
+	mov	ah,0eh		; 每读一个扇区就在 "Booting  " 后面打一个点
+	mov	al,'.'
+	mov	bl,0fh
+	int 	10h
+	pop	bx
+	pop	ax
+
+	mov	cl,1
+	call	ReadSector
+
+	pop	ax		;取出此Sector在FAT中的序号
+	call	GetFATEntry
+	cmp	ax,0fffh
+	jz	LABEL_FILE_LOADED
+	push	ax		;保存Sector在FAT中的序号
+	push	ax
+	mov	dx,RootDirSectors
+	add	ax,dx
+	add	ax,DeltaSectorNo
+	add	bx,[BPB_BytsPerSec]
+	jmp	LABEL_GOON_LOADING_FILE
+LABEL_FILE_LOADED:
+	mov	dh,1		;"Ready."
 	call	Dispstr
-	jmp	$			; 代码暂时停在这里
+;;; ***************************************************
+	
 ;;;===========================================================
 ;;; 变量
 ;Root　Directory占用的扇区数,在循环中会递减至0
@@ -210,7 +247,7 @@ LABEL_EVEN:			;偶数
 	;; 现在ax中是FATEntry在FAT中的偏移量，下面来计算FATEntry在
 	;; 哪个扇区中(FAT占用不止一个扇区)
 	xor	dx,dx
-	mov	bx,[BPB_BytePerSec]
+	mov	bx,[BPB_BytsPerSec]
 	;; dx:ax/BPB/BytePersec
 	;; ax<-商(FATEnry所在的扇区相对于FAT的扇区号)
 	;; dx<-余数(FATEntry在扇区内的偏移)
