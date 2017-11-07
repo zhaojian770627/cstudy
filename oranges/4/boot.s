@@ -24,7 +24,7 @@ DeltaSectorNo	equ	17	   ;DeltaSectorNo=BPB_RsvdSecCnt+(BPB_NumFats*FATSz)-2
 
 	;; 下面是FAT12磁盘的头
 	BS_OEMName	db 'ZhaoJian' ;OEM String,必须8个字节
-	BPB_BytePerSec	dw 512	      ;每扇区字节数
+	BPB_BytsPerSec	dw 512	      ;每扇区字节数
 	BPB_SecPerClus	db 1	      ;每族多少扇区
 	BPB_RsvdSecCnt	dw 1	      ;Boot记录占用多少扇区
 	BPB_NumFATs	db 2	      ;共有多少FAT表
