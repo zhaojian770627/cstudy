@@ -150,6 +150,11 @@ LABEL_GOON_LOADING_FILE:
 LABEL_FILE_LOADED:
 	mov	dh,1		;"Ready."
 	call	Dispstr
+;;; **************************************************************
+	;; 正式跳转到已加载到内存中的LOADER.BIN的开始处，
+	;; 开始执行LOADER.BIN的代码。
+	;; Boot Sector的使命到此结束
+	jmp	BaseOfLoader:OffsetOfLoader
 ;;; ***************************************************
 	
 ;;;===========================================================
