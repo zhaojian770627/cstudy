@@ -16,5 +16,6 @@ int main(int argc, char *argv[]) {
   printf("Elf64_Off size: %ld\n",sizeof(Elf64_Off));
   printf("Elf64_Sword size: %ld\n",sizeof(Elf64_Sword));
   printf("Elf64_Word size: %ld\n",sizeof(Elf64_Word));
+  printf("Elf64_Xword size: %ld\n",sizeof(Elf64_Xword));
   exit(EXIT_SUCCESS);
 }
