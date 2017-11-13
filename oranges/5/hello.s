@@ -2,7 +2,7 @@
 ;;; nasm -f elf64 hello.s -o hello.o
 ;;; ld -s hello.o -o hello
 ;;; ./hello
-	
+;;; https://www.cnblogs.com/lxq20135309/p/5551658.html
 [section .data]			;数据在此
 	strHello	db	"Hello,world!",0ah
 	STRLEN		equ	$-strHello
