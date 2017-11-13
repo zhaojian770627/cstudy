@@ -1,5 +1,5 @@
 ;;; 编译链接方法
-;;; nasm -f elf hello.asm -o hello.o
+;;; nasm -f elf64 hello.s -o hello.o
 ;;; ld -s hello.o -o hello
 ;;; ./hello
 	
@@ -7,7 +7,7 @@
 	strHello	db	"Hello,world!",0ah
 	STRLEN		equ	$-strHello
 
-[section .text[			;代码在此
+[section .text]			;代码在此
 global	_start			;必须导出_start这个入口，以便让链接器识别
 
 _start:
