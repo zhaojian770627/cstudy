@@ -22,26 +22,9 @@ DeltaSectorNo	equ	17	   ;DeltaSectorNo=BPB_RsvdSecCnt+(BPB_NumFats*FATSz)-2
 	jmp	short LABEL_START ;Start to boot.
 	nop			  ;这个nop不可少
 
-	;; 下面是FAT12磁盘的头
-	BS_OEMName	db 'ZhaoJian' ;OEM String,必须8个字节
-	BPB_BytsPerSec	dw 512	      ;每扇区字节数
-	BPB_SecPerClus	db 1	      ;每族多少扇区
-	BPB_RsvdSecCnt	dw 1	      ;Boot记录占用多少扇区
-	BPB_NumFATs	db 2	      ;共有多少FAT表
-	BPB_RootEntCnt 	dw 224	      ;根目录文件数最大值
-	BPB_TotSec16	dw 2880	      ;逻辑扇区总数
-	BPB_Media	db 0xf0	      ;媒体描述符
-	BPB_FATSz16	dw 9	      ;每FAT扇区数
-	BPB_SecPerTrk	dw 18	      ;每磁道扇区数
-	BPB_NumHeads	dw 2	      ;刺头数(面数)
-	BPB_HiddSec	dd 0	      ;隐藏扇区数
-	BPB_TotSec32	dd 0	      ;wTotalSectorCount为0时，这个值记录扇区数
-	BS_DrvNum	db 0	      ;中断13的驱动器号
-	BS_Reserved1	db 0	      ;未使用
-	BS_BootSig	db 29h	      ;扩展移到标记
-	BS_VolID	dd 0	      ;卷序列号
-	BS_VolLab	db 'ZHAOJIANOS1' ;卷标 11个字符
-	BS_FileSysType	db 'FAT12   '	 ;文件系统类型,必须8个字节
+;;; 下面是FAT12磁盘的头，之所以包含它是因为下面是用到了磁盘的一些信息
+%include "fat12hdr.inc"
+	
 LABEL_START:
 	mov	ax,cs
 	mov	ds,ax
@@ -141,6 +124,7 @@ LABEL_GOON_LOADING_FILE:
 	cmp	ax,0fffh
 	jz	LABEL_FILE_LOADED
 	push	ax		;保存Sector在FAT中的序号
+	push	ax
 	mov	dx,RootDirSectors
 	add	ax,dx
 	add	ax,DeltaSectorNo

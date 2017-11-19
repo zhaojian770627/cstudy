@@ -1,78 +1,47 @@
-;;; %define _BOOT_DEBUG_
-%ifdef _BOOT_DEBUG_
 	org	0100h		;调试状态，做成.COM文件，可调试
-%else
-	org	07c00h		;Boot状态，加载到0:7c00
-%endif
-;;; ============================================================================
-%ifdef	_BOOT_DEBUG_
 BaseOfStack		equ	0100h	; 调试状态下堆栈基地址(栈底, 从这个位置向低地址生长)
-%else
-BaseOfStack		equ	07c00h	; 堆栈基地址(栈底, 从这个位置向低地址生长)
-%endif
 
-BaseOfLoader	equ	09000h	;LOADER.BIN　被加载到的位置---段地址
-OffsetOfLoader	equ	0100h	;LOADER.BIN　被加载到的位置---偏移地址
-RootDirSectors	equ	14	;根目录占用空间
-SectorNoOfRootDirectory equ	19 ;Root Directory的第一个扇区
-SectorNoOfFAT1	equ	1	   ;FAT1的第一个扇区号=BPB_RsvdSecCnt
-DeltaSectorNo	equ	17	   ;DeltaSectorNo=BPB_RsvdSecCnt+(BPB_NumFats*FATSz)-2
-;;; ==================================================================
+BaseOfKernelFile	equ	08000h	;KERNEL.BIN　被加载到的位置---段地址
+OffsetOfKernelFile	equ	0h	;KERNEL.BIN　被加载到的位置---偏移地址
 
 	jmp	short LABEL_START ;Start to boot.
-	nop			  ;这个nop不可少
 
-	;; 下面是FAT12磁盘的头
-	BS_OEMName	db 'ZhaoJian' ;OEM String,必须8个字节
-	BPB_BytsPerSec	dw 512	      ;每扇区字节数
-	BPB_SecPerClus	db 1	      ;每族多少扇区
-	BPB_RsvdSecCnt	dw 1	      ;Boot记录占用多少扇区
-	BPB_NumFATs	db 2	      ;共有多少FAT表
-	BPB_RootEntCnt 	dw 224	      ;根目录文件数最大值
-	BPB_TotSec16	dw 2880	      ;逻辑扇区总数
-	BPB_Media	db 0xf0	      ;媒体描述符
-	BPB_FATSz16	dw 9	      ;每FAT扇区数
-	BPB_SecPerTrk	dw 18	      ;每磁道扇区数
-	BPB_NumHeads	dw 2	      ;刺头数(面数)
-	BPB_HiddSec	dd 0	      ;隐藏扇区数
-	BPB_TotSec32	dd 0	      ;wTotalSectorCount为0时，这个值记录扇区数
-	BS_DrvNum	db 0	      ;中断13的驱动器号
-	BS_Reserved1	db 0	      ;未使用
-	BS_BootSig	db 29h	      ;扩展移到标记
-	BS_VolID	dd 0	      ;卷序列号
-	BS_VolLab	db 'ZHAOJIANOS1' ;卷标 11个字符
-	BS_FileSysType	db 'FAT12   '	 ;文件系统类型,必须8个字节
-LABEL_START:
+%include "fat12hdr.inc"
+
+LABEL_START:			;从这里开始
 	mov	ax,cs
 	mov	ds,ax
 	mov	es,ax
 	mov	ss,ax
 	mov	sp,BaseOfStack
 
+	mov	dh,0		;"Loading "
+	call	Dispstr		;显示字符串
+
+	;; 下面在A盘的根目录寻找KERNEL.BIN
+	mov	word[wSectorNo],SectorNoOfRootDirectory
+		
 	;; 软驱复位
 	xor	ah,ah
 	xor	dl,dl
 	int	13h
 
-;;;-----------------------------------------------------------
-;;; 下面再Ａ盘的根目录寻找LOADER.bin
-	mov	word[wSectorNo],SectorNoOfRootDirectory ;19
 LABEL_SEARCH_IN_ROOT_DIR_BEGIN:
 	cmp	word[wRootDirSizeForLoop],0 ;判断根目录是否已经读完
-	jz	LABEL_NO_LOADERBIN	    ;如果读完表示没有找到LOADER.BIN
+	jz	LABEL_NO_KERNELBIN	    ;如果读完表示没有找到KERNEL.BIN
 	dec	word[wRootDirSizeForLoop]
 	mov	ax,BaseOfLoader
-	mov	es,ax			; es <- BaseOfStack
-	mov	bx,OffsetOfLoader 	; bx <- OffsetOfLoader
+	mov	es,ax			; es <- BaseOfKernelFile
+	mov	bx,OffsetOfKernelFile 	; bx <- OffsetOfKernelFile
 	mov	ax,[wSectorNo]		; ax <- Root Directory 中的某扇区号
 	mov	cl,1
 	call	ReadSector
 
-	mov	si,LoaderFileName 	; ds:si -> "LOADER  BIN"
-	mov	di,OffsetOfLoader	; es:di -> BaseOfLoader:0100
+	mov	si,KernelFileName 	; ds:si -> "KERNEL  BIN"
+	mov	di,OffsetOfKernelFile	; es:di -> BaseOfLoader:0100
 	cld
 	mov	dx,10h
-LABEL_SEARCH_FOR_LOADERBIN:
+LABEL_SEARCH_FOR_KERNELBIN:
 	cmp	dx,0		;循环次数控制
 	jz	LABEL_GOTO_NEXT_SECTOR_IN_ROOT_DIR ;如果已经读完了一个Sector
 	dec	dx
@@ -84,7 +53,7 @@ LABEL_CMP_FILENAME:
 	lodsb
 	cmp	al,byte[es:di]
 	jz	LABEL_GO_ON
-	jmp	LABEL_DIFFERENT	;只要发现不一样的字符就是表示本DirectoryEntry不是我们要找的LOADER.BIN
+	jmp	LABEL_DIFFERENT
 
 LABEL_GO_ON:
 	inc	di
@@ -93,7 +62,7 @@ LABEL_GO_ON:
 LABEL_DIFFERENT:
 	and	di,0ffe0h	;di &=e0 是为了让它指向本条目开头
 	add	di,20h		;下一个目录条目
-	mov	si,LoaderFileName ;
+	mov	si,KernelFileName ;
 	jmp	LABEL_SEARCH_FOR_LOADERBIN
 
 LABEL_GOTO_NEXT_SECTOR_IN_ROOT_DIR:
@@ -101,8 +70,8 @@ LABEL_GOTO_NEXT_SECTOR_IN_ROOT_DIR:
 	jmp	LABEL_SEARCH_IN_ROOT_DIR_BEGIN
 
 LABEL_NO_LOADERBIN:
-	mov	dh,2		;“No LOADER.”
-	call	Dispstr
+	mov	dh,2		;“No KERNEL.”
+	call	Dispstr		;显示字符串
 
 	%ifdef	_BOOT_DEBUG_
 	mov	ax, 4c00h		; `.
@@ -114,14 +83,19 @@ LABEL_NO_LOADERBIN:
 LABEL_FILENAME_FOUND:			; 找到 LOADER.BIN 后便来到这里继续
 	mov	ax,RootDirSectors
 	and	di,0ffe0h	; di -> 当前条目的开始
+
+	push	eax
+	mov	eax,[es:di+01ch]
+	mov	dword[dwKernelSize],eax ;/ 保存KERNEL.BIN
+
 	add	di,01ah		; di -> 首 Sector
 	mov	cx,word[es:di]
 	push	cx		;保存此Sector在FAT中的序号
 	add	cx,ax
-	add	cx,DeltaSectorNo ;cl <- LOADER.BIN的起始扇区号(0-based)
+	add	cx,DeltaSectorNo ;cl <- KERNEL.BIN的起始扇区号(0-based)
 	mov	ax,BaseOfLoader
-	mov	es,ax		  ; es <- BaseOfLoader
-	mov	bx,OffsetOfLoader ; bx <- OffsetOfLoader
+	mov	es,ax		  ; es <- BaseOfKernelFile
+	mov	bx,OffsetOfLoader ; bx <- OffsetOfKernelFile
 	mov	ax,cx		  ; ax <- Sector 号
 LABEL_GOON_LOADING_FILE:
 	push	ax
@@ -147,13 +121,12 @@ LABEL_GOON_LOADING_FILE:
 	add	bx,[BPB_BytsPerSec]
 	jmp	LABEL_GOON_LOADING_FILE
 LABEL_FILE_LOADED:
+	CALL 	KillMotor 	;关闭软驱马达
+
 	mov	dh,1		;"Ready."
 	call	Dispstr
 ;;; **************************************************************
-	;; 正式跳转到已加载到内存中的LOADER.BIN的开始处，
-	;; 开始执行LOADER.BIN的代码。
-	;; Boot Sector的使命到此结束
-	jmp	BaseOfLoader:OffsetOfLoader
+	jmp	$
 ;;; ***************************************************
 	
 ;;;===========================================================
@@ -162,12 +135,13 @@ LABEL_FILE_LOADED:
 wRootDirSizeForLoop	dw	RootDirSectors 
 wSectorNo		dw	0 ;要读取的扇区号
 bOdd			db	0 ;奇数还是偶数
+dwKernelSize		dd	0 ;KERNEL.BIN文件大小
 ;;; 字符串
-LoaderFileName		db	"LOADER  BIN"
+KernelFileName		db	"KERNEL  BIN",0
 ;;; 为简化代码，下面每个字符串的长度均为 MessageLength
 ; 为简化代码, 下面每个字符串的长度均为 MessageLength
 MessageLength		equ	9
-BootMessage:		db	"Booting  " ; 9字节, 不够则用空格补齐. 序号 0
+LoadMessage:		db	"Loading  "
 Message1		db	"Ready.   " ; 9字节, 不够则用空格补齐. 序号 1
 Message2		db	"No LOADER" ; 9字节, 不够则用空格补齐. 序号 2
 Message3		db	"FOUND    " ; 9字节, 不够则用空格补齐. 序号 3
@@ -175,7 +149,7 @@ Message3		db	"FOUND    " ; 9字节, 不够则用空格补齐. 序号 3
 Dispstr:
 	mov	ax,MessageLength
 	mul	dh
-	add	ax,BootMessage
+	add	ax,LoadMessage
 	mov	bp,ax		;ES:BP=串地址
 	mov	ax,ds
 	mov	es,ax
@@ -235,7 +209,7 @@ GetFATEntry:
 	push	es
 	push 	bx
 	push	ax
-	mov	ax,BaseOfLoader
+	mov	ax,BaseOfKernelFile
 	sub	ax,0100h	;在BaseOfLoader后面留出4K空间用户存放FAT
 	mov	es,ax
 	pop	ax
@@ -275,6 +249,13 @@ LABEL_GET_FAT_ENTRY_OK:
 	pop	bx
 	pop	es
 	ret
-;;; =====================================================================
-	times	510-($-$$)	db 0 ;填充剩下的空间，生成的二进制代码刚好512
-	dw	0xaa55		     ;结束标记
+;;; --------------------------------------------------------------------
+;;; KillMotor
+	关闭软驱马达
+KillMotor:
+	push	dx
+	mov	dx,03f2h
+	mov	al,0
+	out	dx,al
+	pop	dx
+	ret
