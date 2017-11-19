@@ -1,6 +1,19 @@
 #
 EXEF=hello foobar
-all:$(EXEF)
+#all:$(EXEF)
+all:pig.img
+pig.img:blank.img boot.bin loader.bin 
+	cp blank.img pig.img
+	dd if=boot.bin of=pig.img  bs=512 count=1 conv=notrunc
+	cp pig.img ~/imgs
+blank.img:
+	dd if=/dev/zero of=blank.img bs=512 count=2880
+boot.bin:
+	nasm -f bin boot.s -o boot.bin -l boot.lst
+loader.bin:
+	nasm -f bin loader.s -o loader.bin -l loader.lst
+#kernel.bin:
+#	
 hello:
 	nasm -f elf64 hello.s -o hello.o
 	ld -s hello.o -o hello
@@ -9,4 +22,4 @@ foobar:
 	gcc -m32 -c -o bar.o bar.c
 	ld -m elf_i386 -s -o foobar foo.o bar.o
 clean:
-	$(RM) $(EXEF)  *.o *.lst *.bin
+	$(RM) $(EXEF)  *.o *.lst *.bin *.img

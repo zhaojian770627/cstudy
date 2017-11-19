@@ -30,7 +30,7 @@ LABEL_SEARCH_IN_ROOT_DIR_BEGIN:
 	cmp	word[wRootDirSizeForLoop],0 ;判断根目录是否已经读完
 	jz	LABEL_NO_KERNELBIN	    ;如果读完表示没有找到KERNEL.BIN
 	dec	word[wRootDirSizeForLoop]
-	mov	ax,BaseOfLoader
+	mov	ax,BaseOfKernelFile
 	mov	es,ax			; es <- BaseOfKernelFile
 	mov	bx,OffsetOfKernelFile 	; bx <- OffsetOfKernelFile
 	mov	ax,[wSectorNo]		; ax <- Root Directory 中的某扇区号
@@ -63,13 +63,13 @@ LABEL_DIFFERENT:
 	and	di,0ffe0h	;di &=e0 是为了让它指向本条目开头
 	add	di,20h		;下一个目录条目
 	mov	si,KernelFileName ;
-	jmp	LABEL_SEARCH_FOR_LOADERBIN
+	jmp	LABEL_SEARCH_FOR_KERNELBIN
 
 LABEL_GOTO_NEXT_SECTOR_IN_ROOT_DIR:
 	add	word[wSectorNo],1
 	jmp	LABEL_SEARCH_IN_ROOT_DIR_BEGIN
 
-LABEL_NO_LOADERBIN:
+LABEL_NO_KERNELBIN:
 	mov	dh,2		;“No KERNEL.”
 	call	Dispstr		;显示字符串
 
@@ -93,9 +93,9 @@ LABEL_FILENAME_FOUND:			; 找到 LOADER.BIN 后便来到这里继续
 	push	cx		;保存此Sector在FAT中的序号
 	add	cx,ax
 	add	cx,DeltaSectorNo ;cl <- KERNEL.BIN的起始扇区号(0-based)
-	mov	ax,BaseOfLoader
+	mov	ax,BaseOfKernelFile
 	mov	es,ax		  ; es <- BaseOfKernelFile
-	mov	bx,OffsetOfLoader ; bx <- OffsetOfKernelFile
+	mov	bx,OffsetOfKernelFile ; bx <- OffsetOfKernelFile
 	mov	ax,cx		  ; ax <- Sector 号
 LABEL_GOON_LOADING_FILE:
 	push	ax
@@ -143,7 +143,7 @@ KernelFileName		db	"KERNEL  BIN",0
 MessageLength		equ	9
 LoadMessage:		db	"Loading  "
 Message1		db	"Ready.   " ; 9字节, 不够则用空格补齐. 序号 1
-Message2		db	"No LOADER" ; 9字节, 不够则用空格补齐. 序号 2
+Message2		db	"No KERNEL" ; 9字节, 不够则用空格补齐. 序号 2
 Message3		db	"FOUND    " ; 9字节, 不够则用空格补齐. 序号 3
 ;;; ============================================================
 Dispstr:
@@ -251,7 +251,7 @@ LABEL_GET_FAT_ENTRY_OK:
 	ret
 ;;; --------------------------------------------------------------------
 ;;; KillMotor
-	关闭软驱马达
+;;; 	关闭软驱马达		
 KillMotor:
 	push	dx
 	mov	dx,03f2h

@@ -13,10 +13,6 @@ BaseOfStack		equ	07c00h	; 堆栈基地址(栈底, 从这个位置向低地址生
 
 BaseOfLoader	equ	09000h	;LOADER.BIN　被加载到的位置---段地址
 OffsetOfLoader	equ	0100h	;LOADER.BIN　被加载到的位置---偏移地址
-RootDirSectors	equ	14	;根目录占用空间
-SectorNoOfRootDirectory equ	19 ;Root Directory的第一个扇区
-SectorNoOfFAT1	equ	1	   ;FAT1的第一个扇区号=BPB_RsvdSecCnt
-DeltaSectorNo	equ	17	   ;DeltaSectorNo=BPB_RsvdSecCnt+(BPB_NumFats*FATSz)-2
 ;;; ==================================================================
 
 	jmp	short LABEL_START ;Start to boot.
