@@ -33,7 +33,7 @@ LABEL_START:			;从这里开始
 	mov	sp,BaseOfStack
 
 	mov	dh,0		;"Loading "
-	call	Dispstr		;显示字符串
+	call	DispStrRealMode	;显示字符串
 
 	;; 得到内存数
 	mov	ebx,0		;ebx=后续值，开始时需为0
@@ -48,7 +48,7 @@ LABEL_START:			;从这里开始
 	inc	dword[_dwMCRNumber] ;dwMCRNumber=ARDS的个数
 	cmp	ebx,0
 	jne	.MemChkLoop
-	jmp	.MemChkOk
+	jmp	.MemChkOK
 .MemChkFail:
 	mov	dword[_dwMCRNumber],0
 .MemChkOK:
@@ -106,7 +106,7 @@ LABEL_GOTO_NEXT_SECTOR_IN_ROOT_DIR:
 
 LABEL_NO_KERNELBIN:
 	mov	dh,2		;“No KERNEL.”
-	call	Dispstr		;显示字符串
+	call	DispStr		;显示字符串
 
 	%ifdef	_BOOT_DEBUG_
 	mov	ax, 4c00h		; `.
@@ -159,7 +159,7 @@ LABEL_FILE_LOADED:
 	CALL 	KillMotor 	;关闭软驱马达
 
 	mov	dh,1		;"Ready."
-	call	DispStrRelMode
+	call	DispStrRealMode
 
 	;; 下面准备跳入保护模式
 	;; 加载GDTR
@@ -334,7 +334,7 @@ LABEL_PM_START:
 	mov	esp,TopOfStack
 
 	push	szMemChkTitle
-	call	dispStr
+	call	DispStr
 	add	esp,4
 
 	call	DispMemInfo
@@ -342,7 +342,7 @@ LABEL_PM_START:
 
 	mov	ah,0fh		;0000:黑底 1111:白字
 	mov	al,'P'
-	mov	[ds:((80*0+39)*2)],ax ;屏幕第0行，第39列
+	mov	[gs:((80*0+39)*2)],ax ;屏幕第0行，第39列
 	jmp	$
 
 %include "lib.inc"
