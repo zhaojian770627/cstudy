@@ -14,6 +14,16 @@
 (color-theme-initialize)
 (color-theme-matrix)
 
+;;erlang
+(add-to-list 'load-path "/usr/lib/erlang/lib/tools-2.8.3/emacs")
+(require 'erlang-start)
+
+(add-to-list 'auto-mode-alist '("\\.erl?$" . erlang-mode))
+(add-to-list 'auto-mode-alist '("\\.hrl?$" . erlang-mode))
+
+(setq erlang-root-dir "/usr/lib/erlang")
+(add-to-list 'exec-path "/usr/lib/erlang/bin")
+(setq erlang-man-root-dir "/usr/lib/erlang/man")
 
 (semantic-load-enable-minimum-features)
 (semantic-load-enable-code-helpers)
@@ -29,11 +39,23 @@
 
 (global-linum-mode 'linum-mode)
 (tool-bar-mode 0)
-(menu-bar-mode 0)
+;;(menu-bar-mode 0)
 (setq inhibit-splash-screen t)
 
 ;;bind key
 (global-set-key [f12] 'semantic-ia-fast-jump)
+(global-set-key [S-f12]  
+                (lambda ()  
+                  (interactive)  
+                  (if (ring-empty-p (oref semantic-mru-bookmark-ring ring))  
+                      (error "Semantic Bookmark ring is currently empty"))  
+                  (let* ((ring (oref semantic-mru-bookmark-ring ring))  
+                         (alist (semantic-mrub-ring-to-assoc-list ring))  
+                         (first (cdr (car alist))))  
+                    (if (semantic-equivalent-tag-p (oref first tag)  
+                                                   (semantic-current-tag))  
+                        (setq first (cdr (car (cdr alist)))))  
+                    (semantic-mrub-switch-tags first))))  
 
 (defun my-cedet-hook()
 (local-set-key (kbd "M-n") 'semantic-ia-complete-symbol)
@@ -56,10 +78,11 @@
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(ecb-options-version "2.40"))
+ '(ecb-options-version "2.40")
+ '(tool-bar-mode nil))
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- )
+ '(default ((t (:inherit nil :stipple nil :background "black" :foreground "#7eff00" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 158 :width normal :foundry "PfEd" :family "DejaVu Sans Mono")))))
