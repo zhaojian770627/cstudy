@@ -115,12 +115,13 @@ LABEL_NO_KERNELBIN:
 
 LABEL_FILENAME_FOUND:			; 找到 LOADER.BIN 后便来到这里继续
 	mov	ax,RootDirSectors
-	and	di,0ffe0h	; di -> 当前条目的开始
+	and	di,0fff0h	; di -> 当前条目的开始 boot.s 为0ffe0，应该效果一样，目录项长度为32为，二进制最后五位总是0 
 
 	push	eax
 	mov	eax,[es:di+01ch]
 	mov	dword[dwKernelSize],eax ;/ 保存KERNEL.BIN
-
+	pop	eax
+	
 	add	di,01ah		; di -> 首 Sector
 	mov	cx,word[es:di]
 	push	cx		;保存此Sector在FAT中的序号
@@ -341,6 +342,8 @@ LABEL_PM_START:
 	mov	ah,0fh		;0000:黑底 1111:白字
 	mov	al,'P'
 	mov	[gs:((80*0+39)*2)],ax ;屏幕第0行，第39列
+
+	call	InitKernel
 
 	;jmp	$
 
