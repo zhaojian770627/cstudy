@@ -22,8 +22,6 @@ SelectorFlatC		equ	LABEL_DESC_FLAT_C	- LABEL_GDT
 SelectorFlatRW		equ	LABEL_DESC_FLAT_RW	- LABEL_GDT
 SelectorVideo		equ	LABEL_DESC_VIDEO	- LABEL_GDT + SA_RPL3	
 BaseOfStack		equ	0100h	; 调试状态下堆栈基地址(栈底, 从这个位置向低地址生长)
-PageDirBase		equ	100000h ;页目录开始地址:1M
-PageTblBase		equ	101000h ;页表开始地址:1M+4K
 
 LABEL_START:			;从这里开始
 	mov	ax,cs
@@ -343,8 +341,13 @@ LABEL_PM_START:
 	mov	ah,0fh		;0000:黑底 1111:白字
 	mov	al,'P'
 	mov	[gs:((80*0+39)*2)],ax ;屏幕第0行，第39列
-	jmp	$
 
+	;jmp	$
+
+	;***************************************************************
+	jmp	SelectorFlatC:KernelEntryPointPhyAddr	; 正式进入内核 *
+	;***************************************************************
+	
 %include "lib.inc"
 
 ;;; 显示内存信息---------------------------------------------
