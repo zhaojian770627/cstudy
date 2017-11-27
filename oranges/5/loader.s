@@ -444,7 +444,42 @@ SetupPaging:
 	ret
 ; 分页机制启动完毕 ----------------------------------------------------------
 
+;;; -------------------------------------------------------------------
+;;; InitKernel
+;;; 将 KERNEL.BIN的内容经过整理对齐后放到新的位置
+;;; 遍历每一个Program Header,根据Program Header中的信息来确定把什么放进内存
+;;; 放到什么位置，以及放多少
+InitKernel:
+	xor	esi,esi
+	;; ecx <-pELFHdr->e_phnum
+	mov	cx,word[BaseOfKernelFilePhyAddr+2ch] 
+	movzx	ecx,cx
 
+	;; esi <- pELEHdr->e_phoff
+	mov	esi,[BaseOfKernelFilePhyAddr+1ch]
+
+	;; esi <-OffsetOfKernel+pELEHdr->e_phoff
+	add	esi,BaseOfKernelFilePhyAddr
+
+.Begin:
+	mov	eax,[esi+0]
+	cmp	eax,0		;PT_NULL
+	jz	.NoAction
+	push	dword[esi+010h]	;size
+	mov	eax,[esi+04h]
+	add	eax,BaseOfKernelFilePhyAddr
+	push	eax		;src
+	push	dword[esi+08h]	;dst
+	call	MemCpy
+	add	esp,12
+.NoAction:
+	add	esi,020h
+	dec	ecx
+	jnz	.Begin
+
+	ret
+;;; InitKernel-------------------------------------------------
+	
 ; SECTION .data1 之开始 ---------------------------------------------------------------------------------------------
 [SECTION .data1]
 
