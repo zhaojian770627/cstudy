@@ -11,12 +11,16 @@
 #include <sys/stat.h>  
 #include <errno.h>
 
+#define SECTOR_SIZE	512	/* Disk sector size. */
+
 #define nil 0
 #define IM_NAME_MAX	63
 #define A_MINHDR	32
 
 #define A_I8086	0x04	/* intel i8086/8088 */
 
+/* Flags */
+#define A_NSYM	0x04	/* new style symbol table */
 #define A_SEP	0x20	/* separate I/D */
 
 struct	exec {			/* a.out header */
@@ -101,7 +105,13 @@ void bread(FILE *f, char *name, void *buf, size_t len)
 	}
 }
 
+void bwrite(FILE *f, char *name, void *buf, size_t len)
+{
+	if (len > 0 && fwrite(buf, len, 1, f) != 1) fatal(name);
+}
+
 long total_text= 0, total_data= 0, total_bss= 0;
+int making_image= 0;
 
 void read_header(int talk, char *proc, FILE *procf, struct image_header *ihdr)
 /* Read the a.out header of a program and check it.  If procf happens to be
@@ -170,14 +180,29 @@ void read_header(int talk, char *proc, FILE *procf, struct image_header *ihdr)
 	}
 }
 
+void padimage(char *image, FILE *imagef, int n)
+/* Add n zeros to image to pad it to a sector boundary. */
+{
+	while (n > 0) {
+		if (putc(0, imagef) == EOF) fatal(image);
+		n--;
+	}
+}
+
 void make_image(char *image, char **procv){
   char *proc,*file;
   int procn;
   struct image_header ihdr;
   struct stat st;
+  struct exec phdr;
   FILE *imagef, *procf;
 
   printf("image:%s\n",image);
+
+  making_image= 1;
+
+  if ((imagef= fopen(image, "w")) == nil) fatal(image);
+
   for (procn= 0; (proc= *procv++) != nil; procn++) {
     if ((file= strchr(proc, ':')) != nil) 
       file++; 
@@ -193,13 +218,33 @@ void make_image(char *image, char **procv){
     /* Read a.out header. */
     read_header(1, proc, procf, &ihdr);
 
+    /* Scratch. */
+    phdr= ihdr.process;
+
+    /* The symbol table is always stripped off. */
+    ihdr.process.a_syms= 0;
+    ihdr.process.a_flags &= ~A_NSYM;
+
+    /* Write header padded to fill a sector */
+    bwrite(imagef, image, &ihdr, sizeof(ihdr));
+
+    padimage(image, imagef, SECTOR_SIZE - sizeof(ihdr));
+
     (void) fclose(procf);
   }
+
+  if (fclose(imagef) == EOF) fatal(image);
+
+  printf("   ------   ------   ------   -------\n");
+  printf(" %8ld %8ld %8ld %9ld  total\n",
+	 total_text, total_data, total_bss,
+	 total_text + total_data + total_bss);
 }
 
 int main(int argc, char *argv[]) {
-  char image[50]="dddd";
+  char image[50]="zj.img";
   char *procv[2]={"/home/zj/git/os/minix/zj",0};
+  testsize();  
   make_image(image,procv);
   exit(EXIT_SUCCESS);
 }

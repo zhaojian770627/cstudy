@@ -7,6 +7,6 @@ EXEF:=testsize installboot
 all:$(EXEF)
 testsize:testsize.o
 installboot:
-	gcc -m32 -o installboot installboot.c
+	gcc -g -m32 -o installboot installboot.c
 clean:
 	$(RM) *.o *.d $(EXEF)
