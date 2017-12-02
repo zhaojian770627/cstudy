@@ -13,6 +13,11 @@
 
 #define nil 0
 #define IM_NAME_MAX	63
+#define A_MINHDR	32
+
+#define A_I8086	0x04	/* intel i8086/8088 */
+
+#define A_SEP	0x20	/* separate I/D */
 
 struct	exec {			/* a.out header */
   unsigned char	a_magic[2];	/* magic number */
@@ -35,6 +40,10 @@ struct	exec {			/* a.out header */
   long		a_dbase;	/* data relocation base */
 };
 
+#define A_MAGIC0      (unsigned char) 0x01
+#define A_MAGIC1      (unsigned char) 0x03
+#define BADMAG(X)     ((X).a_magic[0] != A_MAGIC0 ||(X).a_magic[1] != A_MAGIC1)
+
 struct image_header {
 	char		name[IM_NAME_MAX + 1];	/* Null terminated. */
 	struct exec	process;
@@ -52,11 +61,113 @@ void fatal(char *label)
 	exit(1);
 }
 
+char *basename(char *name)
+/* Return the last component of name, stripping trailing slashes from name.
+ * Precondition: name != "/".  If name is prefixed by a label, then the
+ * label is copied to the basename too.
+ */
+{
+	static char base[IM_NAME_MAX];
+	char *p, *bp= base;
+
+	if ((p= strchr(name, ':')) != nil) {
+		while (name <= p && bp < base + IM_NAME_MAX - 1)
+			*bp++ = *name++;
+	}
+	for (;;) {
+		if ((p= strrchr(name, '/')) == nil) { p= name; break; }
+		if (*++p != 0) break;
+		*--p= 0;
+	}
+	while (*p != 0 && bp < base + IM_NAME_MAX - 1) *bp++ = *p++;
+	*bp= 0;
+	return base;
+}
+
 void testsize()
 {
   printf("unsigned char- %d\n",sizeof(unsigned char));
   printf("unsigned short- %d\n",sizeof(unsigned short));
   printf("long- %d\n",sizeof(long));
+}
+
+void bread(FILE *f, char *name, void *buf, size_t len)
+/* Read len bytes.  Don't dare return without them. */
+{
+	if (len > 0 && fread(buf, len, 1, f) != 1) {
+		if (ferror(f)) fatal(name);
+		fprintf(stderr, "installboot: Unexpected EOF on %s\n", name);
+		exit(1);
+	}
+}
+
+long total_text= 0, total_data= 0, total_bss= 0;
+
+void read_header(int talk, char *proc, FILE *procf, struct image_header *ihdr)
+/* Read the a.out header of a program and check it.  If procf happens to be
+ * nil then the header is already in *image_hdr and need only be checked.
+ */
+{
+	int n, big= 0;
+	static int banner= 0;
+	struct exec *phdr= &ihdr->process;
+
+	if (procf == nil) {
+		/* Header already present. */
+		n= phdr->a_hdrlen;
+	} else {
+		memset(ihdr, 0, sizeof(*ihdr));
+
+		/* Put the basename of proc in the header. */
+		strncpy(ihdr->name, basename(proc), IM_NAME_MAX);
+
+		/* Read the header. */
+		n= fread(phdr, sizeof(char), A_MINHDR, procf);
+		if (ferror(procf)) fatal(proc);
+	}
+
+	if (n < A_MINHDR || BADMAG(*phdr)) {
+		fprintf(stderr, "installboot: %s is not an executable\n", proc);
+		exit(1);
+	}
+
+	/* Get the rest of the exec header. */
+	if (procf != nil) {
+		bread(procf, proc, ((char *) phdr) + A_MINHDR,
+						phdr->a_hdrlen - A_MINHDR);
+	}
+
+	if (talk && !banner) {
+		printf("     text     data      bss      size\n");
+		banner= 1;
+	}
+
+	if (talk) {
+		printf(" %8ld %8ld %8ld %9ld  %s\n",
+			phdr->a_text, phdr->a_data, phdr->a_bss,
+			phdr->a_text + phdr->a_data + phdr->a_bss, proc);
+	}
+	total_text+= phdr->a_text;
+	total_data+= phdr->a_data;
+	total_bss+= phdr->a_bss;
+
+	if (phdr->a_cpu == A_I8086) {
+		long data= phdr->a_data + phdr->a_bss;
+
+		if (!(phdr->a_flags & A_SEP)) data+= phdr->a_text;
+
+		if (phdr->a_text >= 65536) big|= 1;
+		if (data >= 65536) big|= 2;
+	}
+	if (big) {
+		fprintf(stderr,
+			"%s will crash, %s%s%s segment%s larger then 64K\n",
+			proc,
+			big & 1 ? "text" : "",
+			big == 3 ? " and " : "",
+			big & 2 ? "data" : "",
+			big == 3 ? "s are" : " is");
+	}
 }
 
 void make_image(char *image, char **procv){
@@ -79,6 +190,8 @@ void make_image(char *image, char **procv){
 	)
       fatal(proc) ;
 
+    /* Read a.out header. */
+    read_header(1, proc, procf, &ihdr);
 
     (void) fclose(procf);
   }
