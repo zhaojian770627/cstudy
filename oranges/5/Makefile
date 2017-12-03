@@ -57,7 +57,7 @@ $(ORANGESKERNEL):$(OBJS)
 	$(LD) $(LDFLAGS) -o $(ORANGESKERNEL) $(OBJS)
 kernel/kernel.o:kernel/kernel.s
 	$(ASM) $(ASMKFLAGS) -o $@ $<
-kernel/start.o:kernel/start.c include/type.h include/const.h include/protect.h
+kernel/start.o:kernel/start.c include/type.h include/const.h include/protect.h include/proto.h include/string.h
 	$(CC) $(CFLAGS) -o $@ $<
 lib/klib.o:lib/klib.s
 	$(ASM) $(ASMKFLAGS) -o $@ $<
