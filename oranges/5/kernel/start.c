@@ -17,7 +17,7 @@ PUBLIC void cstart()
 
   /* 将LOADER中GDT复制到新的GDT中 */
   memcpy(&gdt,		/* New GDT */
-	 (void)(*((u32*)(&gdt_ptr[2]))), /* Base of Old GDT */
+	 (void*)(*((u32*)(&gdt_ptr[2]))), /* Base of Old GDT */
 	 *((u16*)(&gdt_ptr[0]))+1	 /* Limit of Old GDT */
 	 );
   /* gdt_ptr[6]共6个字节:0~15:Limit 16~47:Base.用作sgdt/lgdt的参数 */

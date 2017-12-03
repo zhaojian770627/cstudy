@@ -13,8 +13,11 @@ boot.bin:
 loader.bin:
 	nasm -f bin loader.s -o loader.bin -l loader.lst
 kernel.bin:
-	nasm -f elf kernel.s -o kernel.o
-	ld -s -m elf_i386 -Ttext 0x30400 -o kernel.bin kernel.o
+	nasm -f elf -o kernel.o kernel.s 
+	nasm -f elf -o string.o string.s
+	nasm -f elf -o klib.o klib.s
+	gcc -m32 -c -o start.o start.c
+	ld -s -m elf_i386 -Ttext 0x30400 -o kernel.bin kernel.o string.o start.o klib.o
 #hello:
 #	nasm -f elf64 hello.s -o hello.o
 #	ld -s hello.o -o hello

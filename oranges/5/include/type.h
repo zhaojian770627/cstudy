@@ -3,6 +3,6 @@
 
 typedef unsigned int u32;
 typedef unsigned short u16;
-typedef unsigned char;
+typedef unsigned char u8;
 
 #endif	/* _ORANGES_TYPE_H_ */
