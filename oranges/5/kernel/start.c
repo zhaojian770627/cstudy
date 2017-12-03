@@ -14,7 +14,7 @@ PUBLIC void cstart()
 
   disp_str("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
 	   "-----\"cstart\" begins-----\n");
-
+  disp_str("-----\"cstart\" ends-------\n");
   /* 将LOADER中GDT复制到新的GDT中 */
   memcpy(&gdt,		/* New GDT */
 	 (void*)(*((u32*)(&gdt_ptr[2]))), /* Base of Old GDT */

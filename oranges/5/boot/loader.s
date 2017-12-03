@@ -157,8 +157,8 @@ LABEL_GOON_LOADING_FILE:
 LABEL_FILE_LOADED:
 	CALL 	KillMotor 	;关闭软驱马达
 
-	mov	dh,1		;"Ready."
-	call	DispStrRealMode
+	;;mov	dh,1		;"Ready."
+	;;call	DispStrRealMode
 
 	;; 下面准备跳入保护模式
 	;; 加载GDTR
@@ -338,10 +338,6 @@ LABEL_PM_START:
 
 	call	DispMemInfo
 	call	SetupPaging
-
-	mov	ah,0fh		;0000:黑底 1111:白字
-	mov	al,'P'
-	mov	[gs:((80*0+39)*2)],ax ;屏幕第0行，第39列
 
 	call	InitKernel
 
