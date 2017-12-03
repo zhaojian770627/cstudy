@@ -11,14 +11,14 @@ CC		= gcc
 LD		= ld
 ASMBFLAGS	= -I boot/include/
 ASMKFLAGS	= -I include/ -f elf
-CFLAGS		= -I include/ -c -m32
+CFLAGS		= -I include/ -c -m32 -fno-stack-protector
 LDFLAGS		= -s -m elf_i386 -Ttext $(ENTRYPOINT)
 DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 
 # This Program
 ORANGESBOOT	= boot/boot.bin boot/loader.bin
 ORANGESKERNEL	= kernel.bin
-OBJS		= kernel/kernel.o kernel/start.o lib/klib.o lib/string.o
+OBJS		= kernel/kernel.o kernel/start.o kernel/i8259.o kernel/global.o lib/kliba.o lib/string.o lib/klib.o kernel/protect.o
 DASMOUTPUT	= kernel.bin.asm
 
 # ALL Phony Targets
@@ -57,9 +57,17 @@ $(ORANGESKERNEL):$(OBJS)
 	$(LD) $(LDFLAGS) -o $(ORANGESKERNEL) $(OBJS)
 kernel/kernel.o:kernel/kernel.s
 	$(ASM) $(ASMKFLAGS) -o $@ $<
+kernel/klib.o:
+	$(CC) $(CFLAGS) -o $@ $<
+kernel/protect.o : kernel/protect.c
+	$(CC) $(CFLAGS) -o $@ $<
+kernel/i8259.o : kernel/i8259.c include/type.h include/const.h include/protect.h include/proto.h
+	$(CC) $(CFLAGS) -o $@ $<
+kernel/global.o : kernel/global.c
+	$(CC) $(CFLAGS) -o $@ $<
 kernel/start.o:kernel/start.c include/type.h include/const.h include/protect.h include/proto.h include/string.h
 	$(CC) $(CFLAGS) -o $@ $<
-lib/klib.o:lib/klib.s
+lib/kliba.o:lib/kliba.s
 	$(ASM) $(ASMKFLAGS) -o $@ $<
 lib/string.o:lib/string.s
 	$(ASM) $(ASMKFLAGS) -o $@ $<

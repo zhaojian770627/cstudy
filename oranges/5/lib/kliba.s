@@ -6,14 +6,17 @@
 ; ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-[SECTION .data]
-disp_pos	dd	0
-
+extern disp_pos
+	
 [SECTION .text]
 
 ; 导出函数
 global	disp_str
-
+global	disp_str
+global	disp_color_str
+global	out_byte
+global	in_byte
+	
 ; ========================================================================
 ;                  void disp_str(char * info);
 ; ========================================================================
