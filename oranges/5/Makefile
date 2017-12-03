@@ -1,29 +1,65 @@
-#
-EXEF=hello foobar
-#all:$(EXEF)
-all:pig.img
-pig.img:blank.img boot.bin loader.bin kernel.bin
-	cp blank.img pig.img
-	dd if=boot.bin of=pig.img  bs=512 count=1 conv=notrunc
-	cp pig.img ~/imgs
-blank.img:
-	dd if=/dev/zero of=blank.img bs=512 count=2880
-boot.bin:
-	nasm -f bin boot.s -o boot.bin -l boot.lst
-loader.bin:
-	nasm -f bin loader.s -o loader.bin -l loader.lst
-kernel.bin:
-	nasm -f elf -o kernel.o kernel.s 
-	nasm -f elf -o string.o string.s
-	nasm -f elf -o klib.o klib.s
-	gcc -m32 -c -o start.o start.c
-	ld -s -m elf_i386 -Ttext 0x30400 -o kernel.bin kernel.o string.o start.o klib.o
-#hello:
-#	nasm -f elf64 hello.s -o hello.o
-#	ld -s hello.o -o hello
-#foobar:
-#	nasm -f elf foo.s -o foo.o
-#	gcc -m32 -c -o bar.o bar.c
-#	ld -m elf_i386 -s -o foobar foo.o bar.o
+# Entry point of Orange's
+ENTRYPOINT	=0x30400
+
+# Offset of entry point in kernel file
+ENTRYOFFSET	=0x400
+
+# Programs,flags,etc
+ASM		= nasm
+DASM		= ndisasm
+CC		= gcc
+LD		= ld
+ASMBFLAGS	= -I boot/include/
+ASMKFLAGS	= -I include/ -f elf
+CFLAGS		= -I include/ -c -m32
+LDFLAGS		= -s -m elf_i386 -Ttext $(ENTRYPOINT)
+DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
+
+# This Program
+ORANGESBOOT	= boot/boot.bin boot/loader.bin
+ORANGESKERNEL	= kernel.bin
+OBJS		= kernel/kernel.o kernel/start.o lib/klib.o lib/string.o
+DASMOUTPUT	= kernel.bin.asm
+
+# ALL Phony Targets
+.PHONY:everything final image clean realclean disasm all building
+
+# Default starting position
+everything:$(ORANGESBOOT) $(ORANGESKERNEL)
+
+all:realclean everything
+
+final:all clean
+
+image:final building
+
 clean:
-	$(RM) $(EXEF)  *.o *.lst *.bin *.img
+	$(RM) $(OBJS)
+realclean:
+	$(RM) $(OBJS) $(ORANGESBOOT) $(ORANGESKERNEL)
+disasm:
+	$(DASM) $(DASMFLAGS) $(ORANGESKERNEL) > $(DASMOUTPUT)
+
+buiding: boot.bin loader.bin kernel.bin
+	dd if=/dev/zero of=blank.img bs=512 count=2880
+	cp blank.img pig.img
+	dd if=boot/boot.bin of=pig.img  bs=512 count=1 conv=notrunc
+	cp pig.img ~/imgs
+	sudo mount -o loop ~/imgs/pig.img /mnt/floppy/
+	sudo cp -fv boot/loader.bin /mnt/floppy/
+	sudo cp -fv kernel.bin /mnt/floppy/
+	sudo umount /mnt/floppy
+boot/boot.bin:boot/boot.s boot/include/load.inc boot/include/fat12hdr.inc
+	$(ASM) $(ASMBFLAGS) -o $@ $<
+boot/loader.bin:boot/loader.s boot/include/load.inc boot/include/fat12hdr.inc boot/include/pm.inc
+	$(ASM) $(ASMBFLAGS) -o $@ $<
+$(ORANGESKERNEL):$(OBJS)
+	$(LD) $(LDFLAGS) -o $(ORANGESKERNEL) $(OBJS)
+kernel/kernel.o:kernel/kernel.s
+	$(ASM) $(ASMKFLAGS) -o $@ $<
+kernel/start.o:kernel/start.c include/type.h include/const.h include/protect.h
+	$(CC) $(CFLAGS) -o $@ $<
+lib/klib.o:lib/klib.s
+	$(ASM) $(ASMKFLAGS) -o $@ $<
+lib/string.o:lib/string.s
+	$(ASM) $(ASMKFLAGS) -o $@ $<
