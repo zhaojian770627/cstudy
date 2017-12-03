@@ -22,7 +22,7 @@ OBJS		= kernel/kernel.o kernel/start.o lib/klib.o lib/string.o
 DASMOUTPUT	= kernel.bin.asm
 
 # ALL Phony Targets
-.PHONY:everything final image clean realclean disasm all building
+.PHONY:everything final image clean realclean disasm all buildimg
 
 # Default starting position
 everything:$(ORANGESBOOT) $(ORANGESKERNEL)
@@ -31,16 +31,16 @@ all:realclean everything
 
 final:all clean
 
-image:final building
+image:final buildimg
 
 clean:
-	$(RM) $(OBJS)
+	$(RM) $(OBJS) 
 realclean:
-	$(RM) $(OBJS) $(ORANGESBOOT) $(ORANGESKERNEL)
+	$(RM) $(OBJS) $(ORANGESBOOT) $(ORANGESKERNEL) *.img
 disasm:
 	$(DASM) $(DASMFLAGS) $(ORANGESKERNEL) > $(DASMOUTPUT)
 
-buiding: boot.bin loader.bin kernel.bin
+buildimg:
 	dd if=/dev/zero of=blank.img bs=512 count=2880
 	cp blank.img pig.img
 	dd if=boot/boot.bin of=pig.img  bs=512 count=1 conv=notrunc
