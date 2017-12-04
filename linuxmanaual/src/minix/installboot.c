@@ -352,11 +352,18 @@ void extract_image(char *image)
   }
 }
 
+enum howto { FS, BOOT };
+
+void make_bootable(enum howto how, char *device, char *bootblock,
+		   char *bootcode, char **imagev){
+}
+
 int main(int argc, char *argv[]) {
   char image[50]="zj.img";
-  char *procv[2]={"/home/zj/git/os/minix/zj",,0};
+  char *procv[2]={"/home/zj/git/os/minix/zj",0};
   testsize();  
   //make_image(image,procv);
-  extract_image(image);
+  // extract_image(image);
+  make_bootable(FS,"/dev/fd0",image,image,procv);
   exit(EXIT_SUCCESS);
 }
