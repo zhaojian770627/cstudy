@@ -190,6 +190,29 @@ void padimage(char *image, FILE *imagef, int n)
 	}
 }
 
+#define align(n)	(((n) + ((SECTOR_SIZE) - 1)) & ~((SECTOR_SIZE) - 1))
+
+void copyexec(char *proc, FILE *procf, char *image, FILE *imagef, long n)
+/* Copy n bytes from proc to image padded to fill a sector. */
+{
+	int pad, c;
+
+	/* Compute number of padding bytes. */
+	pad= align(n) - n;
+
+	while (n > 0) {
+		if ((c= getc(procf)) == EOF) {
+			if (ferror(procf)) fatal(proc);
+			fprintf(stderr,	"installboot: premature EOF on %s\n",
+									proc);
+			exit(1);
+		}
+		if (putc(c, imagef) == EOF) fatal(image);
+		n--;
+	}
+	padimage(image, imagef, pad);
+}
+
 void make_image(char *image, char **procv){
   char *proc,*file;
   int procn;
@@ -237,6 +260,19 @@ void make_image(char *image, char **procv){
       phdr.a_text+= phdr.a_hdrlen;
     }
 
+    /* Copy text and data of proc to image. */
+    if (phdr.a_flags & A_SEP) {
+      /* Separate I&D: pad text & data separately. */
+
+      copyexec(proc, procf, image, imagef, phdr.a_text);
+      copyexec(proc, procf, image, imagef, phdr.a_data);
+    } else {
+      /* Common I&D: keep text and data together. */
+
+      copyexec(proc, procf, image, imagef,
+	       phdr.a_text + phdr.a_data);
+    }
+
     (void) fclose(procf);
   }
 
@@ -250,7 +286,7 @@ void make_image(char *image, char **procv){
 
 int main(int argc, char *argv[]) {
   char image[50]="zj.img";
-  char *procv[2]={"/home/zj/git/os/minix/zj",0};
+  char *procv[2]={"/home/zj/github/os/minix/zj",0};
   testsize();  
   make_image(image,procv);
   exit(EXIT_SUCCESS);
