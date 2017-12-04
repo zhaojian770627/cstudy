@@ -20,6 +20,7 @@
 #define A_I8086	0x04	/* intel i8086/8088 */
 
 /* Flags */
+#define A_PAL	0x02	/* page aligned executable */
 #define A_NSYM	0x04	/* new style symbol table */
 #define A_SEP	0x20	/* separate I/D */
 
@@ -229,6 +230,12 @@ void make_image(char *image, char **procv){
     bwrite(imagef, image, &ihdr, sizeof(ihdr));
 
     padimage(image, imagef, SECTOR_SIZE - sizeof(ihdr));
+
+    /* A page aligned executable needs the header in text. */
+    if (phdr.a_flags & A_PAL) {
+      rewind(procf);
+      phdr.a_text+= phdr.a_hdrlen;
+    }
 
     (void) fclose(procf);
   }
