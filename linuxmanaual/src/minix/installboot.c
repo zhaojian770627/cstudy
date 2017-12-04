@@ -284,10 +284,79 @@ void make_image(char *image, char **procv){
 	 total_text + total_data + total_bss);
 }
 
+void extractexec(FILE *imagef, char *image, FILE *procf, char *proc,
+						long count, off_t *alen)
+/* Copy a segment of an executable.  It is padded to a sector in image. */
+{
+	char buf[SECTOR_SIZE];
+
+	while (count > 0) {
+		bread(imagef, image, buf, sizeof(buf));
+		*alen-= sizeof(buf);
+
+		bwrite(procf, proc, buf,
+			count < sizeof(buf) ? (size_t) count : sizeof(buf));
+		count-= sizeof(buf);
+	}
+}
+
+void extract_image(char *image)
+/* Extract the executables from an image. */
+{
+  FILE *imagef, *procf;
+  off_t len;
+  struct stat st;
+  struct image_header ihdr;
+  struct exec phdr;
+  char buf[SECTOR_SIZE];
+
+  if (stat(image, &st) < 0) fatal(image);
+
+  /* Size of the image. */
+  len= S_ISREG(st.st_mode) ? st.st_size : -1;
+
+  if ((imagef= fopen(image, "r")) == nil) fatal(image);
+
+  while (len != 0) {
+    /* Extract a program, first sector is an extended header. */
+    bread(imagef, image, buf, sizeof(buf));
+    len-= sizeof(buf);
+
+    memcpy(&ihdr, buf, sizeof(ihdr));
+    phdr= ihdr.process;
+
+    /* Check header. */
+    read_header(1, ihdr.name, nil, &ihdr);
+
+    if ((procf= fopen(ihdr.name, "w")) == nil) fatal(ihdr.name);
+
+    if (phdr.a_flags & A_PAL) {
+      /* A page aligned process contains a header in text. */
+      phdr.a_text+= phdr.a_hdrlen;
+    } else {
+      bwrite(procf, ihdr.name, &ihdr.process, phdr.a_hdrlen);
+    }
+
+    /* Extract text and data segments. */
+    if (phdr.a_flags & A_SEP) {
+      extractexec(imagef, image, procf, ihdr.name,
+		  phdr.a_text, &len);
+      extractexec(imagef, image, procf, ihdr.name,
+		  phdr.a_data, &len);
+    } else {
+      extractexec(imagef, image, procf, ihdr.name,
+		  phdr.a_text + phdr.a_data, &len);
+    }
+
+    if (fclose(procf) == EOF) fatal(ihdr.name);
+  }
+}
+
 int main(int argc, char *argv[]) {
   char image[50]="zj.img";
-  char *procv[2]={"/home/zj/github/os/minix/zj",0};
+  char *procv[2]={"/home/zj/git/os/minix/zj",,0};
   testsize();  
-  make_image(image,procv);
+  //make_image(image,procv);
+  extract_image(image);
   exit(EXIT_SUCCESS);
 }
