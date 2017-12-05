@@ -11,7 +11,9 @@
 #include <sys/stat.h>  
 #include <errno.h>
 
+#define MAX_BLOCK_SIZE		 4096
 #define SECTOR_SIZE	512	/* Disk sector size. */
+#define BOOT_MAX	64	/* Absolute maximum size of secondary boot */
 
 #define nil 0
 #define IM_NAME_MAX	63
@@ -354,8 +356,22 @@ void extract_image(char *image)
 
 enum howto { FS, BOOT };
 
+/* Install bootblock on the bootsector of device with the disk addresses to
+ * bootcode patched into the data segment of bootblock.  "How" tells if there
+ * should or shoudn't be a file system on the disk.  The images in the imagev
+ * vector are added to the end of the device.
+ */
 void make_bootable(enum howto how, char *device, char *bootblock,
 		   char *bootcode, char **imagev){
+  char buf[MAX_BLOCK_SIZE + 256], *adrp, *parmp;
+  struct fileaddr {
+    off_t	address;
+    int	count;
+  } bootaddr[BOOT_MAX + 1], *bap= bootaddr;
+
+  /* Open device and set variables for readblock. */
+  if ((rawfd= open(rawdev= device, O_RDWR)) < 0) fatal(device);
+
 }
 
 int main(int argc, char *argv[]) {
