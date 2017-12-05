@@ -377,7 +377,8 @@ void make_bootable(enum howto how, char *device, char *bootblock,
 
   /* Open device and set variables for readblock. */
   if ((rawfd= open(rawdev= device, O_RDWR)) < 0) fatal(device);
-
+  /* Read and check the superblock. */
+  fssize= r_super(&block_size);
 }
 
 int main(int argc, char *argv[]) {
