@@ -4,12 +4,14 @@
  *  Created on: Sep 21, 2016
  *      Author: root
  */
-
+#include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <sys/stat.h>  
 #include <errno.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #define MAX_BLOCK_SIZE		 4096
 #define SECTOR_SIZE	512	/* Disk sector size. */
@@ -354,6 +356,10 @@ void extract_image(char *image)
   }
 }
 
+int rawfd;	/* File descriptor to open device. */
+char *rawdev;	/* Name of device. */
+
+
 enum howto { FS, BOOT };
 
 /* Install bootblock on the bootsector of device with the disk addresses to
@@ -376,10 +382,11 @@ void make_bootable(enum howto how, char *device, char *bootblock,
 
 int main(int argc, char *argv[]) {
   char image[50]="zj.img";
+  char device[50]="/dev/loop0";
   char *procv[2]={"/home/zj/git/os/minix/zj",0};
   testsize();  
   //make_image(image,procv);
   // extract_image(image);
-  make_bootable(FS,"/dev/fd0",image,image,procv);
+  make_bootable(FS,device,image,image,procv);
   exit(EXIT_SUCCESS);
 }
