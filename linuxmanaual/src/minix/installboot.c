@@ -28,6 +28,13 @@
 #define A_NSYM	0x04	/* new style symbol table */
 #define A_SEP	0x20	/* separate I/D */
 
+/* fs  */
+#define NR_SUPERS          8
+
+typedef unsigned long zone_t;
+typedef unsigned short zone1_t;
+typedef unsigned long  bit_t;	
+
 struct	exec {			/* a.out header */
   unsigned char	a_magic[2];	/* magic number */
   unsigned char	a_flags;	/* flags, see below */
@@ -48,6 +55,44 @@ struct	exec {			/* a.out header */
   long		a_tbase;	/* text relocation base */
   long		a_dbase;	/* data relocation base */
 };
+
+struct super_block {
+  ino_t s_ninodes;		/* # usable inodes on the minor device */
+  zone1_t  s_nzones;		/* total device size, including bit maps etc */
+  short s_imap_blocks;		/* # of blocks used by inode bit map */
+  short s_zmap_blocks;		/* # of blocks used by zone bit map */
+  zone1_t s_firstdatazone;	/* number of first data zone */
+  short s_log_zone_size;	/* log2 of blocks/zone */
+  short s_pad;			/* try to avoid compiler-dependent padding */
+  off_t s_max_size;		/* maximum file size on this device */
+  zone_t s_zones;		/* number of zones (replaces s_nzones in V2) */
+  short s_magic;		/* magic number to recognize super-blocks */
+
+  /* The following items are valid on disk only for V3 and above */
+
+  /* The block size in bytes. Minimum MIN_BLOCK SIZE. SECTOR_SIZE
+   * multiple. If V1 or V2 filesystem, this should be
+   * initialised to STATIC_BLOCK_SIZE. Maximum MAX_BLOCK_SIZE.
+   */
+  short s_pad2;			/* try to avoid compiler-dependent padding */
+  unsigned short s_block_size;	/* block size in bytes. */
+  char s_disk_version;		/* filesystem format sub-version */
+
+  /* The following items are only used when the super_block is in memory. */
+  struct inode *s_isup;		/* inode for root dir of mounted file sys */
+  struct inode *s_imount;	/* inode mounted on */
+  unsigned s_inodes_per_block;	/* precalculated from magic number */
+  dev_t s_dev;			/* whose super block is this? */
+  int s_rd_only;		/* set to 1 iff file sys mounted read only */
+  int s_native;			/* set to 1 iff not byte swapped file system */
+  int s_version;		/* file system version, zero means bad magic */
+  int s_ndzones;		/* # direct zones in an inode */
+  int s_nindirs;		/* # indirect zones per indirect block */
+  bit_t s_isearch;		/* inodes below this bit number are in use */
+  bit_t s_zsearch;		/* all zones below this bit number are in use*/
+} super_block[NR_SUPERS];
+
+static struct super_block super;	/* Superblock of file system */
 
 #define A_MAGIC0      (unsigned char) 0x01
 #define A_MAGIC1      (unsigned char) 0x03
@@ -98,6 +143,7 @@ void testsize()
   printf("unsigned char- %d\n",sizeof(unsigned char));
   printf("unsigned short- %d\n",sizeof(unsigned short));
   printf("long- %d\n",sizeof(long));
+  printf("off_t- %d\n",sizeof(off_t));
 }
 
 void bread(FILE *f, char *name, void *buf, size_t len)
@@ -356,11 +402,49 @@ void extract_image(char *image)
   }
 }
 
+
+
 int rawfd;	/* File descriptor to open device. */
 char *rawdev;	/* Name of device. */
 
+void readblock(off_t blk, char *buf, int block_size)
+/* For rawfs, so that it can read blocks. */
+{
+	int n;
+
+	if (lseek(rawfd, blk * block_size, SEEK_SET) < 0
+		|| (n= read(rawfd, buf, block_size)) < 0
+	) fatal(rawdev);
+
+	if (n < block_size) {
+		fprintf(stderr, "installboot: Unexpected EOF on %s\n", rawdev);
+		exit(1);
+	}
+}
 
 enum howto { FS, BOOT };
+
+static char dirbuf[MAX_BLOCK_SIZE];	/* Scratch/Directory block. */
+#define scratch dirbuf
+
+void showsuperinfo(struct super_block * p){
+
+}
+
+off_t r_super(int *bs){
+  /* Initialize variables, return size of file system in blocks,
+   * (zero on error).
+   */
+  /* Read superblock. (The superblock is always at 1kB offset,
+   * that's why we lie to readblock and say the block size is 1024
+   * and we want block number 1 (the 'second block', at offset 1kB).)
+   */
+  readblock(1, scratch, 1024);
+
+  memcpy(&super, scratch, sizeof(super));
+  showsuperinfo(&super);
+}
+
 
 /* Install bootblock on the bootsector of device with the disk addresses to
  * bootcode patched into the data segment of bootblock.  "How" tells if there
@@ -374,6 +458,8 @@ void make_bootable(enum howto how, char *device, char *bootblock,
     off_t	address;
     int	count;
   } bootaddr[BOOT_MAX + 1], *bap= bootaddr;
+  off_t addr, fssize, pos, len;
+  int block_size = 0;
 
   /* Open device and set variables for readblock. */
   if ((rawfd= open(rawdev= device, O_RDWR)) < 0) fatal(device);
