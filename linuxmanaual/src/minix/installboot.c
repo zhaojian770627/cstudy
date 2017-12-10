@@ -13,6 +13,14 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#define BYTE            0377
+#define FALSE 0
+
+
+typedef unsigned char   u8_t;	   /* 8 bit type */
+typedef unsigned short u16_t;	   /* 16 bit type */
+typedef unsigned long  u32_t;	   /* 32 bit type */
+
 #define MAX_BLOCK_SIZE		 4096
 #define SECTOR_SIZE	512	/* Disk sector size. */
 #define BOOT_MAX	64	/* Absolute maximum size of secondary boot */
@@ -29,11 +37,56 @@
 #define A_SEP	0x20	/* separate I/D */
 
 /* fs  */
-#define NR_SUPERS          8
+#define V1		   1	/* version number of V1 file systems */ 
+#define V2		   2	/* version number of V2 file systems */ 
+#define V3		   3	/* version number of V3 file systems */ 
 
+#define BYTE_SWAP          0	/* tells conv2/conv4 to swap bytes */
+
+#define NR_INODES         64
+#define V2_NR_TZONES      10
+#define NR_SUPERS          8
+#define SUPER_MAGIC   0x137F	/* magic number contained in super-block */
+#define SUPER_V1 SUPER_MAGIC		/* V1 magic has a weird name. */
+#define SUPER_V2      0x2468
+#define SUPER_V2_REV  0x6824
+#define SUPER_V3      0x4d5a
+#define MIN_BLOCK_SIZE		 1024
+#define STATIC_BLOCK_SIZE	1024
+
+#define V1_INODE_SIZE             usizeof (d1_inode)  /* bytes in V1 dsk ino */
+#define V1_ZONE_NUM_SIZE           usizeof (zone1_t)  /* # bytes in V1 zone  */
+#define V1_NR_DZONES       7
+#define V1_NR_TZONES       9	/* total # zone numbers in a V1 inode */
+
+#define V2_NR_DZONES       7
+#define V2_INODE_SIZE             usizeof (d2_inode)  /* bytes in V2 dsk ino */
+
+
+#define usizeof(t) ((unsigned) sizeof(t))
+
+#define V1_INODES_PER_BLOCK (STATIC_BLOCK_SIZE/V1_INODE_SIZE)
+#define V1_INDIRECTS (STATIC_BLOCK_SIZE/V1_ZONE_NUM_SIZE) 
+
+#define V2_ZONE_NUM_SIZE            usizeof (zone_t)  /* # bytes in V2 zone  */
+#define V2_INDIRECTS(b)   ((b)/V2_ZONE_NUM_SIZE)
+#define V2_INODES_PER_BLOCK(b) ((b)/V2_INODE_SIZE)/* # V2 dsk inodes/blk */
+#define	zone_shift	(super.s_log_zone_size)	/* zone to block ratio */
+
+
+/* types */
+#define time_t long
+
+typedef short          mdev_t;
+typedef unsigned long  mino_t;
+typedef unsigned short mmode_t;
 typedef unsigned long zone_t;
 typedef unsigned short zone1_t;
 typedef unsigned long  bit_t;	
+typedef short          muid_t;
+typedef char           mgid_t;
+typedef short        mnlink_t;
+typedef unsigned long moff_t;
 
 struct	exec {			/* a.out header */
   unsigned char	a_magic[2];	/* magic number */
@@ -56,15 +109,40 @@ struct	exec {			/* a.out header */
   long		a_dbase;	/* data relocation base */
 };
 
+struct inode {
+  mmode_t i_mode;		/* file type, protection, etc. */
+  mnlink_t i_nlinks;		/* how many links to this file */
+  muid_t i_uid;			/* user id of the file's owner */
+  mgid_t i_gid;			/* group number */
+  moff_t i_size;		/* current file size in bytes */
+  time_t i_atime;		/* time of last access (V2 only) */
+  time_t i_mtime;		/* when was file data last changed */
+  time_t i_ctime;		/* when was inode itself changed (V2 only)*/
+  zone_t i_zone[V2_NR_TZONES]; /* zone numbers for direct, ind, and dbl ind */
+  
+  /* The following items are not present on the disk. */
+  mdev_t i_dev;			/* which device is the inode on */
+  mino_t i_num;			/* inode number on its (minor) device */
+  int i_count;			/* # times inode used; 0 means slot is free */
+  int i_ndzones;		/* # direct zones (Vx_NR_DZONES) */
+  int i_nindirs;		/* # indirect zones per indirect block */
+  struct super_block *i_sp;	/* pointer to super block for inode's device */
+  char i_dirt;			/* CLEAN or DIRTY */
+  char i_pipe;			/* set to I_PIPE if pipe */
+  char i_mount;			/* this bit is set if file mounted on */
+  char i_seek;			/* set on LSEEK, cleared on READ/WRITE */
+  char i_update;		/* the ATIME, CTIME, and MTIME bits are here */
+} inode[NR_INODES];
+
 struct super_block {
-  ino_t s_ninodes;		/* # usable inodes on the minor device */
+  mino_t s_ninodes;		/* # usable inodes on the minor device */
   zone1_t  s_nzones;		/* total device size, including bit maps etc */
   short s_imap_blocks;		/* # of blocks used by inode bit map */
   short s_zmap_blocks;		/* # of blocks used by zone bit map */
   zone1_t s_firstdatazone;	/* number of first data zone */
   short s_log_zone_size;	/* log2 of blocks/zone */
   short s_pad;			/* try to avoid compiler-dependent padding */
-  off_t s_max_size;		/* maximum file size on this device */
+  moff_t s_max_size;		/* maximum file size on this device */
   zone_t s_zones;		/* number of zones (replaces s_nzones in V2) */
   short s_magic;		/* magic number to recognize super-blocks */
 
@@ -82,7 +160,7 @@ struct super_block {
   struct inode *s_isup;		/* inode for root dir of mounted file sys */
   struct inode *s_imount;	/* inode mounted on */
   unsigned s_inodes_per_block;	/* precalculated from magic number */
-  dev_t s_dev;			/* whose super block is this? */
+  mdev_t s_dev;			/* whose super block is this? */
   int s_rd_only;		/* set to 1 iff file sys mounted read only */
   int s_native;			/* set to 1 iff not byte swapped file system */
   int s_version;		/* file system version, zero means bad magic */
@@ -92,16 +170,77 @@ struct super_block {
   bit_t s_zsearch;		/* all zones below this bit number are in use*/
 } super_block[NR_SUPERS];
 
+/* Declaration of the V1 inode as it is on the disk (not in core). */
+typedef struct {		/* V1.x disk inode */
+  mmode_t d1_mode;		/* file type, protection, etc. */
+  muid_t d1_uid;			/* user id of the file's owner */
+  moff_t d1_size;		/* current file size in bytes */
+  time_t d1_mtime;		/* when was file data last changed */
+  u8_t d1_gid;			/* group number */
+  u8_t d1_nlinks;		/* how many links to this file */
+  u16_t d1_zone[V1_NR_TZONES];	/* block nums for direct, ind, and dbl ind */
+} d1_inode;
+
+/* Declaration of the V2 inode as it is on the disk (not in core). */
+typedef struct {		/* V2.x disk inode */
+  mmode_t d2_mode;		/* file type, protection, etc. */
+  u16_t d2_nlinks;		/* how many links to this file. HACK! */
+  muid_t d2_uid;			/* user id of the file's owner. */
+  u16_t d2_gid;			/* group number HACK! */
+  moff_t d2_size;		/* current file size in bytes */
+  time_t d2_atime;		/* when was file data last accessed */
+  time_t d2_mtime;		/* when was file data last changed */
+  time_t d2_ctime;		/* when was inode data last changed */
+  zone_t d2_zone[V2_NR_TZONES];	/* block nums for direct, ind, and dbl ind */
+} d2_inode;
+
 static struct super_block super;	/* Superblock of file system */
 
 #define A_MAGIC0      (unsigned char) 0x01
 #define A_MAGIC1      (unsigned char) 0x03
 #define BADMAG(X)     ((X).a_magic[0] != A_MAGIC0 ||(X).a_magic[1] != A_MAGIC1)
 
+/* File system parameters. */
+static unsigned nr_dzones;	/* Fill these in after reading superblock. */
+static unsigned nr_indirects;
+static unsigned inodes_per_block;
+static int block_size;
+
 struct image_header {
 	char		name[IM_NAME_MAX + 1];	/* Null terminated. */
 	struct exec	process;
 };
+
+
+/*===========================================================================*
+ *				conv2					     *
+ *===========================================================================*/
+unsigned conv2(norm, w)
+int norm;			/* TRUE if no swap, FALSE for byte swap */
+int w;				/* promotion of 16-bit word to be swapped */
+{
+/* Possibly swap a 16-bit word between 8086 and 68000 byte order. */
+  if (norm) return( (unsigned) w & 0xFFFF);
+  return( ((w&BYTE) << 8) | ( (w>>8) & BYTE));
+}
+
+/*===========================================================================*
+ *				conv4					     *
+ *===========================================================================*/
+long conv4(norm, x)
+int norm;			/* TRUE if no swap, FALSE for byte swap */
+long x;				/* 32-bit long to be byte swapped */
+{
+/* Possibly swap a 32-bit long between 8086 and 68000 byte order. */
+  unsigned lo, hi;
+  long l;
+  
+  if (norm) return(x);			/* byte order was already ok */
+  lo = conv2(FALSE, (int) x & 0xFFFF);	/* low-order half, byte swapped */
+  hi = conv2(FALSE, (int) (x>>16) & 0xFFFF);	/* high-order half, swapped */
+  l = ( (long) lo <<16) | hi;
+  return(l);
+}
 
 void report(char *label)
 /* installboot: label: No such file or directory */
@@ -144,6 +283,8 @@ void testsize()
   printf("unsigned short- %d\n",sizeof(unsigned short));
   printf("long- %d\n",sizeof(long));
   printf("off_t- %d\n",sizeof(off_t));
+  printf("inode size -%d\n",sizeof(struct inode));
+  printf("super_block size -%d\n",sizeof(struct super_block));
 }
 
 void bread(FILE *f, char *name, void *buf, size_t len)
@@ -428,7 +569,20 @@ static char dirbuf[MAX_BLOCK_SIZE];	/* Scratch/Directory block. */
 #define scratch dirbuf
 
 void showsuperinfo(struct super_block * p){
-
+  printf("------------------super----------------------\n");
+  printf("i节点个数:%ld\n",p->s_ninodes);
+  printf("total device size(not used):%d\n",p->s_nzones);
+  printf("i节点位图块的个数:%d\n",p->s_imap_blocks);
+  printf("区段位图块的个数:%d\n",p->s_zmap_blocks);
+  printf("第一个数据区段:%d\n",p->s_firstdatazone);
+  printf("块数或区段:%d\n",p->s_log_zone_size);
+  printf("填充位:%d\n",p->s_pad);
+  printf("最大文件尺寸:%lu\n",p->s_max_size);
+  printf("区段数:%ld\n",p->s_zones);
+  printf("模数:%X\n",p->s_magic);
+  printf("填充位2:%d\n",p->s_pad2);  
+  printf("块大小:%d\n",p->s_block_size);
+  printf("文件系统版本号:%d\n",p->s_disk_version);
 }
 
 off_t r_super(int *bs){
@@ -443,8 +597,53 @@ off_t r_super(int *bs){
 
   memcpy(&super, scratch, sizeof(super));
   showsuperinfo(&super);
+  /* Is it really a MINIX file system ? */
+  if (super.s_magic == SUPER_V2 || super.s_magic == SUPER_V3) {
+    if(super.s_magic == SUPER_V2)
+      super.s_block_size = 1024;
+    *bs = block_size = super.s_block_size;
+    if(block_size < MIN_BLOCK_SIZE ||
+       block_size > MAX_BLOCK_SIZE) {
+      return 0;
+    }
+    nr_dzones= V2_NR_DZONES;
+    nr_indirects= V2_INDIRECTS(block_size);
+    inodes_per_block= V2_INODES_PER_BLOCK(block_size);
+    return (off_t) super.s_zones << zone_shift;
+  } else
+    if (super.s_magic == SUPER_V1) {
+      *bs = block_size = 1024;
+      nr_dzones= V1_NR_DZONES;
+      nr_indirects= V1_INDIRECTS;
+      inodes_per_block= V1_INODES_PER_BLOCK;
+      return (off_t) super.s_nzones << zone_shift;
+    } else {
+      /* Filesystem not recognized as Minix. */
+      return 0;
+    }
 }
 
+int initsuper(struct super_block * sp){
+  int magic;
+  int version, native, r; 
+  magic = sp->s_magic;		/* determines file system type */
+
+  /* Get file system version and type. */
+  if (magic == SUPER_MAGIC || magic == conv2(BYTE_SWAP, SUPER_MAGIC)) {
+    version = V1;
+    native  = (magic == SUPER_MAGIC);
+  } else if (magic == SUPER_V2 || magic == conv2(BYTE_SWAP, SUPER_V2)) {
+    version = V2;
+    native  = (magic == SUPER_V2);
+  } else if (magic == SUPER_V3) {
+    version = V3;
+    native = 1;
+  } else {
+    return(EINVAL);
+  }
+  printf("version %d\n",version);
+
+}
 
 /* Install bootblock on the bootsector of device with the disk addresses to
  * bootcode patched into the data segment of bootblock.  "How" tells if there
@@ -465,6 +664,10 @@ void make_bootable(enum howto how, char *device, char *bootblock,
   if ((rawfd= open(rawdev= device, O_RDWR)) < 0) fatal(device);
   /* Read and check the superblock. */
   fssize= r_super(&block_size);
+
+  initsuper(&super);
+
+
 }
 
 int main(int argc, char *argv[]) {
