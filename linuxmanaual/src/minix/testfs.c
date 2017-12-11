@@ -8,7 +8,7 @@ void showsize()
   printf("off_t- %d\n",sizeof(off_t));
   printf("inode size -%d\n",sizeof(struct inode));
   printf("super_block size -%d\n",sizeof(struct super_block));
-
+}
 
 int main(int argc, char *argv[]) {
   char image[50]="zj.img";
