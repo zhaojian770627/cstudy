@@ -10,11 +10,15 @@ void showsize()
   printf("super_block size -%d\n",sizeof(struct super_block));
 }
 
+void getsuper(char *device){
+}
+
 int main(int argc, char *argv[]) {
   char image[50]="zj.img";
   char device[50]="/dev/loop0";
   char *procv[2]={"/home/zj/git/os/minix/zj",0};
   showsize();  
+  getsuper(device); 
   exit(EXIT_SUCCESS);
 }
 
