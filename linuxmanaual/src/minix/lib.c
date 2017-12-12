@@ -73,3 +73,9 @@ void showsuperinfo(struct super_block * p){
   printf("块大小:%d\n",p->s_block_size);
   printf("文件系统版本号:%d\n",p->s_disk_version);
 }
+
+/* Allocate a bit from a bit map and return its bit number. */
+bit_t alloc_bit(struct super_block *sp, int map, bit_t origin){
+  block_t start_block;		/* first bit block */
+  bit_t map_bits;		/* how many bits are there in the bit map? */
+}

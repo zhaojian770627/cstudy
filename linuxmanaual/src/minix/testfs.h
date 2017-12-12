@@ -31,6 +31,7 @@ typedef short          muid_t;
 typedef char           mgid_t;
 typedef short        mnlink_t;
 typedef unsigned long moff_t;
+typedef unsigned long block_t;	   /* block number */
 
 #define usizeof(t) ((unsigned) sizeof(t))
 
@@ -176,4 +177,5 @@ long conv4(int norm,long x);
 void readblock(moff_t blk, char *buf, int block_size);
 void showsuperinfo(struct super_block * p);
 
+bit_t alloc_bit(struct super_block *sp, int map, bit_t origin);
 #endif	/* __testfs_h */
