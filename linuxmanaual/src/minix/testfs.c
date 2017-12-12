@@ -121,7 +121,8 @@ void getsuper(char *device){
    */
   readblock(1, scratch, 1024);
   memcpy(&super, scratch, sizeof(super));
-
+  initsuper(&super);
+  showsuperinfo(&super);
 
 }
 
