@@ -126,7 +126,6 @@ void getsuper(char *device){
 }
 
 
-
 int main(int argc, char *argv[]) {
   char image[50]="zj.img";
   char device[50]="/dev/loop0";

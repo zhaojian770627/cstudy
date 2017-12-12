@@ -174,5 +174,6 @@ void fatal(char *label);
 unsigned conv2(int norm,int w);
 long conv4(int norm,long x);
 void readblock(moff_t blk, char *buf, int block_size);
+void showsuperinfo(struct super_block * p);
 
 #endif	/* __testfs_h */

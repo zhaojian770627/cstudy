@@ -56,3 +56,20 @@ void readblock(moff_t blk, char *buf, int block_size)
 		exit(1);
 	}
 }
+
+void showsuperinfo(struct super_block * p){
+  printf("------------------super----------------------\n");
+  printf("i节点个数:%ld\n",p->s_ninodes);
+  printf("total device size(not used):%d\n",p->s_nzones);
+  printf("i节点位图块的个数:%d\n",p->s_imap_blocks);
+  printf("区段位图块的个数:%d\n",p->s_zmap_blocks);
+  printf("第一个数据区段:%d\n",p->s_firstdatazone);
+  printf("块数或区段:%d\n",p->s_log_zone_size);
+  printf("填充位:%d\n",p->s_pad);
+  printf("最大文件尺寸:%lu\n",p->s_max_size);
+  printf("区段数:%ld\n",p->s_zones);
+  printf("模数:%X\n",p->s_magic);
+  printf("填充位2:%d\n",p->s_pad2);  
+  printf("块大小:%d\n",p->s_block_size);
+  printf("文件系统版本号:%d\n",p->s_disk_version);
+}
