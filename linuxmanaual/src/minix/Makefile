@@ -8,7 +8,11 @@ all:$(EXEF)
 testsize:testsize.o
 installboot:
 	gcc -g -m32 -o installboot installboot.c
-testfs:
-	gcc -g -m32 -o testfs testfs.c
+testfs:lib.o testfs.o
+	gcc -o testfs testfs.o lib.o
+testfs.o:
+	gcc -g -m32 -o testfs.o -c testfs.c
+lib.o:
+	gcc -g -m32 -o lib.o -c lib.c
 clean:
 	$(RM) *.o *.d $(EXEF)

@@ -11,6 +11,8 @@ void showsize()
 }
 
 void getsuper(char *device){
+  /* Open device and set variables for readblock. */
+  if ((rawfd= open(rawdev= device, O_RDWR)) < 0) fatal(device);
 }
 
 int main(int argc, char *argv[]) {

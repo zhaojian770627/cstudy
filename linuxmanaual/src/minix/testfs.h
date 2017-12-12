@@ -91,5 +91,11 @@ struct inode {
   char i_update;		/* the ATIME, CTIME, and MTIME bits are here */
 } inode[NR_INODES];
 
+int rawfd;	/* File descriptor to open device. */
+char *rawdev;	/* Name of device. */
+
+
+void report(char *label);
+void fatal(char *label);
 
 #endif	/* __testfs_h */
