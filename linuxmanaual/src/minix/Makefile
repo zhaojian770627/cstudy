@@ -9,7 +9,7 @@ testsize:testsize.o
 installboot:
 	gcc -g -m32 -o installboot installboot.c
 testfs:lib.o testfs.o
-	gcc -o testfs testfs.o lib.o
+	gcc -m32 -o testfs testfs.o lib.o
 testfs.o:
 	gcc -g -m32 -o testfs.o -c testfs.c
 lib.o:
