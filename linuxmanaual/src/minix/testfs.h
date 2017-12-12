@@ -159,6 +159,9 @@ struct inode {
   char i_update;		/* the ATIME, CTIME, and MTIME bits are here */
 } inode[NR_INODES];
 
+#define IMAP		0	/* operating on the inode bit map */
+#define START_BLOCK 	2		/* first block of FS (not counting SB) */
+
 
 int rawfd;	/* File descriptor to open device. */
 char *rawdev;	/* Name of device. */

@@ -74,8 +74,26 @@ void showsuperinfo(struct super_block * p){
   printf("文件系统版本号:%d\n",p->s_disk_version);
 }
 
+
+
 /* Allocate a bit from a bit map and return its bit number. */
 bit_t alloc_bit(struct super_block *sp, int map, bit_t origin){
   block_t start_block;		/* first bit block */
   bit_t map_bits;		/* how many bits are there in the bit map? */
+  unsigned bit_blocks;		/* how many blocks are there in the bit map? */
+  if (sp->s_rd_only)
+    fatal("error");
+
+  if (map == IMAP) {
+    start_block = START_BLOCK;
+    map_bits = sp->s_ninodes + 1;
+    bit_blocks = sp->s_imap_blocks;
+  } else {
+    start_block = START_BLOCK + sp->s_imap_blocks;
+    map_bits = sp->s_zones - (sp->s_firstdatazone - 1);
+    bit_blocks = sp->s_zmap_blocks;
+  }
+
+  return 0;
 }
+

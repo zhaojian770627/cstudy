@@ -133,6 +133,7 @@ int main(int argc, char *argv[]) {
   char *procv[2]={"/home/zj/git/os/minix/zj",0};
   showsize();  
   getsuper(device); 
+  alloc_bit(&super, IMAP, 0);
   exit(EXIT_SUCCESS);
 }
 
