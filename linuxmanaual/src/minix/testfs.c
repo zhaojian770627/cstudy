@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
   char device[50]="/dev/loop0";
   char *procv[2]={"/home/zj/git/os/minix/zj",0};
   showsize();  
-  //getsuper(device); 
+  getsuper(device); 
   exit(EXIT_SUCCESS);
 }
 
