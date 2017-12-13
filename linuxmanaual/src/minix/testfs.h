@@ -13,6 +13,7 @@
 #define OK            0
 #define BYTE            0377
 #define FALSE 0
+#define CHAR_BIT           8	/* # bits in a char */
 
 /* types */
 #define time_t long

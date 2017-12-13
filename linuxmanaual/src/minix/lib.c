@@ -82,6 +82,8 @@ bit_t alloc_bit(struct super_block *sp, int map, bit_t origin){
   bit_t map_bits;		/* how many bits are there in the bit map? */
   unsigned bit_blocks;		/* how many blocks are there in the bit map? */
   unsigned block, word, bcount;
+  bitchunk_t b__bitmap[FS_BITMAP_CHUNKS(MAX_BLOCK_SIZE)];  
+  bitchunk_t *wptr, *wlim, k;
 
   if (sp->s_rd_only)
     fatal("error");
@@ -102,6 +104,17 @@ bit_t alloc_bit(struct super_block *sp, int map, bit_t origin){
   /* Locate the starting place. */
   block = origin / FS_BITS_PER_BLOCK(sp->s_block_size);
   word = (origin % FS_BITS_PER_BLOCK(sp->s_block_size)) / FS_BITCHUNK_BITS;
+
+  /* Iterate over all blocks plus one, because we start in the middle. */
+  bcount = bit_blocks + 1;
+
+  printf("start_block+block:%ld\n",start_block+block);
+
+  do{
+    readblock(start_block + block,(char*)b__bitmap,sp->s_block_size);
+    wlim = &b__bitmap[FS_BITMAP_CHUNKS(sp->s_block_size)];
+    printf("---%d\n",b__bitmap[0]);
+  }while (--bcount > 0);
 
   return 0;
 }
