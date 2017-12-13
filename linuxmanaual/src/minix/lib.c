@@ -81,6 +81,8 @@ bit_t alloc_bit(struct super_block *sp, int map, bit_t origin){
   block_t start_block;		/* first bit block */
   bit_t map_bits;		/* how many bits are there in the bit map? */
   unsigned bit_blocks;		/* how many blocks are there in the bit map? */
+  unsigned block, word, bcount;
+
   if (sp->s_rd_only)
     fatal("error");
 
@@ -93,6 +95,13 @@ bit_t alloc_bit(struct super_block *sp, int map, bit_t origin){
     map_bits = sp->s_zones - (sp->s_firstdatazone - 1);
     bit_blocks = sp->s_zmap_blocks;
   }
+
+  /* Figure out where to start the bit search (depends on 'origin'). */
+  if (origin >= map_bits) origin = 0;	/* for robustness */
+
+  /* Locate the starting place. */
+  block = origin / FS_BITS_PER_BLOCK(sp->s_block_size);
+  word = (origin % FS_BITS_PER_BLOCK(sp->s_block_size)) / FS_BITCHUNK_BITS;
 
   return 0;
 }

@@ -32,6 +32,8 @@ typedef char           mgid_t;
 typedef short        mnlink_t;
 typedef unsigned long moff_t;
 typedef unsigned long block_t;	   /* block number */
+typedef unsigned short bitchunk_t; /* collection of bits in a bitmap */
+
 
 #define usizeof(t) ((unsigned) sizeof(t))
 
@@ -161,6 +163,11 @@ struct inode {
 
 #define IMAP		0	/* operating on the inode bit map */
 #define START_BLOCK 	2		/* first block of FS (not counting SB) */
+
+#define FS_BITCHUNK_BITS		(usizeof(bitchunk_t) * CHAR_BIT)
+#define FS_BITMAP_CHUNKS(b) ((b)/usizeof (bitchunk_t))/* # map chunks/blk   */
+#define FS_BITS_PER_BLOCK(b)	(FS_BITMAP_CHUNKS(b) * FS_BITCHUNK_BITS)
+
 
 
 int rawfd;	/* File descriptor to open device. */
