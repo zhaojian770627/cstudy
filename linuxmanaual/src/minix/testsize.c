@@ -14,6 +14,8 @@
 #define dma_bytes_left(phys)    \
    ((unsigned) (sizeof(int) == 2 ? 0 : 0x10000) - (unsigned) ((phys) & 0xFFFF))
 
+int buffer[512];
+
 int main(int argc, char *argv[]) {
   printf("1- %d\n",align(1));
   printf("2- %d\n",align(2));
@@ -21,6 +23,7 @@ int main(int argc, char *argv[]) {
   printf("513- %d\n",align(513));
   printf("1024- %d\n",align(1024));
   printf("1025- %d\n",align(1025));
+  printf("sizeof(buffer)- %ld\n",sizeof(buffer));
   printf("sizeof(int)- %ld\n",sizeof(int));
   printf("dma_bytes_left- %d\n",dma_bytes_left(0));
   exit(EXIT_SUCCESS);
