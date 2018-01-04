@@ -7,7 +7,8 @@ EXEF:=testsize cvul64m  #installboot testfs
 all:$(EXEF)
 cvul64m:
 	gcc -g -m32 -o cvul64m.o -c cvul64m.c
-	as --32 -g cvu64.s -o cvu64.o
+	#as --32 -g cvu64.s -o cvu64.o
+	nasm -f elf32 cvu64.asm -g -F stabs -o cvu64.o
 	gcc -g -m32 cvu64.o cvul64m.o -o cvul64m
 	#ld -m elf_i386 -s -o cvul64test cvul64test.o cvu64.o
 testsize:
