@@ -99,7 +99,7 @@ crb_create_array_i(CRB_Interpreter *inter,int size)
 }
 
 CRB_Object *
-CRB_create_array(CRB_Interpreter *inter,CRB_Localenvironment *env,
+CRB_create_array(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
 		 int size)
 {
   CRB_Object *ret;
@@ -196,7 +196,7 @@ gc_reset_mark(CRB_Object *obj)
 }
 
 static void
-gc_mark_ref_in_native_method(CRB_Localenvironment *env)
+gc_mark_ref_in_native_method(CRB_LocalEnvironment *env)
 {
   RefInNativeFunc *ref;
 
@@ -210,7 +210,7 @@ gc_mark_objects(CRB_Interpreter *inter)
 {
   CRB_Object *obj;
   Variable *v;
-  CRB_Localenvironment *lv;
+  CRB_LocalEnvironment *lv;
   int i;
 
   for(obj=inter->heap.header;obj;obj=obj->next){
