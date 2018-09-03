@@ -191,6 +191,18 @@ crb_create_minus_expression(Expression *operand)
 }
 
 Expression *
+crb_create_index_expression(Expression *array,Expression *index)
+{
+  Expression *exp;
+
+  exp=crb_alloc_expression(INDEX_EXPRESSION);
+  exp->u.index_expression.array=array;
+  exp->u.index_expression.index=index;
+
+  return exp;
+}
+
+Expression *
 crb_create_identifier_expression(char *identifier)
 {
   Expression *exp;
@@ -212,6 +224,20 @@ crb_create_function_call_expression(char *func_name,ArgumentList *argument)
 
   return exp;
 }
+
+Expression *
+crb_create_method_call_expression(Expression *expression,
+				  char *method_name,ArgumentList *argument)
+{
+  Expression *exp;
+  exp=crb_alloc_expression(METHOD_CALL_EXPRESSION);
+  exp->u.method_call_expression.expression=expression;
+  exp->u.method_call_expression.identifier=method_name;
+  exp->u.method_call_expression.argument=argument;
+
+  return exp;
+}
+
 
 Expression *
 crb_create_boolean_expression(CRB_Boolean value)

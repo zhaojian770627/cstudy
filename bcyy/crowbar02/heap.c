@@ -242,7 +242,7 @@ gc_mark_objects(CRB_Interpreter *inter)
 static void
 gc_dispose_object(CRB_Interpreter *inter,CRB_Object *obj)
 {
-  switch(obj->value){
+  switch(obj->type){
   case ARRAY_OBJECT:
     inter->heap.current_heap_size-=sizeof(CRB_Value)*obj->u.array.alloc_size;
     MEM_free(obj->u.array.array);
