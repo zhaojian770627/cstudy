@@ -384,7 +384,7 @@ ArgumentList *crb_chain_argument_list(ArgumentList *list,
 				      Expression *expr);
 ExpressionList *crb_create_expression_list(Expression *expression);
 ExpressionList *crb_chain_expression_list(ExpressionList *list,
-					  Expression expr);
+					  Expression *expr);
 StatementList *crb_create_statement_list(Statement *statement);
 StatementList *crb_chain_statement_list(StatementList *list,
 					Statement *statement);
