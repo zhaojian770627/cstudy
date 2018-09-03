@@ -63,7 +63,7 @@ crb_literal_to_crb_string(CRB_Interpreter *inter,char *str)
 CRB_Object *
 crb_create_crowbar_string_i(CRB_Interpreter *inter,char *str)
 {
-  CRB_Object *str;
+  CRB_Object *ret;
 
   ret=alloc_object(inter,STRING_OBJECT);
   ret->u.string.string=str;
