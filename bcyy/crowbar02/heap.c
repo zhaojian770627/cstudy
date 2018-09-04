@@ -12,7 +12,7 @@ check_gc(CRB_Interpreter *inter)
 #endif
   if(inter->heap.current_heap_size>inter->heap.current_threshold){
     /* fprintf(stderr,"garbage collecting..."); */
-    crb_garbate_collect(inter);
+    crb_garbage_collect(inter);
     /* fprintf(stderr,"done.\n"); */
     inter->heap.current_threshold
       =inter->heap.current_heap_size+HEAP_THRESHOLD_SIZE;
@@ -25,7 +25,7 @@ alloc_object(CRB_Interpreter *inter,ObjectType type)
   CRB_Object *ret;
 
   check_gc(inter);
-  ret=MEM_Malloc(sizeof(CRB_Object));
+  ret=MEM_malloc(sizeof(CRB_Object));
   inter->heap.current_heap_size+=sizeof(CRB_Object);
   ret->type=type;
   ret->marked=CRB_FALSE;
@@ -42,7 +42,7 @@ add_ref_in_native_method(CRB_LocalEnvironment *env,CRB_Object *obj)
 {
   RefInNativeFunc *new_ref;
 
-  new_ref=MEM_Malloc(sizeof(RefInNativeFunc));
+  new_ref=MEM_malloc(sizeof(RefInNativeFunc));
   new_ref->object=obj;
   new_ref->next=env->ref_in_native_method;
   env->ref_in_native_method=new_ref;
