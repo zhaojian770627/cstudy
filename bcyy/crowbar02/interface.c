@@ -58,7 +58,7 @@ CRB_interpret(CRB_Interpreter *interpreter)
   interpreter->execute_storage=MEM_open_storage(0);
   crb_add_std_fp(interpreter);
   crb_execute_statement_list(interpreter,NULL,interpreter->statement_list);
-crb_garbage_collect(interpreter);
+  crb_garbage_collect(interpreter);
 }
 
 static void

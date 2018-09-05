@@ -210,7 +210,7 @@ MEM_realloc_func(MEM_Controller controller,char *filename,
       error_handler(controller,filename,line,"realloc(malloc)");
     }else{
       error_handler(controller,filename,line,"realloc");
-	free(real_ptr);
+      free(real_ptr);
     }
   }
 #ifdef DEBUG
