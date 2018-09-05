@@ -938,6 +938,7 @@ eval_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
     break;
   case METHOD_CALL_EXPRESSION:
     eval_method_call_expression(inter,env,expr);
+    break;
   case NULL_EXPRESSION:
     eval_null_expression(inter);
     break;
