@@ -28,6 +28,13 @@ CRB_create_interpreter(void)
   interpreter->function_list=NULL;
   interpreter->statement_list=NULL;
   interpreter->current_line_number=1;
+  interpreter->stack.stack_alloc_size=0;
+  interpreter->stack.stack_pointer=0;
+  interpreter->stack.stack=MEM_malloc(sizeof(CRB_Value)*STACK_ALLOC_SIZE);
+  interpreter->heap.current_heap_size=0;
+  interpreter->heap.current_threshold=HEAP_THRESHOLD_SIZE;
+  interpreter->heap.header=NULL;
+  interpreter->top_environment=NULL;
 
   crb_set_current_interpreter(interpreter);
   add_native_functions(interpreter);
