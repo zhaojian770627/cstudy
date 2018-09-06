@@ -85,6 +85,11 @@ CRB_dispose_interpreter(CRB_Interpreter *interpreter)
   if(interpreter->execute_storage){
     MEM_dispose_storage(interpreter->execute_storage);
   }
+  interpreter->variable=NULL;
+  crb_garbage_collect(interpreter);
+  DBG_assert(interpreter->heap.current_heap_size==0,
+	     ("%d bytes leaked.\n",interpreter->heap.current_heap_size));
+  MEM_free(interpreter->stack.stack);
   MEM_dispose_storage(interpreter->interpreter_storage);
 }
 
