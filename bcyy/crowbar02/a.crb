@@ -1,1 +1,6 @@
-i=5;
+##########################
+# Check lexical analyzer
+#########################
+# comment
+print("hoge\tpiyo\n\\n");
+print("abc\n"); # comment

@@ -31,6 +31,7 @@ alloc_object(CRB_Interpreter *inter,ObjectType type)
   ret->marked=CRB_FALSE;
   ret->prev=NULL;
   ret->next=inter->heap.header;
+  inter->heap.header=ret;
   if(ret->next){
     ret->next->prev=ret;
   }
@@ -275,7 +276,7 @@ gc_sweep_objects(CRB_Interpreter *inter)
 	inter->heap.header=obj->next;
       }
       if(obj->next){
-	obj->prev=obj->prev;
+	obj->next->prev=obj->prev;
       }
       tmp=obj->next;
       gc_dispose_object(inter,obj);
