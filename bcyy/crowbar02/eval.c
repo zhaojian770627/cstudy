@@ -919,7 +919,7 @@ eval_expression(CRB_Interpreter *inter,CRB_LocalEnvironment *env,
   case GE_EXPRESSION:		/* FALLTHRU */
   case LT_EXPRESSION:		/* FALLTHRU */
   case LE_EXPRESSION:		/* FALLTHRU */
-    crb_eval_binary_expression(inter,env,
+    eval_binary_expression(inter,env,
 				 expr->type,
 				 expr->u.binary_expression.left,
 				 expr->u.binary_expression.right);
