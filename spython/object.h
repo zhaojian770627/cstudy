@@ -4,17 +4,30 @@
 extern "C" {
 #endif
 
-#define PyObject_HEAD \
-  int refCount;\
-  struct tagPyTypeObject *type;
+#define PyObject_HEAD				\
+  int refCount;					\
+  struct tagPyTypeObject *type
 
-#define PyObject_HEAD_INIT(typePtr) \
+#define PyObject_HEAD_INIT(typePtr)		\
   0,typePtr
 
-typedef struct tagPyObject
+  typedef struct tagPyObject
+  {
+    PyObject_HEAD;
+  }PyObject;
+
+  typedef void (*PrintFun)(PyObject* object);
+  typedef PyObject* (*AddFun)(PyObject* left,PyObject* right);
+  typedef long (*HashFun)(PyObject* object);
+
+typedef struct tagPyTypeObject
 {
   PyObject_HEAD;
-}PyObject;
+  char *name;
+  PrintFun print;
+  AddFun add;
+  HashFun hash;
+}PyTypeObject;
 
 #ifdef __cplusplus
 }
