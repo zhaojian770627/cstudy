@@ -3,6 +3,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include <stdio.h>
+#include <stdlib.h>
 
 #define PyObject_HEAD				\
   int refCount;					\
@@ -20,14 +22,16 @@ extern "C" {
   typedef PyObject* (*AddFun)(PyObject* left,PyObject* right);
   typedef long (*HashFun)(PyObject* object);
 
-typedef struct tagPyTypeObject
-{
-  PyObject_HEAD;
-  char *name;
-  PrintFun print;
-  AddFun add;
-  HashFun hash;
-}PyTypeObject;
+  typedef struct tagPyTypeObject
+  {
+    PyObject_HEAD;
+    char *name;
+    PrintFun print;
+    AddFun add;
+    HashFun hash;
+  }PyTypeObject;
+
+PyTypeObject PyType_Type;
 
 #ifdef __cplusplus
 }

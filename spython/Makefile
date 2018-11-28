@@ -5,7 +5,6 @@ CFLAGS+=-g
 OBJECTS=
 EXEF:=main
 all:$(EXEF)
-main:main.o
-
+main:main.o object.o intobject.o
 clean:
 	$(RM) *.o  $(EXEF)
