@@ -2,7 +2,17 @@
 #include "object.h"
 #include "stringobject.h"
 
-PyTypeObject PyString_Type;
+static void string_print(PyObject* object);
+static long string_hash(PyObject* object);
+static PyObject* string_add(PyObject* left,PyObject* right);
+
+PyTypeObject PyString_Type={
+  PyObject_HEAD_INIT(&PyType_Type),
+  "Str",
+  string_print,
+  string_add,
+  string_hash
+};
 
 PyObject* PyStr_Create(const char* value)
 {
@@ -58,11 +68,3 @@ static PyObject* string_add(PyObject* left,PyObject* right)
   }
   return (PyObject*)result;
 }
-
-PyTypeObject PyString_Type={
-  PyObject_HEAD_INIT(&PyType_Type),
-  "Str",
-  string_print,
-  string_add,
-  string_hash
-};

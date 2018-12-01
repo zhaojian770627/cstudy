@@ -1,4 +1,4 @@
-#
+# 如果cpp -lstdc++ 
 #GPATH=
 #VPATH=
 CFLAGS+=-g

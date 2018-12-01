@@ -31,7 +31,7 @@ extern "C" {
     HashFun hash;
   }PyTypeObject;
 
-PyTypeObject PyType_Type;
+extern PyTypeObject PyType_Type;
 
 #ifdef __cplusplus
 }
